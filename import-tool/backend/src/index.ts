@@ -4,6 +4,7 @@ import http from "http";
 import "dotenv/config";
 
 import { router } from "./routes";
+import { socketClients } from "./state";
 
 //------ Constants
 const PORT = process.env.API_PORT || 3001;
@@ -14,7 +15,6 @@ const app = express();
 const httpServer = http.createServer(app);
 
 //------ Socket.io
-const socketClients: { [key: string]: any } = {};
 const io = new Server(httpServer);
 io.on("connection", (socket) => {
   console.log("New client connected " + socket.id);
@@ -25,7 +25,7 @@ io.on("connection", (socket) => {
     delete socketClients[socket.id];
   });
 
-  // socket.emit("update", { processed: 0, failed: 0, total: 0 });
+  // socket.emit("importStats", { processed: 0, failed: 0, totalFiles: 0 });
 });
 //------
 

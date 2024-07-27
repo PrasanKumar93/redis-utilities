@@ -4,7 +4,12 @@ import fg from "fast-glob";
 const readFiles = async (
   include: string[],
   exclude: string[] = [],
-  recursiveCallback: (filePath: string, content: string) => void
+  recursiveCallback: (data: {
+    filePath: string;
+    content: string;
+    totalFiles: number;
+    error: any;
+  }) => Promise<void>
 ) => {
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
 
@@ -15,11 +20,24 @@ const readFiles = async (
       ignore: exclude,
     });
 
+    const totalFiles = filePaths.length;
     await Promise.all(
       filePaths.map(async (filePath) => {
-        const content = await fs.readFile(filePath, "utf8");
-        console.log(`Read file:  ${filePath}`);
-        recursiveCallback(filePath, content);
+        let content = "";
+        let error: any = null;
+        try {
+          content = await fs.readFile(filePath, "utf8");
+          console.log(`Read file:  ${filePath}`);
+        } catch (err) {
+          error = err;
+          console.error(`Error reading file:  ${filePath}`, err);
+        }
+        await recursiveCallback({
+          filePath,
+          content,
+          totalFiles,
+          error,
+        });
       })
     );
   }
