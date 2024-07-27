@@ -2,28 +2,15 @@ import { createClient } from "redis";
 
 type RedisClientType = ReturnType<typeof createClient>;
 
-// Singleton class to wrap the Redis client
 class RedisWrapper {
-  private static instance: RedisWrapper;
-  public client: RedisClientType | null = null;
+  client: RedisClientType | null = null;
 
-  private constructor(connectionURL?: string) {
+  constructor(connectionURL?: string) {
     this.client = createClient({ url: connectionURL });
     this.client.on("error", (err) => {
       console.error("Redis Client Error", err);
     });
   }
-
-  // --- static methods
-  public static setInstance(connectionURL: string) {
-    RedisWrapper.instance = new RedisWrapper(connectionURL);
-    return RedisWrapper.instance;
-  }
-
-  public static getInstance(): RedisWrapper {
-    return RedisWrapper.instance;
-  }
-  // ---
 
   public async connect() {
     await this.client?.connect();
@@ -52,17 +39,43 @@ class RedisWrapper {
   }
 }
 
-export default RedisWrapper;
+// Singleton class to wrap the Redis client
+class RedisWrapperST extends RedisWrapper {
+  private static instance: RedisWrapperST;
 
-/** Example Usage 
+  private constructor(connectionURL?: string) {
+    super(connectionURL);
+  }
+
+  public static setInstance(connectionURL: string) {
+    RedisWrapperST.instance = new RedisWrapperST(connectionURL);
+    return RedisWrapperST.instance;
+  }
+
+  public static getInstance(): RedisWrapperST {
+    return RedisWrapperST.instance;
+  }
+}
+
+export { RedisWrapper, RedisWrapperST };
+
+/** Example Usage (RedisWrapper)
  
-// on app start
-const redisWrapper = RedisWrapper.setInstance("redis://localhost:6379");
+const redisWrapper = new RedisWrapper("redis://localhost:6379");
 await redisWrapper.connect(); 
+// perform redis operations
+await redisWrapper.disconnect();
+//--------------------------------
+
+** Example Usage (RedisWrapperST)
+
+// on app start
+const redisWrapperST = RedisWrapperST.setInstance("redis://localhost:6379");
+await redisWrapperST.connect(); 
 
 // on app usage
-const redisWrapper = RedisWrapper.getInstance();
-await redisWrapper.set("key", "value");
-await redisWrapper.client.set("key", "value"); // direct access to client 
+const redisWrapperST = RedisWrapperST.getInstance();
+await redisWrapperST.set("key", "value");
+await redisWrapperST.client.set("key", "value"); // direct access to client 
 
 */
