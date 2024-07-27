@@ -21,8 +21,8 @@ const readFiles = async (
     });
 
     const totalFiles = filePaths.length;
-    await Promise.all(
-      filePaths.map(async (filePath) => {
+    if (filePaths?.length) {
+      for (const filePath of filePaths) {
         let content = "";
         let error: any = null;
         try {
@@ -38,8 +38,8 @@ const readFiles = async (
           totalFiles,
           error,
         });
-      })
-    );
+      }
+    }
   }
 };
 

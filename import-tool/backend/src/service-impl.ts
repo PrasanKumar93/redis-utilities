@@ -56,16 +56,22 @@ const importFilesToRedis = async (
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
 ) => {
   InputSchemas.importFilesToRedisSchema.parse(input); // validate input
+  let socketClient = input.socketId ? socketClients[input.socketId] : null;
 
   const stats = {
     totalFiles: 0,
     processed: 0,
     failed: 0,
+    startTime: 0,
+    endTime: 0,
+    totalTime: 0,
   };
   const redisWrapper = new RedisWrapper(input.redisConUrl);
   await redisWrapper.connect();
 
   const jsonGlob = getJSONGlob(input.serverFolderPath);
+
+  stats.startTime = performance.now();
 
   //async call
   let allFilesPromObj = readFiles(
@@ -83,14 +89,15 @@ const importFilesToRedis = async (
         console.log(`Added file: ${filePath}`);
       }
 
-      if (input.socketId) {
-        const socketClient = socketClients[input.socketId];
-        socketClient?.emit("importStats", stats);
-      }
+      socketClient?.emit("importStats", stats);
     }
   );
 
   allFilesPromObj = allFilesPromObj.then(() => {
+    stats.endTime = performance.now();
+    stats.totalTime = stats.endTime - stats.startTime;
+    console.log(`Time taken: ${stats.totalTime} ms`);
+    socketClient?.emit("importStats", stats);
     return redisWrapper.disconnect();
   });
 
