@@ -1,15 +1,17 @@
 import fs from "fs-extra";
 import fg from "fast-glob";
 
+interface IFileReaderData {
+  filePath: string;
+  content: string;
+  totalFiles: number;
+  error: any;
+}
+
 const readFiles = async (
   include: string[],
   exclude: string[] = [],
-  recursiveCallback: (data: {
-    filePath: string;
-    content: string;
-    totalFiles: number;
-    error: any;
-  }) => Promise<void>
+  recursiveCallback: (data: IFileReaderData) => Promise<void>
 ) => {
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
 
@@ -44,3 +46,5 @@ const readFiles = async (
 };
 
 export { readFiles };
+
+export type { IFileReaderData };

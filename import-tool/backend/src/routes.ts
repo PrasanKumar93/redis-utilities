@@ -10,12 +10,10 @@ router.post("/testRedisConnection", async (req: Request, res: Response) => {
     data: null,
     error: null,
   };
-  const { redisConUrl } = req.body;
+  const input = req.body;
 
   try {
-    result.data = await testRedisConnection({
-      redisConUrl,
-    });
+    result.data = await testRedisConnection(input);
   } catch (err) {
     console.error("/testRedisConnection API failed !", err);
     result.error = err;
@@ -30,14 +28,10 @@ router.post("/importFilesToRedis", async (req: Request, res: Response) => {
     data: null,
     error: null,
   };
-  const { redisConUrl, serverFolderPath, socketId } = req.body;
+  const input = req.body;
 
   try {
-    result.data = await importFilesToRedis({
-      redisConUrl,
-      serverFolderPath,
-      socketId,
-    });
+    result.data = await importFilesToRedis(input);
   } catch (err) {
     console.error("/importFilesToRedis API failed !", err);
     result.error = err;
