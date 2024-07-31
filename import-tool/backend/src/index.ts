@@ -2,6 +2,7 @@ import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 import "dotenv/config";
+import cors from "cors";
 
 import { router } from "./routes";
 import { socketClients } from "./state";
@@ -12,6 +13,7 @@ const API_PREFIX = "/api";
 //------
 
 const app = express();
+app.use(cors());
 const httpServer = http.createServer(app);
 
 //------ Socket.io

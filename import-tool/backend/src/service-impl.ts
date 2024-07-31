@@ -154,7 +154,7 @@ const importFilesToRedis = async (
 
   allFilesPromObj = allFilesPromObj.then(() => {
     stats.endTimeInMs = performance.now();
-    stats.totalTimeInMs = stats.endTimeInMs - stats.startTimeInMs;
+    stats.totalTimeInMs = Math.round(stats.endTimeInMs - stats.startTimeInMs);
     console.log(`Time taken: ${stats.totalTimeInMs} ms`);
 
     emitSocketMessages(socketClient, stats, null);
