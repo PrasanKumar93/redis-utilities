@@ -1,0 +1,88 @@
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.subHeader {
+    margin-bottom: 20px;
+}
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.progressBar {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress {
+    height: 24px;
+    background-color: #4caf50;
+    width: 0;
+    transition: width 0.4s;
+}
+
+
+
+.buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.buttonStart {
+    background-color: #4caf50;
+    color: white;
+}
+
+.buttonPause {
+    background-color: #ff9800;
+    color: white;
+}
+
+.buttonResume {
+    background-color: #2196f3;
+    color: white;
+}
+
+.buttonCancel {
+    background-color: #f44336;
+    color: white;
+}
+
+.importStatus {
+    margin-top: 10px;
+    padding: 10px;
+
+    background-color: bisque;
+}
+
+.errorLog {
+    background-color: lightcoral;
+    padding: 10px;
+}
