@@ -1,10 +1,66 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
+
 import styles from "./page.module.css";
 
 import { testRedisConnection, importFilesToRedis } from "../utils/services";
+import { config } from "../config";
 
+interface ImportStats {
+    totalFiles: number;
+    processed: 0,
+    failed: 0,
+    totalTimeInMs: 0
+}
+
+interface ImportFileError {
+    filePath: string;
+    error: any;
+}
+
+const useSocket = () => {
+    const [socketId, setSocketId] = useState<string>("");
+    const [displayStats, setDisplayStats] = useState<ImportStats>({
+        totalFiles: 0,
+        processed: 0,
+        failed: 0,
+        totalTimeInMs: 0
+    });
+    const [displayErrors, setDisplayErrors] = useState<ImportFileError[]>([]);
+
+    useEffect(() => {
+        const socket = io(config.SOCKET_IO_URL);
+
+        socket.on("connect", () => {
+            console.log("Browser connected to socket server " + socket.id);
+            setSocketId(socket.id || "");
+        });
+
+        socket.on("error", (error) => {
+            console.error("Socket error", error);
+        });
+
+        socket.on("importStats", (stats) => {
+            if (stats?.totalFiles) {
+                setDisplayStats(stats);
+            }
+        });
+
+        socket.on("importFileError", (info) => {
+            if (info?.filePath) {
+                setDisplayErrors((prev) => [...prev, info]);
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
+    return { socketId, displayStats, setDisplayStats, displayErrors };
+};
 
 
 const Page = () => {
@@ -14,20 +70,18 @@ const Page = () => {
     const [serverFolderPath, setServerFolderPath] = useState('');
     const [keyPrefix, setKeyPrefix] = useState('');
     const [idField, setIdField] = useState('');
+    const [isStopOnError, setIsStopOnError] = useState(false);
 
-    const [displayStats, setDisplayStats] = useState({
-        totalFiles: 0,
-        processed: 0,
-        failed: 0,
-        totalTimeInMs: 0
-    });
+    const { socketId, displayStats, setDisplayStats, displayErrors } = useSocket();
 
     const handleClickStart = async () => {
         const result = await importFilesToRedis({
             redisConUrl,
             serverFolderPath,
             keyPrefix,
-            idField
+            idField,
+            socketId,
+            isStopOnError
         });
         if (result?.data?.stats) {
             const stats = result.data.stats;
@@ -99,8 +153,14 @@ const Page = () => {
                     onChange={(e) => setIdField(e.target.value)}
                 />
             </div>
-            <div className={`${styles.inputGroup} ${styles.disabled}`}>
-                <label><input type="checkbox" /> Stop on error (NA) </label>
+            <div className={styles.inputGroup}>
+                <label>
+                    <input type="checkbox"
+                        checked={isStopOnError}
+                        onChange={(e) => setIsStopOnError(e.target.checked)}
+                    />
+                    Stop on error
+                </label>
             </div>
 
             <div className={`${styles.buttons}`}>
@@ -133,7 +193,12 @@ const Page = () => {
                 </pre>
             </div>
             <div id="errorLogs" className={styles.errorLog}>
-                Errors : (NA) <br />
+                Errors : (NA)
+                <pre>
+                    <code>
+                        {JSON.stringify(displayErrors, null, 2)}
+                    </code>
+                </pre>
             </div>
         </div>
     );

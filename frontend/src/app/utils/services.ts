@@ -13,6 +13,7 @@ const importFilesToRedisSchema = z.object({
   socketId: z.string().optional(),
   idField: z.string().optional(),
   keyPrefix: z.string().optional(),
+  isStopOnError: z.boolean().optional(),
 });
 
 //#endregion
