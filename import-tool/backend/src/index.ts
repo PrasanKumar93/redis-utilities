@@ -1,11 +1,12 @@
 import express from "express";
 import { Server } from "socket.io";
 import http from "http";
-import "dotenv/config";
 import cors from "cors";
+import "dotenv/config";
 
-import { router } from "./routes";
-import { socketClients } from "./state";
+import { router } from "./routes.js";
+import { socketClients } from "./state.js";
+import { LoggerCls } from "./utils/logger.js";
 
 //------ Constants
 const PORT = process.env.API_PORT || 3001;
@@ -13,17 +14,25 @@ const API_PREFIX = "/api";
 //------
 
 const app = express();
-app.use(cors());
+app.use(cors()); // express cors middleware
+
 const httpServer = http.createServer(app);
 
 //------ Socket.io
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+  },
+});
+
 io.on("connection", (socket) => {
-  console.log("New client connected " + socket.id);
+  LoggerCls.info("New client connected " + socket.id);
   socketClients[socket.id] = socket;
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected " + socket.id);
+    LoggerCls.info("Client disconnected " + socket.id);
     delete socketClients[socket.id];
   });
 
@@ -36,5 +45,5 @@ app.use(express.json());
 app.use(API_PREFIX, router);
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  LoggerCls.info(`Server running on port ${PORT}`);
 });

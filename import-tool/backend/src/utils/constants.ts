@@ -8,4 +8,4 @@ const CONSTANTS = {
   },
 };
 
-export { CONSTANTS as default };
+export { CONSTANTS };

@@ -1,6 +1,8 @@
 import fs from "fs-extra";
 import fg from "fast-glob";
 
+import { LoggerCls } from "./logger.js";
+
 interface IFileReaderData {
   filePath: string;
   content: string;
@@ -11,6 +13,7 @@ interface IFileReaderData {
 const readFiles = async (
   include: string[],
   exclude: string[] = [],
+  isStopOnError: boolean = false,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
 ) => {
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
@@ -29,10 +32,11 @@ const readFiles = async (
         let error: any = null;
         try {
           content = await fs.readFile(filePath, "utf8");
-          console.log(`Read file:  ${filePath}`);
+          content = JSON.parse(content);
         } catch (err) {
-          error = err;
-          console.error(`Error reading file:  ${filePath}`, err);
+          content = "";
+          error = LoggerCls.getPureError(err);
+          LoggerCls.error(`Error reading/ parsing file:  ${filePath}`, error);
         }
         await recursiveCallback({
           filePath,
@@ -40,6 +44,9 @@ const readFiles = async (
           totalFiles,
           error,
         });
+        if (error && isStopOnError) {
+          break;
+        }
       }
     }
   }

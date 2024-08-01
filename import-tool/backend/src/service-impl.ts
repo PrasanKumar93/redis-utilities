@@ -1,20 +1,20 @@
-import type { IFileReaderData } from "./utils/file-reader";
+import type { IFileReaderData } from "./utils/file-reader.js";
 
 import path from "path";
 import { z } from "zod";
 import _ from "lodash";
 
-import { RedisWrapper } from "./utils/redis";
-import { readFiles } from "./utils/file-reader";
-import * as InputSchemas from "./input-schema";
-import { socketClients } from "./state";
+import { RedisWrapper } from "./utils/redis.js";
+import { readFiles } from "./utils/file-reader.js";
+import { LoggerCls } from "./utils/logger.js";
+
+import * as InputSchemas from "./input-schema.js";
+import { socketClients } from "./state.js";
 
 interface IImportStats {
   totalFiles: number;
   processed: number;
   failed: number;
-  startTimeInMs: number;
-  endTimeInMs: number;
   totalTimeInMs: number;
 }
 
@@ -110,8 +110,6 @@ const processFileData = async (
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
 ) => {
   if (data?.content) {
-    data.content = JSON.parse(data.content);
-
     let key = getFileKey(
       data.filePath,
       input.idField,
@@ -119,7 +117,7 @@ const processFileData = async (
       input.keyPrefix
     );
     await redisWrapper.client?.json.set(key, ".", data.content);
-    console.log(`Added file: ${data.filePath}`);
+    LoggerCls.log(`Added file: ${data.filePath}`);
   }
 };
 
@@ -133,10 +131,10 @@ const importFilesToRedis = async (
     totalFiles: 0,
     processed: 0,
     failed: 0,
-    startTimeInMs: 0,
-    endTimeInMs: 0,
     totalTimeInMs: 0,
   };
+  let startTimeInMs = 0;
+  let endTimeInMs = 0;
   const fileErrors: any[] = [];
 
   const redisWrapper = new RedisWrapper(input.redisConUrl);
@@ -144,18 +142,23 @@ const importFilesToRedis = async (
 
   const jsonGlob = getJSONGlob(input.serverFolderPath);
 
-  stats.startTimeInMs = performance.now();
+  startTimeInMs = performance.now();
 
-  let allFilesPromObj: any = readFiles([jsonGlob], [], async (data) => {
-    await processFileData(data, redisWrapper, input);
-    updateStatsAndErrors(data, stats, fileErrors);
-    emitSocketMessages(socketClient, stats, data);
-  });
+  let allFilesPromObj: any = readFiles(
+    [jsonGlob],
+    [],
+    input.isStopOnError,
+    async (data) => {
+      await processFileData(data, redisWrapper, input);
+      updateStatsAndErrors(data, stats, fileErrors);
+      emitSocketMessages(socketClient, stats, data);
+    }
+  );
 
   allFilesPromObj = allFilesPromObj.then(() => {
-    stats.endTimeInMs = performance.now();
-    stats.totalTimeInMs = Math.round(stats.endTimeInMs - stats.startTimeInMs);
-    console.log(`Time taken: ${stats.totalTimeInMs} ms`);
+    endTimeInMs = performance.now();
+    stats.totalTimeInMs = Math.round(endTimeInMs - startTimeInMs);
+    LoggerCls.info(`Time taken: ${stats.totalTimeInMs} ms`);
 
     emitSocketMessages(socketClient, stats, null);
 

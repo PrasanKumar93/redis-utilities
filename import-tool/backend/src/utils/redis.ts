@@ -1,5 +1,7 @@
 import { createClient } from "redis";
 
+import { LoggerCls } from "./logger.js";
+
 type RedisClientType = ReturnType<typeof createClient>;
 
 class RedisWrapper {
@@ -8,18 +10,18 @@ class RedisWrapper {
   constructor(connectionURL?: string) {
     this.client = createClient({ url: connectionURL });
     this.client.on("error", (err) => {
-      console.error("Redis Client Error", err);
+      LoggerCls.error("Redis Client Error", err);
     });
   }
 
   public async connect() {
     await this.client?.connect();
-    console.log("Connected successfully to Redis !");
+    LoggerCls.info("Connected successfully to Redis !");
   }
 
   public async disconnect() {
     await this.client?.disconnect();
-    console.log("Disconnected from Redis.");
+    LoggerCls.info("Disconnected from Redis.");
   }
 
   public async set(_key: string, _value: string) {
