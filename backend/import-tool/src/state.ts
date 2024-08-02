@@ -1,3 +1,18 @@
-const socketClients: { [key: string]: any } = {};
+import type { IImportStats } from "./input-schema.js";
+import { Socket } from "socket.io";
 
-export { socketClients };
+interface IImportFilesState {
+  socketClient?: Socket;
+  filePaths?: string[];
+  filePathIndex?: number;
+  stats?: IImportStats;
+  fileErrors?: any[];
+}
+
+const socketState: {
+  [socketId: string]: IImportFilesState;
+} = {};
+
+export { socketState };
+
+export type { IImportFilesState };

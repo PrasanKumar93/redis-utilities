@@ -1,22 +1,18 @@
 import type { IFileReaderData } from "./utils/file-reader.js";
+import type { IImportStats } from "./input-schema.js";
+import type { IImportFilesState } from "./state.js";
 
 import path from "path";
 import { z } from "zod";
 import _ from "lodash";
+import { Socket } from "socket.io";
 
 import { RedisWrapper } from "./utils/redis.js";
 import { readFiles } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
 
 import * as InputSchemas from "./input-schema.js";
-import { socketClients } from "./state.js";
-
-interface IImportStats {
-  totalFiles: number;
-  processed: number;
-  failed: number;
-  totalTimeInMs: number;
-}
+import { socketState } from "./state.js";
 
 const testRedisConnection = async (
   input: z.infer<typeof InputSchemas.testRedisConnectionSchema>
@@ -68,30 +64,30 @@ const getFileKey = (
 
 const updateStatsAndErrors = (
   data: IFileReaderData,
-  stats: IImportStats,
-  fileErrors: any[]
+  storeStats?: IImportStats,
+  storeFileErrors?: any[]
 ) => {
-  if (data) {
-    stats.totalFiles = data.totalFiles;
+  if (data && storeStats && storeFileErrors) {
+    storeStats.totalFiles = data.totalFiles;
     if (data.error) {
-      stats.failed++;
+      storeStats.failed++;
 
       const fileError = {
         filePath: data.filePath,
         error: data.error,
       };
-      fileErrors.push(fileError);
+      storeFileErrors.push(fileError);
     } else {
-      stats.processed++;
+      storeStats.processed++;
     }
   }
 };
 const emitSocketMessages = (
-  socketClient: any,
-  stats: IImportStats,
-  data: IFileReaderData | null
+  socketClient?: Socket,
+  stats?: IImportStats,
+  data?: IFileReaderData
 ) => {
-  if (socketClient) {
+  if (socketClient && stats) {
     socketClient.emit("importStats", stats);
 
     if (data?.error) {
@@ -116,9 +112,39 @@ const processFileData = async (
       data.content,
       input.keyPrefix
     );
+
+    const isKeyExists = await redisWrapper.client?.exists(key);
     await redisWrapper.client?.json.set(key, ".", data.content);
-    LoggerCls.log(`Added file: ${data.filePath}`);
+    if (isKeyExists) {
+      LoggerCls.info(`Updated file: ${data.filePath}`);
+    } else {
+      LoggerCls.log(`Added file: ${data.filePath}`);
+    }
   }
+};
+
+const calcImportFilesTime = (
+  startTimeInMs: number,
+  importState: IImportFilesState
+) => {
+  if (importState?.stats) {
+    const endTimeInMs = performance.now();
+    importState.stats.totalTimeInMs = Math.round(endTimeInMs - startTimeInMs);
+    LoggerCls.info(`Time taken: ${importState.stats.totalTimeInMs} ms`);
+    emitSocketMessages(importState.socketClient, importState.stats);
+  }
+};
+
+const readEachFileCallback = async (
+  data: IFileReaderData,
+  redisWrapper: RedisWrapper,
+  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>,
+  importState: IImportFilesState
+) => {
+  await processFileData(data, redisWrapper, input);
+  updateStatsAndErrors(data, importState.stats, importState.fileErrors);
+  emitSocketMessages(importState.socketClient, importState.stats, data);
+  importState.filePathIndex = data.filePathIndex;
 };
 
 const importFilesToRedis = async (
@@ -126,16 +152,21 @@ const importFilesToRedis = async (
 ) => {
   InputSchemas.importFilesToRedisSchema.parse(input); // validate input
 
-  let socketClient = input.socketId ? socketClients[input.socketId] : null;
-  const stats: IImportStats = {
+  let startTimeInMs = 0;
+  let importState: IImportFilesState = {};
+
+  if (input.socketId && socketState[input.socketId]) {
+    importState = socketState[input.socketId];
+  }
+  importState.stats = {
     totalFiles: 0,
     processed: 0,
     failed: 0,
     totalTimeInMs: 0,
   };
-  let startTimeInMs = 0;
-  let endTimeInMs = 0;
-  const fileErrors: any[] = [];
+  importState.fileErrors = [];
+  importState.filePaths = [];
+  importState.filePathIndex = 0;
 
   const redisWrapper = new RedisWrapper(input.redisConUrl);
   await redisWrapper.connect();
@@ -148,33 +179,22 @@ const importFilesToRedis = async (
     [jsonGlob],
     [],
     input.isStopOnError,
+    importState.filePaths,
     async (data) => {
-      await processFileData(data, redisWrapper, input);
-      updateStatsAndErrors(data, stats, fileErrors);
-      emitSocketMessages(socketClient, stats, data);
+      await readEachFileCallback(data, redisWrapper, input, importState);
     }
   );
 
   allFilesPromObj = allFilesPromObj.then(() => {
-    endTimeInMs = performance.now();
-    stats.totalTimeInMs = Math.round(endTimeInMs - startTimeInMs);
-    LoggerCls.info(`Time taken: ${stats.totalTimeInMs} ms`);
-
-    emitSocketMessages(socketClient, stats, null);
-
+    calcImportFilesTime(startTimeInMs, importState);
     return redisWrapper.disconnect();
   });
 
-  if (socketClient) {
-    // if input.socketId exists, individual file stats/ error will be updated through socket messages
-    return {
-      message: "Importing files to Redis started !",
-    };
-  } else {
-    // For regular API call, return the final stats and errors
-    await allFilesPromObj;
-    return { stats, fileErrors };
-  }
+  await allFilesPromObj;
+  return {
+    stats: importState.stats,
+    fileErrors: importState.fileErrors,
+  };
 };
 
 //#endregion

@@ -1,11 +1,11 @@
 import express from "express";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import http from "http";
 import cors from "cors";
 import "dotenv/config";
 
 import { router } from "./routes.js";
-import { socketClients } from "./state.js";
+import { socketState } from "./state.js";
 import { LoggerCls } from "./utils/logger.js";
 
 //------ Constants
@@ -27,13 +27,16 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   LoggerCls.info("New client connected " + socket.id);
-  socketClients[socket.id] = socket;
+  if (!socketState[socket.id]) {
+    socketState[socket.id] = {};
+  }
+  socketState[socket.id].socketClient = socket;
 
   socket.on("disconnect", () => {
     LoggerCls.info("Client disconnected " + socket.id);
-    delete socketClients[socket.id];
+    delete socketState[socket.id];
   });
 
   // socket.emit("importStats", { processed: 0, failed: 0, totalFiles: 0 });

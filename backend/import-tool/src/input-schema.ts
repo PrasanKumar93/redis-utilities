@@ -12,3 +12,14 @@ export const importFilesToRedisSchema = z.object({
   keyPrefix: z.string().optional(),
   isStopOnError: z.boolean().optional(),
 });
+
+//--- types ---
+
+interface IImportStats {
+  totalFiles: number;
+  processed: number;
+  failed: number;
+  totalTimeInMs: number;
+}
+
+export type { IImportStats };

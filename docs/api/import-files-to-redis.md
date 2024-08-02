@@ -26,7 +26,7 @@ Note:
 
   - `isStopOnError` : If true, it will stop the import process if any error occurs.
 
-## Response (without socketId)
+## Response
 
 ```json
 {
@@ -43,17 +43,6 @@ Note:
         "error": "..."
       }
     ]
-  },
-  "error": null
-}
-```
-
-## Response ( with socketId)
-
-```json
-{
-  "data": {
-    "message": "Importing files to Redis started !"
   },
   "error": null
 }
