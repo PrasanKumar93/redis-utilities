@@ -16,6 +16,11 @@ const importFilesToRedisSchema = z.object({
   isStopOnError: z.boolean().optional(),
 });
 
+const resumeImportFilesToRedisSchema = z.object({
+  socketId: z.string(),
+  isStopOnError: z.boolean().optional(),
+});
+
 //#endregion
 
 //#region API calls
@@ -34,6 +39,14 @@ const importFilesToRedis = async (
   const response = await postRequest("/importFilesToRedis", input);
   return response?.data;
 };
+
+const resumeImportFilesToRedis = async (
+  input: z.infer<typeof resumeImportFilesToRedisSchema>
+) => {
+  resumeImportFilesToRedisSchema.parse(input); // validate input //TODO: handle catch
+  const response = await postRequest("/resumeImportFilesToRedis", input);
+  return response?.data;
+};
 //#endregion
 
-export { testRedisConnection, importFilesToRedis };
+export { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis };

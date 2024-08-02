@@ -5,7 +5,7 @@ import io from "socket.io-client";
 
 import styles from "./page.module.css";
 
-import { testRedisConnection, importFilesToRedis } from "../utils/services";
+import { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis } from "../utils/services";
 import { config } from "../config";
 
 interface ImportStats {
@@ -29,6 +29,7 @@ const useSocket = () => {
         totalTimeInMs: 0
     });
     const [displayErrors, setDisplayErrors] = useState<ImportFileError[]>([]);
+    const [displayStatus, setDisplayStatus] = useState('');
 
     useEffect(() => {
         const socket = io(config.SOCKET_IO_URL);
@@ -54,12 +55,23 @@ const useSocket = () => {
             }
         });
 
+        socket.on("importStatus", (status) => {
+            if (status) {
+                setDisplayStatus(status);
+            }
+        });
+
         return () => {
             socket.disconnect();
         };
     }, []);
 
-    return { socketId, displayStats, setDisplayStats, displayErrors };
+    return {
+        socketId,
+        displayStats, setDisplayStats,
+        displayErrors, setDisplayErrors,
+        displayStatus, setDisplayStatus
+    };
 };
 
 
@@ -72,9 +84,17 @@ const Page = () => {
     const [idField, setIdField] = useState('');
     const [isStopOnError, setIsStopOnError] = useState(false);
 
-    const { socketId, displayStats, setDisplayStats, displayErrors } = useSocket();
+
+    const {
+        socketId,
+        displayStats, setDisplayStats,
+        displayErrors, setDisplayErrors,
+        displayStatus, setDisplayStatus
+    } = useSocket();
 
     const handleClickStart = async () => {
+        setDisplayErrors([]);
+
         const result = await importFilesToRedis({
             redisConUrl,
             serverFolderPath,
@@ -84,8 +104,24 @@ const Page = () => {
             isStopOnError
         });
         if (result?.data?.stats) {
-            const stats = result.data.stats;
-            setDisplayStats(stats);
+            setDisplayStats(result.data.stats);
+        }
+        if (result?.data?.currentStatus) {
+            setDisplayStatus(result.data.currentStatus);
+        }
+    }
+
+    const handleClickResume = async () => {
+
+        const result = await resumeImportFilesToRedis({
+            socketId,
+            isStopOnError
+        });
+        if (result?.data?.stats) {
+            setDisplayStats(result.data.stats);
+        }
+        if (result?.data?.currentStatus) {
+            setDisplayStatus(result.data.currentStatus);
         }
     }
 
@@ -173,8 +209,9 @@ const Page = () => {
                     Pause (NA)
                 </button>
 
-                <button className={`${styles.button} ${styles.buttonResume}  ${styles.disabled}`} >
-                    Resume (NA)
+                <button className={`${styles.button} ${styles.buttonResume}`}
+                    onClick={handleClickResume}>
+                    Resume
                 </button>
 
                 <button className={`${styles.button} ${styles.buttonCancel}  ${styles.disabled}`} >
@@ -184,7 +221,7 @@ const Page = () => {
             </div>
 
             <div id="status" className={styles.importStatus}>
-                Status: In Progress*
+                Status: {displayStatus}
 
                 <pre>
                     <code>
