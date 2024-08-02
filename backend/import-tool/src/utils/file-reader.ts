@@ -60,6 +60,7 @@ const readFilesExt = async (
           filePathIndex,
         });
         if (error && isStopOnError) {
+          LoggerCls.error("Stopped on error");
           break;
         }
       }
@@ -67,6 +68,6 @@ const readFilesExt = async (
   }
 };
 
-export { readFiles };
+export { readFiles, readFilesExt };
 
 export type { IFileReaderData };

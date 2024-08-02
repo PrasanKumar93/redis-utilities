@@ -9,7 +9,7 @@ POST http://localhost:3001/api/importFilesToRedis
 "serverFolderPath":"/Users/user1/Documents/data/product-data",
 "keyPrefix":"products:",
 "idField":"meta.requestId"
-//,"socketId":""
+//,"socketId":"1"
 //,"isStopOnError":true
 }
 ```

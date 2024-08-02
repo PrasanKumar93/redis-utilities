@@ -13,6 +13,11 @@ export const importFilesToRedisSchema = z.object({
   isStopOnError: z.boolean().optional(),
 });
 
+export const resumeImportFilesToRedisSchema = z.object({
+  socketId: z.string(),
+  isStopOnError: z.boolean().optional(),
+});
+
 //--- types ---
 
 interface IImportStats {

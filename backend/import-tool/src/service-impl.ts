@@ -8,11 +8,11 @@ import _ from "lodash";
 import { Socket } from "socket.io";
 
 import { RedisWrapper } from "./utils/redis.js";
-import { readFiles } from "./utils/file-reader.js";
+import { readFiles, readFilesExt } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
 
 import * as InputSchemas from "./input-schema.js";
-import { socketState } from "./state.js";
+import { socketState, ImportStatus } from "./state.js";
 
 const testRedisConnection = async (
   input: z.infer<typeof InputSchemas.testRedisConnectionSchema>
@@ -82,20 +82,27 @@ const updateStatsAndErrors = (
     }
   }
 };
-const emitSocketMessages = (
-  socketClient?: Socket,
-  stats?: IImportStats,
-  data?: IFileReaderData
-) => {
-  if (socketClient && stats) {
-    socketClient.emit("importStats", stats);
+const emitSocketMessages = (info: {
+  socketClient?: Socket | null;
+  stats?: IImportStats;
+  data?: IFileReaderData;
+  currentStatus?: ImportStatus;
+}) => {
+  if (info?.socketClient) {
+    if (info.stats) {
+      info.socketClient.emit("importStats", info.stats);
+    }
 
-    if (data?.error) {
+    if (info.data?.error) {
       const fileError = {
-        filePath: data.filePath,
-        error: data.error,
+        filePath: info.data.filePath,
+        error: info.data.error,
       };
-      socketClient.emit("importFileError", fileError);
+      info.socketClient.emit("importFileError", fileError);
+    }
+
+    if (info.currentStatus) {
+      info.socketClient.emit("importStatus", info.currentStatus);
     }
   }
 };
@@ -123,7 +130,7 @@ const processFileData = async (
   }
 };
 
-const calcImportFilesTime = (
+const setImportTimeAndStatus = (
   startTimeInMs: number,
   importState: IImportFilesState
 ) => {
@@ -131,7 +138,23 @@ const calcImportFilesTime = (
     const endTimeInMs = performance.now();
     importState.stats.totalTimeInMs = Math.round(endTimeInMs - startTimeInMs);
     LoggerCls.info(`Time taken: ${importState.stats.totalTimeInMs} ms`);
-    emitSocketMessages(importState.socketClient, importState.stats);
+
+    if (importState.currentStatus != ImportStatus.ERROR_STOPPED) {
+      const failed = importState.stats.failed;
+      const processed = importState.stats.processed;
+      const totalFiles = importState.stats.totalFiles;
+      if (processed == totalFiles) {
+        importState.currentStatus = ImportStatus.SUCCESS;
+      } else {
+        importState.currentStatus = ImportStatus.PARTIAL_SUCCESS;
+      }
+    }
+
+    emitSocketMessages({
+      socketClient: importState.socketClient,
+      stats: importState.stats,
+      currentStatus: importState.currentStatus,
+    });
   }
 };
 
@@ -143,8 +166,16 @@ const readEachFileCallback = async (
 ) => {
   await processFileData(data, redisWrapper, input);
   updateStatsAndErrors(data, importState.stats, importState.fileErrors);
-  emitSocketMessages(importState.socketClient, importState.stats, data);
+  emitSocketMessages({
+    socketClient: importState.socketClient,
+    stats: importState.stats,
+    data,
+  });
   importState.filePathIndex = data.filePathIndex;
+
+  if (data?.error && input.isStopOnError) {
+    importState.currentStatus = ImportStatus.ERROR_STOPPED;
+  }
 };
 
 const importFilesToRedis = async (
@@ -155,9 +186,14 @@ const importFilesToRedis = async (
   let startTimeInMs = 0;
   let importState: IImportFilesState = {};
 
-  if (input.socketId && socketState[input.socketId]) {
+  if (input.socketId) {
+    if (!socketState[input.socketId]) {
+      socketState[input.socketId] = {};
+    }
     importState = socketState[input.socketId];
   }
+
+  importState.input = input;
   importState.stats = {
     totalFiles: 0,
     processed: 0,
@@ -174,6 +210,11 @@ const importFilesToRedis = async (
   const jsonGlob = getJSONGlob(input.serverFolderPath);
 
   startTimeInMs = performance.now();
+  importState.currentStatus = ImportStatus.IN_PROGRESS;
+  emitSocketMessages({
+    socketClient: importState.socketClient,
+    currentStatus: importState.currentStatus,
+  });
 
   let allFilesPromObj: any = readFiles(
     [jsonGlob],
@@ -186,7 +227,7 @@ const importFilesToRedis = async (
   );
 
   allFilesPromObj = allFilesPromObj.then(() => {
-    calcImportFilesTime(startTimeInMs, importState);
+    setImportTimeAndStatus(startTimeInMs, importState);
     return redisWrapper.disconnect();
   });
 
@@ -194,9 +235,65 @@ const importFilesToRedis = async (
   return {
     stats: importState.stats,
     fileErrors: importState.fileErrors,
+    currentStatus: importState.currentStatus,
+  };
+};
+
+const resumeImportFilesToRedis = async (
+  resumeInput: z.infer<typeof InputSchemas.resumeImportFilesToRedisSchema>
+) => {
+  InputSchemas.resumeImportFilesToRedisSchema.parse(resumeInput); // validate input
+
+  let startTimeInMs = 0;
+  let importState: IImportFilesState = {};
+  let allFilesPromObj: Promise<any> = Promise.resolve();
+
+  if (resumeInput.socketId && socketState[resumeInput.socketId]) {
+    importState = socketState[resumeInput.socketId];
+
+    if (importState.currentStatus == ImportStatus.IN_PROGRESS) {
+      throw new Error("Import is already in progress for this socketId");
+    }
+
+    if (importState.input && importState.filePaths?.length) {
+      importState.input.isStopOnError = resumeInput.isStopOnError;
+
+      let input = importState.input;
+
+      const redisWrapper = new RedisWrapper(input.redisConUrl);
+      await redisWrapper.connect();
+
+      startTimeInMs = performance.now();
+      importState.currentStatus = ImportStatus.IN_PROGRESS;
+      emitSocketMessages({
+        socketClient: importState.socketClient,
+        currentStatus: importState.currentStatus,
+      });
+
+      allFilesPromObj = readFilesExt(
+        importState.filePaths,
+        input.isStopOnError,
+        importState.filePathIndex,
+        async (data) => {
+          await readEachFileCallback(data, redisWrapper, input, importState);
+        }
+      );
+
+      allFilesPromObj = allFilesPromObj.then(() => {
+        setImportTimeAndStatus(startTimeInMs, importState);
+        return redisWrapper.disconnect();
+      });
+    }
+  }
+
+  await allFilesPromObj;
+  return {
+    stats: importState.stats,
+    fileErrors: importState.fileErrors,
+    currentStatus: importState.currentStatus,
   };
 };
 
 //#endregion
 
-export { testRedisConnection, importFilesToRedis };
+export { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis };
