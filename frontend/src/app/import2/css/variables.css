@@ -1,0 +1,101 @@
+.pg001-body {
+    /* common variables */
+
+    --space-2: 2px;
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+
+    --font-size-12: 12px;
+    --font-size-14: 14px;
+    --font-size-16: 16px;
+    --font-size-18: 18px;
+    --font-size-24: 24px;
+
+    --success-clr: #50ff50;
+    --error-clr: #ff0000;
+}
+
+.pg001-body {
+    /* default dark theme */
+
+    --primary-1: #ECF0FF;
+    --primary-clr-1: #000000;
+    --primary-2: #D6E3FF;
+    --primary-clr-2: #000000;
+    --primary-3: #8EACE3;
+    --primary-clr-3: #000000;
+    --primary-4: #7491C7;
+    --primary-clr-4: #ffffff;
+    --primary-5: #5A77AB;
+    --primary-clr-5: #ffffff;
+    --primary-6: #415F91;
+    --primary-clr-6: #ffffff;
+    --primary-7: #345284;
+    --primary-clr-7: #ffffff;
+    --primary-8: #284777;
+    --primary-clr-8: #ffffff;
+    --primary-9: #1A3B6B;
+    --primary-clr-9: #ffffff;
+    --primary-10: #0A305F;
+    --primary-clr-10: #ffffff;
+    --primary-11: #002551;
+    --primary-clr-11: #ffffff;
+
+    --secondary-1: #fdbb2d;
+    --secondary-clr-1: #000000;
+
+    --bg-1: var(--primary-4);
+    --bg-2: var(--primary-7);
+    --bg-3: var(--primary-9);
+    --bg-4: var(--primary-11);
+
+    --border: #d6d6d6;
+    --gradient-clr-1: #22c1c3;
+    --gradient-clr-2: #fdbb2d;
+    --gradient-clr: #000000;
+}
+
+.pg001-body.light-theme {
+    /* light theme */
+
+    --primary-1: #ffffff;
+    --primary-clr-1: #000000;
+    --primary-2: #FAFAFA;
+    --primary-clr-2: #000000;
+    --primary-3: #F5F5F5;
+    --primary-clr-3: #000000;
+    --primary-4: #EEEEEE;
+    --primary-clr-4: #000000;
+    --primary-5: #e8e7e7;
+    --primary-clr-5: #000000;
+    --primary-6: #E0E0E0;
+    --primary-clr-6: #000000;
+    --primary-7: #cfcdcd;
+    --primary-clr-7: #000000;
+    --primary-8: #BDBDBD;
+    --primary-clr-8: #000000;
+    --primary-9: #b0b0b0;
+    --primary-clr-9: #000000;
+    --primary-10: #9E9E9E;
+    --primary-clr-10: #000000;
+    --primary-11: #757575;
+    --primary-clr-11: #ffffff;
+
+    --secondary-1: #6D4C41;
+    --secondary-clr-1: #ffffff;
+
+
+    --bg-1: var(--primary-7);
+    --bg-2: var(--primary-6);
+    --bg-3: var(--primary-3);
+    --bg-4: var(--primary-1);
+
+    --border: var(--primary-10);
+    --gradient-clr-1: #8A2387;
+    --gradient-clr-2: #F27121;
+    --gradient-clr: #ffffff;
+
+    --success-clr: #00c500;
+}
