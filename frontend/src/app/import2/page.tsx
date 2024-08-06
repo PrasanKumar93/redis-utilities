@@ -1,121 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
+import React, { useState } from "react";
 
 import './css/typography.css';
 import './css/variables.css';
 import './css/page.css';
 
 import { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis } from "../utils/services";
-import { config } from "../config";
+import { IMPORT_ANIMATE_CSS, ImportStatus } from "../constants";
 
-interface ImportStats {
-    totalFiles: number;
-    processed: 0,
-    failed: 0,
-    totalTimeInMs: 0
-}
-
-interface ImportFileError {
-    filePath: string;
-    error: any;
-}
-
-
-const ANIMATION_CSS = {
-    CHOOSE_FOLDER_PATH: 'choose-folder-path',
-    SHOW_IMPORT_PROCESS_CTR: 'show-import-process-ctr',
-    IMPORT_START: 'import-start',
-    IMPORT_PAUSE: 'import-pause',
-    IMPORT_ERROR: 'import-error',
-    IMPORT_COMPLETE: 'import-complete'
-}
-
-enum ImportStatus {
-    IN_PROGRESS = "inProgress",
-    ERROR_STOPPED = "errorStopped",
-    SUCCESS = "success",
-    PARTIAL_SUCCESS = "partialSuccess",
-}
-
-
-const useSocket = () => {
-    const [socketId, setSocketId] = useState<string>("");
-    const [displayStats, setDisplayStats] = useState<ImportStats>({
-        totalFiles: 0,
-        processed: 0,
-        failed: 0,
-        totalTimeInMs: 0
-    });
-    const [displayErrors, setDisplayErrors] = useState<ImportFileError[]>([]);
-    const [displayStatus, setDisplayStatus] = useState('');
-    const [bodyClasses, setBodyClasses] = useState(new Set<string>());
-
-    const addBodyClass = (value: string) => {
-        setBodyClasses((prevSet) => {
-            const newSet = new Set(prevSet);
-            newSet.add(value);
-            return newSet;
-        });
-    };
-    const removeBodyClass = (value: string) => {
-        setBodyClasses((prevSet) => {
-            const newSet = new Set(prevSet);
-            newSet.delete(value);
-            return newSet;
-        });
-    };
-
-    useEffect(() => {
-        const socket = io(config.SOCKET_IO_URL);
-
-        socket.on("connect", () => {
-            console.log("Browser connected to socket server " + socket.id);
-            setSocketId(socket.id || "");
-        });
-
-        socket.on("error", (error) => {
-            console.error("Socket error", error);
-        });
-
-        socket.on("importStats", (stats) => {
-            if (stats?.totalFiles) {
-                setDisplayStats(stats);
-            }
-        });
-
-        socket.on("importFileError", (info) => {
-            if (info?.filePath) {
-                setDisplayErrors((prev) => [...prev, info]);
-            }
-        });
-
-        socket.on("importStatus", (status) => {
-            if (status) {
-                setDisplayStatus(status);
-
-                if (status == ImportStatus.ERROR_STOPPED) {
-                    addBodyClass(ANIMATION_CSS.IMPORT_PAUSE);
-                } else if (status == ImportStatus.SUCCESS || status == ImportStatus.PARTIAL_SUCCESS) {
-                    addBodyClass(ANIMATION_CSS.IMPORT_COMPLETE);
-                }
-            }
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
-
-    return {
-        socketId,
-        displayStats, setDisplayStats,
-        displayErrors, setDisplayErrors,
-        displayStatus, setDisplayStatus,
-        bodyClasses, addBodyClass, removeBodyClass
-    };
-};
+import { useSocket } from "./use-socket";
 
 
 const Page = () => {
@@ -135,47 +29,35 @@ const Page = () => {
         displayStats, setDisplayStats,
         displayErrors, setDisplayErrors,
         displayStatus, setDisplayStatus,
-        bodyClasses, addBodyClass, removeBodyClass
+        bodyClasses, setBodyClasses,
+        addToSet, removeFromSet
     } = useSocket();
 
 
+    const evtClickEnterConUrl = async () => {
 
-    const evtClickLogTab = (_clickedTabIndex: number) => {
-        const successTabElm = document.getElementById('tab-title-success');
-        const failedTabElm = document.getElementById('tab-title-failed');
-        const successContainerElm = document.getElementById('import-log-success-container');
-        const failedContainerElm = document.getElementById('import-log-error-container');
-
-        if (_clickedTabIndex != activeTabIndex) {
-            successTabElm?.classList.toggle('tab-title-active');
-            failedTabElm?.classList.toggle('tab-title-active');
-            successContainerElm?.classList.toggle('error-tab-container');
-            failedContainerElm?.classList.toggle('error-tab-container');
-            setActiveTabIndex(_clickedTabIndex);
-        }
-    }
-
-
-
-    const handleValidRedisConUrl = async () => {
         if (testRedisUrl) {
             setRedisConUrl("");
             const result = await testRedisConnection({ redisConUrl: testRedisUrl });
             if (result?.data) {
                 setRedisConUrl(testRedisUrl);
+
+                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
             }
 
         }
-    };
-    const evtClickEnterConUrl = async () => {
-
-        if (testRedisUrl) {
-            await handleValidRedisConUrl();
-            addBodyClass(ANIMATION_CSS.CHOOSE_FOLDER_PATH);
-        }
     }
 
-    const handleStart = async () => {
+    const evtClickEnterFolderPath = () => {
+
+        if (serverFolderPath) {
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
+            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
+        }
+
+    }
+
+    const startImportFiles = async () => {
         setDisplayErrors([]);
 
         const result = await importFilesToRedis({
@@ -193,7 +75,7 @@ const Page = () => {
             setDisplayStatus(result.data.currentStatus);
         }
     }
-    const handleResume = async () => {
+    const resumeImportFiles = async () => {
 
         const result = await resumeImportFilesToRedis({
             socketId,
@@ -209,49 +91,51 @@ const Page = () => {
     const evtClickPlayPause = async (isPlay: boolean) => {
 
         if (isPlay) {
-            removeBodyClass(ANIMATION_CSS.IMPORT_PAUSE);
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
 
             if (!displayStatus) { // first time
-                addBodyClass(ANIMATION_CSS.IMPORT_START);
+                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
 
-                await handleStart();
+                await startImportFiles();
 
             } else if (displayStatus == ImportStatus.ERROR_STOPPED) {
-                await handleResume();
+                await resumeImportFiles();
             }
         }
         else {
-            addBodyClass(ANIMATION_CSS.IMPORT_PAUSE);
+            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
         }
 
     }
     const evtClickCancel = () => {
+
+        const result = confirm("Do you want to cancel the import?");
+
+        if (result) {
+            alert("Import Cancelled - dummy alert");
+        }
+
     }
 
     const evtClickToggleTheme = () => {
 
-        if (bodyClasses.has('light-theme')) {
-            removeBodyClass('light-theme');
+        if (bodyClasses.has(IMPORT_ANIMATE_CSS.LIGHT_THEME)) {
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.LIGHT_THEME);
         }
         else {
-            addBodyClass('light-theme');
+            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.LIGHT_THEME);
         }
     }
 
-    const evtClickEnterFolderPath = () => {
 
-        if (serverFolderPath) {
-            removeBodyClass(ANIMATION_CSS.CHOOSE_FOLDER_PATH);
-            addBodyClass(ANIMATION_CSS.SHOW_IMPORT_PROCESS_CTR);
-        }
-
-    }
 
     return (
-        <div className={"pg001-body roboto-regular " + (displayErrors.length ? "import-error " : "")
+        <div className={"pg001-body roboto-regular "
+            + (displayErrors.length ? "import-error " : "")
             + Array.from(bodyClasses).join(" ")
         }
             id="pg001-body">
+
             <div className="pg001-outer-container">
                 <div className="heading roboto-black">
                     <i className="fas fa-file-import heading-icon"></i> <span>Import Tool</span>
@@ -265,9 +149,18 @@ const Page = () => {
                             placeholder="Enter Redis Connection URL"
                             className="con-url-textbox pg001-textbox"
                             value={testRedisUrl}
-                            onChange={(e) => setTestRedisUrl(e.target.value)} />
+                            onChange={(e) => setTestRedisUrl(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key.toLowerCase() === 'enter') {
+                                    evtClickEnterConUrl();
+                                }
+                            }}
+                            tabIndex={1}
+                        />
 
-                        <div className="fas fa-arrow-circle-right con-url-submit-icon enter" title="Enter" onClick={evtClickEnterConUrl}></div>
+                        <div className="fas fa-arrow-circle-right con-url-submit-icon enter"
+                            title="Next"
+                            onClick={evtClickEnterConUrl}></div>
                         <div className="fas fa-check-circle con-url-submit-icon done"></div>
                     </div>
                 </div>
@@ -282,9 +175,17 @@ const Page = () => {
                                 id="folder-path-textbox"
                                 value={serverFolderPath}
                                 onChange={(e) => setServerFolderPath(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key.toLowerCase() === 'enter') {
+                                        evtClickEnterFolderPath();
+                                    }
+                                }}
+                                tabIndex={2}
                             />
 
-                            <div className="fas fa-arrow-circle-right folder-path-submit-icon" onClick={(evt) => evtClickEnterFolderPath()}></div>
+                            <div className="fas fa-arrow-circle-right folder-path-submit-icon"
+                                title="Next"
+                                onClick={(evt) => evtClickEnterFolderPath()}></div>
                         </div>
 
 
@@ -307,23 +208,31 @@ const Page = () => {
 
                                         <div className="options-row">
                                             <div>
-                                                <div className="import-option-title roboto-medium">Enter key prefix</div>
+                                                <div className="import-option-title roboto-medium"> Key prefix</div>
 
-                                                <input type="text" placeholder="products:"
+                                                <input type="text" className="pg001-textbox"
+                                                    placeholder="products:"
                                                     value={keyPrefix}
                                                     onChange={(e) => setKeyPrefix(e.target.value)}
+                                                    tabIndex={3}
                                                 />
                                             </div>
                                             <div>
-                                                <div className="import-option-title roboto-medium">Enter ID field</div>
-                                                <input type="text" placeholder="productId"
+                                                <div className="import-option-title roboto-medium"> ID field</div>
+                                                <input type="text" className="pg001-textbox"
+                                                    placeholder="productId"
                                                     value={idField}
-                                                    onChange={(e) => setIdField(e.target.value)} />
+                                                    onChange={(e) => setIdField(e.target.value)}
+                                                    tabIndex={4}
+                                                />
                                             </div>
                                             <div className="options-col">
-                                                <input type="checkbox" id="import-check-stop-on-error"
+                                                <input type="checkbox" className="pg001-checkbox"
+                                                    id="import-check-stop-on-error"
                                                     checked={isStopOnError}
-                                                    onChange={(e) => setIsStopOnError(e.target.checked)} />
+                                                    onChange={(e) => setIsStopOnError(e.target.checked)}
+                                                    tabIndex={5}
+                                                />
                                                 <label htmlFor="import-check-stop-on-error" className="roboto-medium">Stop on error</label>
                                             </div>
                                         </div>
@@ -337,9 +246,30 @@ const Page = () => {
                                 </fieldset>
                             </div>
                             <div className="action-container fade-in-out-to-top">
-                                <div className="action-icons fas fa-play" title="Play" onClick={() => evtClickPlayPause(true)} ></div>
-                                <div className="action-icons fas fa-pause" title="Pause" onClick={() => evtClickPlayPause(false)} ></div>
-                                <div className="action-icons fas fa-ban" title="Cancel" onClick={evtClickCancel}></div>
+                                <div className="action-icons fas fa-play" title="Start/ Resume Import"
+                                    onClick={() => evtClickPlayPause(true)}
+                                    onKeyDown={(e) => {
+                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
+                                            evtClickPlayPause(true);
+                                        }
+                                    }}
+                                    tabIndex={6} ></div>
+                                <div className="action-icons fas fa-pause" title="Pause Import"
+                                    onClick={() => evtClickPlayPause(false)}
+                                    onKeyDown={(e) => {
+                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
+                                            evtClickPlayPause(false);
+                                        }
+                                    }}
+                                    tabIndex={7}></div>
+                                <div className="action-icons fas fa-ban" title="Cancel Import"
+                                    onClick={evtClickCancel}
+                                    onKeyDown={(e) => {
+                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
+                                            evtClickCancel();
+                                        }
+                                    }}
+                                    tabIndex={8}></div>
                             </div>
                             <div className="count-outer-container fade-in-out-to-top">
                                 <div className="count-container success-count-container">
@@ -358,14 +288,27 @@ const Page = () => {
                         <div className="import-process-right-container">
                             <div className="tabs-outer-container fade-in-out-to-left">
                                 <div className="tab-headings">
-                                    <div className="tab-title roboto-bold tab-title-active" id="tab-title-success" onClick={() => evtClickLogTab(0)}>Info</div>
-                                    <div className="tab-title roboto-bold" id="tab-title-failed" onClick={() => evtClickLogTab(1)}>Errors ({displayErrors.length}) </div>
+
+                                    <div className={"tab-title roboto-bold "
+                                        + (activeTabIndex == 0 ? "tab-title-active" : "")}
+                                        onClick={() => setActiveTabIndex(0)}>
+                                        Info
+                                    </div>
+
+                                    <div className={"tab-title roboto-bold "
+                                        + (activeTabIndex == 1 ? "tab-title-active" : "")}
+                                        onClick={() => setActiveTabIndex(1)}>
+                                        Errors ({displayErrors.length})
+                                    </div>
                                 </div>
-                                <div className="tab-container" id="import-log-success-container">
+                                <div className={"tab-container "
+                                    + (activeTabIndex == 1 ? "hide-tab-container" : "")}>
                                     Status : {displayStatus}
 
                                 </div>
-                                <div className="tab-container error-tab-container" id="import-log-error-container">
+                                <div className={"tab-container "
+                                    + (activeTabIndex == 0 ? "hide-tab-container" : "")}>
+
                                     {displayErrors.map((error, index) => (
                                         <div key={index} className="error-log">
                                             <div className="error-log-path">

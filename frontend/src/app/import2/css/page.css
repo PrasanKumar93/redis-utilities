@@ -10,12 +10,22 @@
     inherits: false;
 }
 
+.pg001-checkbox {
+    transform: scale(1.3);
+    margin: 10px;
+}
+
 .pg001-textbox {
     padding: var(--space-8);
     border: 1px solid var(--border);
     border-radius: 16px;
     margin-right: var(--space-8);
     outline: none;
+}
+
+.pg001-textbox::placeholder {
+    color: lightgrey;
+    /* opacity: 0.8; */
 }
 
 .pg001-single-line-label {
@@ -220,7 +230,7 @@
                     align-items: center;
                     justify-content: center;
                     column-gap: 48px;
-                    margin-top: var(--space-8);
+                    margin-top: var(--space-16);
                     animation: fade-in-out-to-top .5s 1s forwards;
 
                     .action-icons {
@@ -376,7 +386,7 @@
                         }
                     }
 
-                    .error-tab-container {
+                    .hide-tab-container {
                         display: none;
                     }
 
