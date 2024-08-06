@@ -1,3 +1,5 @@
+import type { IImportFilesState } from "../state.js";
+
 import fs from "fs-extra";
 import fg from "fast-glob";
 
@@ -15,24 +17,33 @@ const readFiles = async (
   exclude: string[] = [],
   isStopOnError: boolean = false,
   storeFilePaths: string[] = [],
+  importState: IImportFilesState | null = null,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
 ) => {
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
   if (include?.length) {
-    const filePaths = await fg(include, {
+    let filePaths = await fg(include, {
       caseSensitiveMatch: false,
       dot: true, // allow files that begin with a period (.)
       ignore: exclude,
     });
+
     storeFilePaths.push(...filePaths);
     let startIndex = 0;
-    await readFilesExt(filePaths, isStopOnError, startIndex, recursiveCallback);
+    await readFilesExt(
+      filePaths,
+      isStopOnError,
+      startIndex,
+      importState,
+      recursiveCallback
+    );
   }
 };
 const readFilesExt = async (
   filePaths: string[],
   isStopOnError: boolean = false,
   startIndex: number = 0,
+  importState: IImportFilesState | null = null,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
 ) => {
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
@@ -59,8 +70,12 @@ const readFilesExt = async (
           error,
           filePathIndex,
         });
+
         if (error && isStopOnError) {
           LoggerCls.error("Stopped on error");
+          break;
+        } else if (importState?.isPaused) {
+          LoggerCls.info("Paused on user request");
           break;
         }
       }

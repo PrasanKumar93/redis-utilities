@@ -30,7 +30,8 @@ const Page = () => {
         displayErrors, setDisplayErrors,
         displayStatus, setDisplayStatus,
         bodyClasses, setBodyClasses,
-        addToSet, removeFromSet
+        addToSet, removeFromSet,
+        pauseImportFilesToRedis
     } = useSocket();
 
 
@@ -88,34 +89,36 @@ const Page = () => {
             setDisplayStatus(result.data.currentStatus);
         }
     }
-    const evtClickPlayPause = async (isPlay: boolean) => {
+    const evtClickPlay = async () => {
 
-        if (isPlay) {
-            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
+        removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
 
-            if (!displayStatus) { // first time
-                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
+        if (!displayStatus) { // first time
+            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
 
-                await startImportFiles();
+            await startImportFiles();
 
-            } else if (displayStatus == ImportStatus.ERROR_STOPPED) {
-                await resumeImportFiles();
-            }
+        } else if (displayStatus != ImportStatus.IN_PROGRESS) {
+            await resumeImportFiles();
         }
-        else {
-            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
-        }
+
 
     }
-    const evtClickCancel = () => {
 
-        const result = confirm("Do you want to cancel the import?");
-
-        if (result) {
-            alert("Import Cancelled - dummy alert");
-        }
-
+    const evtClickPause = () => {
+        addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
+        pauseImportFilesToRedis();
     }
+
+    // const evtClickCancel = () => {
+
+    //     const result = confirm("Do you want to cancel the import?");
+
+    //     if (result) {
+    //         alert("Import Cancelled - dummy alert");
+    //     }
+
+    // }
 
     const evtClickToggleTheme = () => {
 
@@ -246,30 +249,34 @@ const Page = () => {
                                 </fieldset>
                             </div>
                             <div className="action-container fade-in-out-to-top">
-                                <div className="action-icons fas fa-play" title="Start/ Resume Import"
-                                    onClick={() => evtClickPlayPause(true)}
-                                    onKeyDown={(e) => {
-                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
-                                            evtClickPlayPause(true);
-                                        }
-                                    }}
-                                    tabIndex={6} ></div>
-                                <div className="action-icons fas fa-pause" title="Pause Import"
-                                    onClick={() => evtClickPlayPause(false)}
-                                    onKeyDown={(e) => {
-                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
-                                            evtClickPlayPause(false);
-                                        }
-                                    }}
-                                    tabIndex={7}></div>
-                                <div className="action-icons fas fa-ban" title="Cancel Import"
+                                {displayStatus != ImportStatus.IN_PROGRESS ? (
+                                    <div className="action-icons fas fa-play" title="Start/ Resume Import"
+                                        onClick={() => evtClickPlay()}
+                                        onKeyDown={(e) => {
+                                            if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
+                                                evtClickPlay();
+                                            }
+                                        }}
+                                        tabIndex={6} ></div>
+                                ) : (
+                                    <div className="action-icons fas fa-pause" title="Pause Import"
+                                        onClick={() => evtClickPause()}
+                                        onKeyDown={(e) => {
+                                            if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
+                                                evtClickPause();
+                                            }
+                                        }}
+                                        tabIndex={7}></div>
+                                )}
+
+                                {/* <div className="action-icons fas fa-ban" title="Cancel Import"
                                     onClick={evtClickCancel}
                                     onKeyDown={(e) => {
                                         if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
                                             evtClickCancel();
                                         }
                                     }}
-                                    tabIndex={8}></div>
+                                    tabIndex={8}></div> */}
                             </div>
                             <div className="count-outer-container fade-in-out-to-top">
                                 <div className="count-container success-count-container">

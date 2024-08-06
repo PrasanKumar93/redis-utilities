@@ -139,7 +139,7 @@ const setImportTimeAndStatus = (
     importState.stats.totalTimeInMs = Math.round(endTimeInMs - startTimeInMs);
     LoggerCls.info(`Time taken: ${importState.stats.totalTimeInMs} ms`);
 
-    if (importState.currentStatus != ImportStatus.ERROR_STOPPED) {
+    if (importState.currentStatus == ImportStatus.IN_PROGRESS) {
       const failed = importState.stats.failed;
       const processed = importState.stats.processed;
       const totalFiles = importState.stats.totalFiles;
@@ -175,6 +175,8 @@ const readEachFileCallback = async (
 
   if (data?.error && input.isStopOnError) {
     importState.currentStatus = ImportStatus.ERROR_STOPPED;
+  } else if (importState.isPaused) {
+    importState.currentStatus = ImportStatus.PAUSED;
   }
 };
 
@@ -210,6 +212,7 @@ const importFilesToRedis = async (
   const jsonGlob = getJSONGlob(input.serverFolderPath);
 
   startTimeInMs = performance.now();
+  importState.isPaused = false;
   importState.currentStatus = ImportStatus.IN_PROGRESS;
   emitSocketMessages({
     socketClient: importState.socketClient,
@@ -221,6 +224,7 @@ const importFilesToRedis = async (
     [],
     input.isStopOnError,
     importState.filePaths,
+    importState,
     async (data) => {
       await readEachFileCallback(data, redisWrapper, input, importState);
     }
@@ -258,12 +262,20 @@ const resumeImportFilesToRedis = async (
     if (importState.input && importState.filePaths?.length) {
       importState.input.isStopOnError = resumeInput.isStopOnError;
 
+      //if error occurred, resume from last file
+      let filePathIndex = importState.filePathIndex || 0;
+      if (importState.currentStatus == ImportStatus.PAUSED) {
+        // if paused, resume from next file
+        filePathIndex++;
+      }
+
       let input = importState.input;
 
       const redisWrapper = new RedisWrapper(input.redisConUrl);
       await redisWrapper.connect();
 
       startTimeInMs = performance.now();
+      importState.isPaused = false;
       importState.currentStatus = ImportStatus.IN_PROGRESS;
       emitSocketMessages({
         socketClient: importState.socketClient,
@@ -273,7 +285,8 @@ const resumeImportFilesToRedis = async (
       allFilesPromObj = readFilesExt(
         importState.filePaths,
         input.isStopOnError,
-        importState.filePathIndex,
+        filePathIndex,
+        importState,
         async (data) => {
           await readEachFileCallback(data, redisWrapper, input, importState);
         }

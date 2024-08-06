@@ -11,6 +11,7 @@ const IMPORT_ANIMATE_CSS = {
 enum ImportStatus {
   IN_PROGRESS = "inProgress",
   ERROR_STOPPED = "errorStopped",
+  PAUSED = "paused",
   SUCCESS = "success",
   PARTIAL_SUCCESS = "partialSuccess",
 }

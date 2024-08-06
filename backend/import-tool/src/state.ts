@@ -8,6 +8,7 @@ import * as InputSchemas from "./input-schema.js";
 enum ImportStatus {
   IN_PROGRESS = "inProgress",
   ERROR_STOPPED = "errorStopped",
+  PAUSED = "paused",
   SUCCESS = "success",
   PARTIAL_SUCCESS = "partialSuccess",
 }
@@ -20,6 +21,7 @@ interface IImportFilesState {
   fileErrors?: any[];
   input?: z.infer<typeof InputSchemas.importFilesToRedisSchema>;
   currentStatus?: ImportStatus;
+  isPaused?: boolean;
 }
 
 const socketState: {

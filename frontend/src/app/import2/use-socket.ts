@@ -1,7 +1,7 @@
 import type { ImportStats, ImportFileError } from "../types";
 
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
+import React, { useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 
 import { config } from "../config";
 import { IMPORT_ANIMATE_CSS, ImportStatus } from "../constants";
@@ -32,13 +32,15 @@ const useSocket = () => {
   const [displayErrors, setDisplayErrors] = useState<ImportFileError[]>([]);
   const [displayStatus, setDisplayStatus] = useState("");
   const [bodyClasses, setBodyClasses] = useState(new Set<string>());
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io(config.SOCKET_IO_URL);
+    socketRef.current = io(config.SOCKET_IO_URL);
+    const socket = socketRef.current;
 
     socket.on("connect", () => {
-      console.log("Browser connected to socket server " + socket.id);
-      setSocketId(socket.id || "");
+      console.log("Browser connected to socket server " + socket?.id);
+      setSocketId(socket?.id || "");
     });
 
     socket.on("error", (error) => {
@@ -73,9 +75,14 @@ const useSocket = () => {
     });
 
     return () => {
-      socket.disconnect();
+      socket?.disconnect();
     };
   }, []);
+
+  const pauseImportFilesToRedis = () => {
+    const socket = socketRef.current;
+    socket?.emit("pauseImportFilesToRedis", true);
+  };
 
   return {
     socketId,
@@ -89,6 +96,7 @@ const useSocket = () => {
     setBodyClasses,
     addToSet,
     removeFromSet,
+    pauseImportFilesToRedis,
   };
 };
 

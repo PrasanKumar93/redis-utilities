@@ -34,6 +34,11 @@ io.on("connection", (socket: Socket) => {
   }
   socketState[socket.id].socketClient = socket;
 
+  socket.on("pauseImportFilesToRedis", (message) => {
+    LoggerCls.info("socket onPauseImportFilesToRedis " + message);
+    socketState[socket.id].isPaused = true;
+  });
+
   socket.on("disconnect", () => {
     LoggerCls.info("Client disconnected " + socket.id);
     delete socketState[socket.id];
