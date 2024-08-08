@@ -8,13 +8,14 @@ import './css/page.css';
 
 import { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis } from "../utils/services";
 import { IMPORT_ANIMATE_CSS, ImportStatus } from "../constants";
+import { config } from "../config";
 
 import { useSocket } from "./use-socket";
 
 
 const Page = () => {
 
-    const [testRedisUrl, setTestRedisUrl] = useState('');
+    const [testRedisUrl, setTestRedisUrl] = useState(config.DEFAULT_REDIS_URL);
 
     const [redisConUrl, setRedisConUrl] = useState('');
     const [serverFolderPath, setServerFolderPath] = useState('');

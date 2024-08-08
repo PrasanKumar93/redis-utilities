@@ -19,8 +19,8 @@ const getRequest = async (
     const response = await axiosInstance.get(url, config);
     return response;
   } catch (error) {
-    console.error("GET request error:", error);
-    throw error; //TODO: handle error notification
+    console.error("GET request error:", url, error);
+    throw error;
   }
 };
 
@@ -33,8 +33,8 @@ const postRequest = async (
     const response = await axiosInstance.post(url, data, config);
     return response;
   } catch (error) {
-    console.error("POST request error:", error);
-    throw error; //TODO: handle error notification
+    console.error("POST request error:", url, error);
+    throw error;
   }
 };
 

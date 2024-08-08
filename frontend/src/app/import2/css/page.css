@@ -2,6 +2,7 @@
     width: 100%;
     display: flex;
     font-size: var(--font-size-12);
+    overflow: hidden;
 }
 
 @property --angle {
@@ -81,8 +82,10 @@
             width: 40%;
 
             .con-url-lbl {
-                display: none;
+                display: flex;
                 margin-right: var(--space-4);
+                font-size: var(--font-size-14);
+                color: var(--primary-clr-6);
             }
 
             .con-url-textbox {
@@ -405,11 +408,6 @@
         margin-top: var(--space-8);
 
         color: var(--primary-clr-6);
-
-        .con-url-lbl {
-            display: flex !important;
-            font-size: var(--font-size-14);
-        }
 
         .con-url-textbox {
             background: transparent;

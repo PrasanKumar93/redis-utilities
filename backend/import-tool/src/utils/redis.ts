@@ -8,7 +8,19 @@ class RedisWrapper {
   client: RedisClientType | null = null;
 
   constructor(connectionURL?: string) {
-    this.client = createClient({ url: connectionURL });
+    this.client = createClient({
+      url: connectionURL,
+      socket: {
+        reconnectStrategy: (retries) => {
+          if (retries > 3) {
+            // Limit to 3 retry attempts
+            return new Error("Retry attempts exhausted.");
+          }
+          // Retry after ms
+          return 10;
+        },
+      },
+    });
     this.client.on("error", (err) => {
       LoggerCls.error("Redis Client Error", err);
     });

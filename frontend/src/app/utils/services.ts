@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { postRequest } from "./axios-util";
 
+import { errorToast } from "./toast-util";
+
 //#region API input schema
 const testRedisConnectionSchema = z.object({
   redisConUrl: z.string(),
@@ -27,25 +29,40 @@ const resumeImportFilesToRedisSchema = z.object({
 const testRedisConnection = async (
   input: z.infer<typeof testRedisConnectionSchema>
 ) => {
-  testRedisConnectionSchema.parse(input); // validate input //TODO: handle catch
-  const response = await postRequest("/testRedisConnection", input);
-  return response?.data;
+  try {
+    testRedisConnectionSchema.parse(input); // validate input
+    const response = await postRequest("/testRedisConnection", input);
+    return response?.data;
+  } catch (error) {
+    errorToast("Error in /testRedisConnection API");
+    console.error(error);
+  }
 };
 
 const importFilesToRedis = async (
   input: z.infer<typeof importFilesToRedisSchema>
 ) => {
-  importFilesToRedisSchema.parse(input); // validate input //TODO: handle catch
-  const response = await postRequest("/importFilesToRedis", input);
-  return response?.data;
+  try {
+    importFilesToRedisSchema.parse(input); // validate input
+    const response = await postRequest("/importFilesToRedis", input);
+    return response?.data;
+  } catch (error) {
+    errorToast("Error in /importFilesToRedis API");
+    console.error(error);
+  }
 };
 
 const resumeImportFilesToRedis = async (
   input: z.infer<typeof resumeImportFilesToRedisSchema>
 ) => {
-  resumeImportFilesToRedisSchema.parse(input); // validate input //TODO: handle catch
-  const response = await postRequest("/resumeImportFilesToRedis", input);
-  return response?.data;
+  try {
+    resumeImportFilesToRedisSchema.parse(input); // validate input
+    const response = await postRequest("/resumeImportFilesToRedis", input);
+    return response?.data;
+  } catch (error) {
+    errorToast("Error in /resumeImportFilesToRedis API");
+    console.error(error);
+  }
 };
 //#endregion
 
