@@ -10,6 +10,7 @@ import { Socket } from "socket.io";
 import { RedisWrapper } from "./utils/redis.js";
 import { readFiles, readFilesExt } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
+import { runJSFunction } from "./utils/validate-js.js";
 
 import * as InputSchemas from "./input-schema.js";
 import { socketState, ImportStatus } from "./state.js";
@@ -309,4 +310,29 @@ const resumeImportFilesToRedis = async (
 
 //#endregion
 
-export { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis };
+const testJSONFormatterFn = async (
+  input: z.infer<typeof InputSchemas.testJSONFormatterFnSchema>
+) => {
+  InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
+
+  const functionString = `function userFunction(jsonObj){
+          
+          ${input.jsFunctionBody}
+
+          return jsonObj;
+}`;
+  const functionResult = await runJSFunction(
+    functionString,
+    input.paramsObj,
+    true
+  );
+
+  return functionResult;
+};
+
+export {
+  testRedisConnection,
+  importFilesToRedis,
+  resumeImportFilesToRedis,
+  testJSONFormatterFn,
+};

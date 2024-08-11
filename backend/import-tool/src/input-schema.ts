@@ -18,6 +18,11 @@ export const resumeImportFilesToRedisSchema = z.object({
   isStopOnError: z.boolean().optional(),
 });
 
+export const testJSONFormatterFnSchema = z.object({
+  jsFunctionBody: z.string(),
+  paramsObj: z.record(z.string(), z.any()),
+});
+
 //--- types ---
 
 interface IImportStats {

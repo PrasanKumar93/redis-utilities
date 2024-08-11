@@ -30,4 +30,14 @@ class LoggerCls {
   }
 }
 
-export { LoggerCls };
+class CustomErrorCls extends Error {
+  userMessage: string;
+
+  constructor(message: string, userMessage?: string) {
+    super(message);
+    this.userMessage = userMessage || "";
+    this.name = "CustomError";
+  }
+}
+
+export { LoggerCls, CustomErrorCls };
