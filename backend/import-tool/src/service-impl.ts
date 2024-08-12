@@ -11,6 +11,7 @@ import { RedisWrapper } from "./utils/redis.js";
 import { readFiles, readFilesExt } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
 import { runJSFunction } from "./utils/validate-js.js";
+import { DISABLE_JS_FLAGS } from "./utils/constants.js";
 
 import * as InputSchemas from "./input-schema.js";
 import { socketState, ImportStatus } from "./state.js";
@@ -324,7 +325,7 @@ const testJSONFormatterFn = async (
   const functionResult = await runJSFunction(
     functionString,
     input.paramsObj,
-    true
+    DISABLE_JS_FLAGS
   );
 
   return functionResult;

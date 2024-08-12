@@ -1,93 +1,116 @@
+import type { DisableJsFlagsType } from "./constants.ts";
+
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 
 import { LoggerCls, CustomErrorCls } from "./logger.js";
+import { DISABLE_JS_DATA, DISABLE_JS_FLAGS } from "./constants.js";
 
-const disallowedJSConstructs = [
-  "window",
-  "document",
-  "global",
-  "process",
-  "eval",
-  "setTimeout",
-  "setInterval",
-  "fetch",
-  "XMLHttpRequest",
-  "require",
-  "module",
-  "exports",
-  "console",
-];
+//#region private functions
 
-const hasNestedFunction = (ast: acorn.Node): boolean => {
-  let nestedFunctionFound = false;
+const getCheckNamesAndConstructs = (df: DisableJsFlagsType) => {
+  const CHECK_NAMES = [
+    ...(df.NAMES_GLOBAL ? DISABLE_JS_DATA.NAMES_GLOBAL : []),
+    ...(df.NAMES_DANGEROUS ? DISABLE_JS_DATA.NAMES_DANGEROUS : []),
+    ...(df.NAMES_TIME_INTERVALS ? DISABLE_JS_DATA.NAMES_TIME_INTERVALS : []),
+    ...(df.NAMES_NETWORK ? DISABLE_JS_DATA.NAMES_NETWORK : []),
+    ...(df.NAMES_MODULES ? DISABLE_JS_DATA.NAMES_MODULES : []),
+    ...(df.NAMES_CONSOLE ? DISABLE_JS_DATA.NAMES_CONSOLE : []),
+  ];
 
-  const checkNestedFunctions = (node: acorn.Node) => {
-    if (nestedFunctionFound) return;
+  const CHECK_CONSTRUCTS = [
+    ...(df.LOOPS ? DISABLE_JS_DATA.CONSTRUCT_LOOPS : []),
+  ];
 
-    if (
-      node.type === "FunctionDeclaration" ||
-      node.type === "FunctionExpression" ||
-      node.type === "ArrowFunctionExpression"
-    ) {
-      // Walk the children of the current function node
-      walk.simple(node, {
-        FunctionDeclaration(childNode) {
-          nestedFunctionFound = true;
-        },
-        FunctionExpression(childNode) {
-          nestedFunctionFound = true;
-        },
-        ArrowFunctionExpression(childNode) {
-          nestedFunctionFound = true;
-        },
-      });
+  return { CHECK_NAMES, CHECK_CONSTRUCTS };
+};
+
+//#endregion
+
+const validateJS = (
+  code: string,
+  disableFlags?: DisableJsFlagsType
+): boolean => {
+  let isValid = true;
+  let error: any | null = null;
+  let functionCount = 0;
+  const disallowedArr: string[] = [];
+
+  if (!disableFlags) {
+    disableFlags = DISABLE_JS_FLAGS;
+  }
+
+  const { CHECK_NAMES, CHECK_CONSTRUCTS } =
+    getCheckNamesAndConstructs(disableFlags);
+
+  const addDisallowedName = (node: acorn.Identifier) => {
+    //node?.name = variable names, function names, etc.
+    if (CHECK_NAMES.includes(node.name)) {
+      disallowedArr.push(node.name);
     }
   };
 
-  walk.simple(ast, {
-    FunctionDeclaration: checkNestedFunctions,
-    FunctionExpression: checkNestedFunctions,
-    ArrowFunctionExpression: checkNestedFunctions,
-  });
+  const addDisallowedConstruct = (node: acorn.Node) => {
+    if (CHECK_CONSTRUCTS.includes(node.type)) {
+      disallowedArr.push(node.type);
+    }
+  };
 
-  return nestedFunctionFound;
-};
+  const incrementFunctionCount = (node: acorn.Node) => {
+    functionCount++;
+  };
 
-const validateJS = (code: string, disallowNestedFn: boolean): boolean => {
-  let isValid = true;
-  let error: any | null = null;
+  const addDisallowedArrayLoops = (node: acorn.CallExpression) => {
+    if (
+      node.callee.type === "MemberExpression" &&
+      node.callee.property.type === "Identifier"
+    ) {
+      const methodName = node.callee.property.name;
+      const arrayLoops = DISABLE_JS_DATA.CALL_EXPRESSION_ARRAY_LOOPS;
+      if (arrayLoops.includes(methodName)) {
+        disallowedArr.push(`Array.${methodName}`);
+      }
+    }
+  };
 
   try {
     // Parse the code to check for syntax errors  and generate an AST
     const ast = acorn.parse(code, { ecmaVersion: 2020 });
 
-    // Traverse the AST to check for disallowed constructs
-    const disallowedNames: string[] = [];
+    // Traverse the AST to check for disallowed name & constructs
     walk.simple(ast, {
-      Identifier(node) {
-        //node?.name = variable names, function names, etc.
-        if (disallowedJSConstructs.includes(node.name)) {
-          disallowedNames.push(node.name);
-        }
+      Identifier: addDisallowedName,
+
+      ForStatement: addDisallowedConstruct,
+      WhileStatement: addDisallowedConstruct,
+      DoWhileStatement: addDisallowedConstruct,
+      ForInStatement: addDisallowedConstruct,
+      ForOfStatement: addDisallowedConstruct,
+
+      FunctionDeclaration: incrementFunctionCount,
+      FunctionExpression: incrementFunctionCount,
+      ArrowFunctionExpression: incrementFunctionCount,
+
+      CallExpression(node) {
+        addDisallowedArrayLoops(node);
       },
     });
 
-    if (disallowedNames.length > 0) {
+    if (disallowedArr.length > 0) {
+      isValid = false;
+
+      error = new CustomErrorCls(
+        `Disallowed JS constructs found :
+       ${disallowedArr.join(", ")}. Please remove them and try again.`,
+        "Your code contains disallowed JavaScript constructs.  For more information, refer to the errors tab."
+      );
+    } else if (disableFlags.NESTED_FUNCTIONS && functionCount > 1) {
       isValid = false;
       error = new CustomErrorCls(
-        "Disallowed JS constructs found : " + disallowedNames.join(", "),
-        "Your code contains disallowed JavaScript constructs. Please remove them and try again. For more information, refer to the errors tab."
+        "Nested functions are not allowed",
+        "Your code contains nested functions. Please remove them and try again."
       );
     }
-    //disable loops ..etc
-    // else if (disallowNestedFn) {
-    //   const isNestedFn = hasNestedFunction(ast);
-    //   if (isNestedFn) {
-    //     isValid = false;
-    //     error = new Error("Nested functions are not allowed");
-    //   }
-    // }
   } catch (e: any) {
     isValid = false;
     error = e?.message || e;
@@ -104,7 +127,7 @@ const validateJS = (code: string, disallowNestedFn: boolean): boolean => {
 function runJSFunction(
   functionString: string,
   paramsObj: any,
-  disallowNestedFn: boolean = false
+  disableFlags?: DisableJsFlagsType
 ): any {
   let result: any | null = null;
 
@@ -113,7 +136,7 @@ function runJSFunction(
 
     LoggerCls.log(functionString, paramsObj);
 
-    const isValid = validateJS(functionString, disallowNestedFn);
+    const isValid = validateJS(functionString, disableFlags);
 
     LoggerCls.log("isValid function : " + isValid);
 
