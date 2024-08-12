@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 
 import { config } from "../config";
-import { IMPORT_ANIMATE_CSS, ImportStatus } from "../constants";
+import { IMPORT_ANIMATE_CSS, IMPORT_STATUS } from "../constants";
 
 const addToSet = (setterFn: any, value: string) => {
   setterFn((prevSet: Set<string>) => {
@@ -63,11 +63,11 @@ const useSocket = () => {
       if (status) {
         setDisplayStatus(status);
 
-        if (status == ImportStatus.ERROR_STOPPED) {
+        if (status == IMPORT_STATUS.ERROR_STOPPED) {
           addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
         } else if (
-          status == ImportStatus.SUCCESS ||
-          status == ImportStatus.PARTIAL_SUCCESS
+          status == IMPORT_STATUS.SUCCESS ||
+          status == IMPORT_STATUS.PARTIAL_SUCCESS
         ) {
           addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_COMPLETE);
         }

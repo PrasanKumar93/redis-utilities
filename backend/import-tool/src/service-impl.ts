@@ -316,14 +316,8 @@ const testJSONFormatterFn = async (
 ) => {
   InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
 
-  const functionString = `function userFunction(jsonObj){
-          
-          ${input.jsFunctionBody}
-
-          return jsonObj;
-}`;
   const functionResult = await runJSFunction(
-    functionString,
+    input.jsFunctionString,
     input.paramsObj,
     DISABLE_JS_FLAGS
   );

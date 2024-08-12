@@ -8,7 +8,7 @@ const IMPORT_ANIMATE_CSS = {
   IMPORT_COMPLETE: "import-complete",
 };
 
-enum ImportStatus {
+enum IMPORT_STATUS {
   IN_PROGRESS = "inProgress",
   ERROR_STOPPED = "errorStopped",
   PAUSED = "paused",
@@ -16,4 +16,9 @@ enum ImportStatus {
   PARTIAL_SUCCESS = "partialSuccess",
 }
 
-export { IMPORT_ANIMATE_CSS, ImportStatus };
+enum IMPORT_PAGE_TABS {
+  LOGS = 0,
+  ERRORS = 1,
+}
+
+export { IMPORT_ANIMATE_CSS, IMPORT_STATUS, IMPORT_PAGE_TABS };

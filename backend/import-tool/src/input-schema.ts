@@ -19,7 +19,7 @@ export const resumeImportFilesToRedisSchema = z.object({
 });
 
 export const testJSONFormatterFnSchema = z.object({
-  jsFunctionBody: z.string(),
+  jsFunctionString: z.string(),
   paramsObj: z.record(z.string(), z.any()),
 });
 

@@ -6,8 +6,9 @@ interface ImportStats {
 }
 
 interface ImportFileError {
-  filePath: string;
-  error: any;
+  message?: string;
+  filePath?: string;
+  error?: any;
 }
 
 export type { ImportStats, ImportFileError };

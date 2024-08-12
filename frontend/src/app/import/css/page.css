@@ -209,21 +209,21 @@
                                 }
                             }
 
-                            /* .import-formatter-func-section {
-                                        margin-top: var(--space-8);
-    
-                                        .import-formatter-func-field {
-                                            margin-top: var(--space-2);
-    
-                                            .import-formatter-func-textarea {
-                                                width: 100%;
-                                                height: 130px;
-                                                padding: var(--space-4);
-                                                box-sizing: border-box;
-                                                resize: none;
-                                            }
-                                        }
-                                    } */
+                            .import-formatter-func-section {
+                                margin-top: var(--space-8);
+
+                                .import-formatter-func-field {
+                                    margin-top: var(--space-2);
+
+                                    .import-formatter-func-textarea {
+                                        width: 100%;
+                                        height: 180px;
+                                        padding: var(--space-4);
+                                        box-sizing: border-box;
+                                        resize: none;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -442,6 +442,10 @@
 
         .import-process-outer-container {
             display: flex;
+
+            .tabs-outer-container {
+                animation: fade-in-out-to-left .5s .5s forwards;
+            }
         }
     }
 }
@@ -452,10 +456,6 @@
 
         .count-outer-container {
             animation: fade-in-out-to-top .5s .5s forwards;
-        }
-
-        .tabs-outer-container {
-            animation: fade-in-out-to-left .5s .5s forwards;
         }
     }
 }

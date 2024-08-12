@@ -23,7 +23,22 @@ const resumeImportFilesToRedisSchema = z.object({
   isStopOnError: z.boolean().optional(),
 });
 
+export const testJSONFormatterFnSchema = z.object({
+  jsFunctionString: z.string(),
+  paramsObj: z.record(z.string(), z.any()),
+});
+
 //#endregion
+
+// #region helper functions
+const consoleLogError = (axiosError: any) => {
+  const error = axiosError?.response?.data?.error || axiosError;
+  if (error) {
+    console.error(error);
+  }
+  return error;
+};
+// #endregion
 
 //#region API calls
 const testRedisConnection = async (
@@ -33,9 +48,9 @@ const testRedisConnection = async (
     testRedisConnectionSchema.parse(input); // validate input
     const response = await postRequest("/testRedisConnection", input);
     return response?.data;
-  } catch (error) {
+  } catch (axiosError: any) {
+    consoleLogError(axiosError);
     errorToast("Error in /testRedisConnection API");
-    console.error(error);
   }
 };
 
@@ -46,9 +61,9 @@ const importFilesToRedis = async (
     importFilesToRedisSchema.parse(input); // validate input
     const response = await postRequest("/importFilesToRedis", input);
     return response?.data;
-  } catch (error) {
+  } catch (axiosError: any) {
+    consoleLogError(axiosError);
     errorToast("Error in /importFilesToRedis API");
-    console.error(error);
   }
 };
 
@@ -59,11 +74,41 @@ const resumeImportFilesToRedis = async (
     resumeImportFilesToRedisSchema.parse(input); // validate input
     const response = await postRequest("/resumeImportFilesToRedis", input);
     return response?.data;
-  } catch (error) {
+  } catch (axiosError: any) {
+    consoleLogError(axiosError);
     errorToast("Error in /resumeImportFilesToRedis API");
-    console.error(error);
   }
 };
+
+const testJSONFormatterFn = async (
+  input: z.infer<typeof testJSONFormatterFnSchema>
+) => {
+  const testResult: any = {
+    data: null,
+    error: null,
+  };
+  try {
+    testJSONFormatterFnSchema.parse(input); // validate input
+    const response = await postRequest("/testJSONFormatterFn", input);
+    testResult.data = response?.data?.data;
+  } catch (axisError: any) {
+    const error = consoleLogError(axisError);
+    if (error?.userMessage) {
+      errorToast(error.userMessage);
+    } else {
+      errorToast("Error in /testJSONFormatterFn API");
+    }
+    testResult.error = error?.message || error; // message, stack
+  }
+
+  return testResult;
+};
+
 //#endregion
 
-export { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis };
+export {
+  testRedisConnection,
+  importFilesToRedis,
+  resumeImportFilesToRedis,
+  testJSONFormatterFn,
+};

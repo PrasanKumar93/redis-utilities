@@ -1,17 +1,64 @@
 "use client";
 
+import type { ImportFileError } from "../types";
 import React, { useState } from "react";
 
 import './css/typography.css';
 import './css/variables.css';
 import './css/page.css';
 
-import { testRedisConnection, importFilesToRedis, resumeImportFilesToRedis } from "../utils/services";
-import { IMPORT_ANIMATE_CSS, ImportStatus } from "../constants";
+import {
+    testRedisConnection,
+    importFilesToRedis,
+    resumeImportFilesToRedis,
+    testJSONFormatterFn
+} from "../utils/services";
+import { infoToast } from "../utils/toast-util";
+
+import { IMPORT_ANIMATE_CSS, IMPORT_STATUS, IMPORT_PAGE_TABS } from "../constants";
 import { config } from "../config";
 
 import { useSocket } from "./use-socket";
 
+const sampleFormatterInput = {
+    "meta": {
+        "code": 200,
+        "requestId": "bb3b40d6-44ac-4a81-b188-945fd3b4c1fb"
+    },
+    "productDetails": {
+        "id": 1165,
+        "price": 2495,
+        "productDisplayName": "Nike Mean Team India Cricket Jersey",
+        "brandName": "Nike",
+        "gender": "Men",
+        "baseColour": "Blue",
+        "year": "2013"
+    }
+
+}
+
+const defaultFunctionString = `function customJSONFormatter(jsonObj){
+
+/**
+
+1> Can modify jsonObj as needed
+
+jsonObj.insertedAt = new Date() // add new field
+jsonObj.productDetails.brandName = jsonObj.productDetails.brandName.toUpperCase() //update field
+delete jsonObj.meta //delete field
+
+2> Can custom assign jsonObj
+jsonObj = {
+  productId: jsonObj.productDetails.id,
+  productName: jsonObj.productDetails.productDisplayName,
+  price: jsonObj.productDetails.price,
+  insertedAt: new Date(),
+}
+*/
+
+
+ return jsonObj; // mandatory return 
+}`;
 
 const Page = () => {
 
@@ -23,7 +70,12 @@ const Page = () => {
     const [idField, setIdField] = useState('');
     const [isStopOnError, setIsStopOnError] = useState(false);
 
-    const [activeTabIndex, setActiveTabIndex] = useState(0);
+    const [formatterFn, setFormatterFn] = useState(defaultFunctionString);
+    const [formatterFnInput, setFormatterFnInput] = useState<any>(sampleFormatterInput);
+    const [formatterFnOutput, setFormatterFnOutput] = useState<any>(null);
+    const [isValidFormatterFn, setIsValidFormatterFn] = useState(true);
+
+    const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
 
     const {
         socketId,
@@ -92,17 +144,23 @@ const Page = () => {
     }
     const evtClickPlay = async () => {
 
-        removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
+        if (isValidFormatterFn) {
 
-        if (!displayStatus) { // first time
-            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
 
-            await startImportFiles();
+            if (!displayStatus) { // first time
+                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
 
-        } else if (displayStatus != ImportStatus.IN_PROGRESS) {
-            await resumeImportFiles();
+                await startImportFiles();
+
+            } else if (displayStatus != IMPORT_STATUS.IN_PROGRESS) {
+                await resumeImportFiles();
+            }
+
         }
-
+        else {
+            infoToast("Please correct the formatter function before starting the import");
+        }
 
     }
 
@@ -131,6 +189,41 @@ const Page = () => {
         }
     }
 
+    const validateFormatterFn = async () => {
+
+        if (formatterFn) {
+            const testResult = await testJSONFormatterFn({
+                jsFunctionString: formatterFn,
+                paramsObj: formatterFnInput
+            });
+
+            if (testResult?.data) {
+                setIsValidFormatterFn(true);
+                setFormatterFnOutput(testResult?.data);
+                setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
+            }
+            else if (testResult?.error) {
+                setIsValidFormatterFn(false);
+                const displayError: ImportFileError = {
+                    message: "Error in formatter function ",
+                    error: testResult?.error
+                };
+                setDisplayErrors((prev) => [...prev, displayError]);
+                setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
+            }
+
+            setTimeout(() => {
+                const tabContainer = document.querySelector(".tab-container:not(.hide-tab-container)");
+                if (tabContainer) {
+                    tabContainer.scrollTop = tabContainer.scrollHeight;
+                }
+            }, 10);
+        }
+        else {
+            setFormatterFn("");
+            setIsValidFormatterFn(true);
+        }
+    }
 
 
     return (
@@ -240,17 +333,25 @@ const Page = () => {
                                                 <label htmlFor="import-check-stop-on-error" className="roboto-medium">Stop on error</label>
                                             </div>
                                         </div>
-                                        {/* <div className="import-formatter-func-section">
+                                        <div className="import-formatter-func-section">
                                             <div className="roboto-medium">Formatter function</div>
                                             <div className="import-formatter-func-field">
-                                                <textarea name="" id="" className="import-formatter-func-textarea roboto-regular" placeholder="Enter formatter function"></textarea>
+                                                <textarea className="import-formatter-func-textarea roboto-regular" placeholder="Enter formatter function"
+
+                                                    value={formatterFn}
+                                                    onChange={(e) => setFormatterFn(e.target.value)}
+                                                    onBlur={validateFormatterFn}
+                                                    tabIndex={6}
+                                                >
+
+                                                </textarea>
                                             </div>
-                                        </div> */}
+                                        </div>
                                     </div>
                                 </fieldset>
                             </div>
                             <div className="action-container fade-in-out-to-top">
-                                {displayStatus != ImportStatus.IN_PROGRESS ? (
+                                {displayStatus != IMPORT_STATUS.IN_PROGRESS ? (
                                     <div className="action-icons fas fa-play" title="Start/ Resume Import"
                                         onClick={() => evtClickPlay()}
                                         onKeyDown={(e) => {
@@ -258,7 +359,7 @@ const Page = () => {
                                                 evtClickPlay();
                                             }
                                         }}
-                                        tabIndex={6} ></div>
+                                        tabIndex={7} ></div>
                                 ) : (
                                     <div className="action-icons fas fa-pause" title="Pause Import"
                                         onClick={() => evtClickPause()}
@@ -267,7 +368,7 @@ const Page = () => {
                                                 evtClickPause();
                                             }
                                         }}
-                                        tabIndex={7}></div>
+                                        tabIndex={8}></div>
                                 )}
 
                                 {/* <div className="action-icons fas fa-ban" title="Cancel Import"
@@ -277,7 +378,7 @@ const Page = () => {
                                             evtClickCancel();
                                         }
                                     }}
-                                    tabIndex={8}></div> */}
+                                    tabIndex={9}></div> */}
                             </div>
                             <div className="count-outer-container fade-in-out-to-top">
                                 <div className="count-container success-count-container">
@@ -298,31 +399,57 @@ const Page = () => {
                                 <div className="tab-headings">
 
                                     <div className={"tab-title roboto-bold "
-                                        + (activeTabIndex == 0 ? "tab-title-active" : "")}
-                                        onClick={() => setActiveTabIndex(0)}>
+                                        + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "tab-title-active" : "")}
+                                        onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)}>
                                         Info
                                     </div>
 
                                     <div className={"tab-title roboto-bold "
-                                        + (activeTabIndex == 1 ? "tab-title-active" : "")}
-                                        onClick={() => setActiveTabIndex(1)}>
+                                        + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "tab-title-active" : "")}
+                                        onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS)}>
                                         Errors ({displayErrors.length})
                                     </div>
                                 </div>
                                 <div className={"tab-container "
-                                    + (activeTabIndex == 1 ? "hide-tab-container" : "")}>
+                                    + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "hide-tab-container" : "")}>
                                     Status : {displayStatus}
+
+                                    {formatterFnInput &&
+                                        <>
+                                            <hr />
+                                            Formatter function input (jsonObj) is file content :
+                                            <pre>
+                                                <code>
+                                                    {JSON.stringify(formatterFnInput, null, 4)}
+                                                </code>
+                                            </pre>
+                                        </>
+                                    }
+                                    {formatterFnOutput &&
+                                        <>
+                                            <hr />
+                                            Formatter function output to be stored in Redis :
+                                            <pre>
+                                                <code>
+                                                    {JSON.stringify(formatterFnOutput, null, 4)}
+                                                </code>
+                                            </pre>
+                                        </>
+                                    }
 
                                 </div>
                                 <div className={"tab-container "
-                                    + (activeTabIndex == 0 ? "hide-tab-container" : "")}>
+                                    + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "hide-tab-container" : "")}>
 
                                     {displayErrors.map((error, index) => (
                                         <div key={index} className="error-log">
                                             <div className="error-log-path">
-                                                {index + 1}) FilePath : {error.filePath}</div>
+                                                {index + 1})
+                                                {error.filePath ? 'FilePath : ' + error.filePath : ''}
+                                                {error.message ? ' Message : ' + error.message : ''}
+                                            </div>
                                             <div className="error-log-msg">
-                                                Error :
+                                                {/* Error : */}
                                                 <pre>
                                                     <code>
                                                         {JSON.stringify(error.error, null, 4)}
