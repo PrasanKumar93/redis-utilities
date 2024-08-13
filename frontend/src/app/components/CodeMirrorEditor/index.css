@@ -1,0 +1,7 @@
+.code-mirror-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    height: 200px;
+    box-sizing: border-box;
+}

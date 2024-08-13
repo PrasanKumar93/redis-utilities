@@ -214,13 +214,11 @@
 
                                 .import-formatter-func-field {
                                     margin-top: var(--space-2);
+                                    max-width: 50vw;
 
                                     .import-formatter-func-textarea {
-                                        width: 100%;
                                         height: 180px;
                                         padding: var(--space-4);
-                                        box-sizing: border-box;
-                                        resize: none;
                                     }
                                 }
                             }

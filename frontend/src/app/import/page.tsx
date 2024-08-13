@@ -7,6 +7,9 @@ import './css/typography.css';
 import './css/variables.css';
 import './css/page.css';
 
+import CodeMirrorEditor from '../components/CodeMirrorEditor';
+
+
 import {
     testRedisConnection,
     importFilesToRedis,
@@ -143,7 +146,6 @@ const Page = () => {
         }
     }
     const evtClickPlay = async () => {
-
         if (isValidFormatterFn) {
 
             removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
@@ -189,11 +191,13 @@ const Page = () => {
         }
     }
 
-    const validateFormatterFn = async () => {
+    const validateFormatterFn = async (code: string) => {
 
-        if (formatterFn) {
+        if (code) {
+            setFormatterFn(code);
+
             const testResult = await testJSONFormatterFn({
-                jsFunctionString: formatterFn,
+                jsFunctionString: code,
                 paramsObj: formatterFnInput
             });
 
@@ -336,15 +340,13 @@ const Page = () => {
                                         <div className="import-formatter-func-section">
                                             <div className="roboto-medium">Formatter function</div>
                                             <div className="import-formatter-func-field">
-                                                <textarea className="import-formatter-func-textarea roboto-regular" placeholder="Enter formatter function"
 
-                                                    value={formatterFn}
-                                                    onChange={(e) => setFormatterFn(e.target.value)}
+                                                <CodeMirrorEditor
+                                                    initialValue={formatterFn}
+                                                    className="import-formatter-func-textarea"
                                                     onBlur={validateFormatterFn}
                                                     tabIndex={6}
-                                                >
-
-                                                </textarea>
+                                                />
                                             </div>
                                         </div>
                                     </div>
