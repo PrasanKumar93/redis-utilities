@@ -1,7 +1,7 @@
 "use client";
 
 import type { ImportFileError } from "../types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import './css/typography.css';
 import './css/variables.css';
@@ -14,7 +14,8 @@ import {
     testRedisConnection,
     importFilesToRedis,
     resumeImportFilesToRedis,
-    testJSONFormatterFn
+    testJSONFormatterFn,
+    getSampleInputForJSONFormatterFn
 } from "../utils/services";
 import { infoToast } from "../utils/toast-util";
 
@@ -23,22 +24,6 @@ import { config } from "../config";
 
 import { useSocket } from "./use-socket";
 
-const sampleFormatterInput = {
-    "meta": {
-        "code": 200,
-        "requestId": "bb3b40d6-44ac-4a81-b188-945fd3b4c1fb"
-    },
-    "productDetails": {
-        "id": 1165,
-        "price": 2495,
-        "productDisplayName": "Nike Mean Team India Cricket Jersey",
-        "brandName": "Nike",
-        "gender": "Men",
-        "baseColour": "Blue",
-        "year": "2013"
-    }
-
-}
 
 const defaultFunctionString = `function customJSONFormatter(jsonObj){
 
@@ -74,7 +59,7 @@ const Page = () => {
     const [isStopOnError, setIsStopOnError] = useState(false);
 
     const [formatterFn, setFormatterFn] = useState(defaultFunctionString);
-    const [formatterFnInput, setFormatterFnInput] = useState<any>(sampleFormatterInput);
+    const [formatterFnInput, setFormatterFnInput] = useState<any>({});
     const [formatterFnOutput, setFormatterFnOutput] = useState<any>(null);
     const [isValidFormatterFn, setIsValidFormatterFn] = useState(true);
 
@@ -90,6 +75,22 @@ const Page = () => {
         pauseImportFilesToRedis
     } = useSocket();
 
+    useEffect(() => {
+        const getSampleJSONInput = async () => {
+            if (serverFolderPath) {
+                const result = await getSampleInputForJSONFormatterFn({
+                    serverFolderPath
+                });
+                if (result?.data) {
+                    setFormatterFnInput(result.data);
+                }
+                else if (result?.error) {
+                    setFormatterFnInput({});
+                }
+            }
+        }
+        getSampleJSONInput();
+    }, [serverFolderPath]);
 
     const evtClickEnterConUrl = async () => {
 
@@ -224,7 +225,7 @@ const Page = () => {
             }, 10);
         }
         else {
-            setFormatterFn("");
+            setFormatterFn(defaultFunctionString);
             setIsValidFormatterFn(true);
         }
     }
@@ -419,23 +420,31 @@ const Page = () => {
                                     {formatterFnInput &&
                                         <>
                                             <hr />
-                                            Formatter function input (jsonObj) is file content :
-                                            <pre>
-                                                <code>
-                                                    {JSON.stringify(formatterFnInput, null, 4)}
-                                                </code>
-                                            </pre>
+                                            <details>
+                                                <summary>
+                                                    Formatter function input (jsonObj) is file content :
+                                                </summary>
+                                                <pre>
+                                                    <code>
+                                                        {JSON.stringify(formatterFnInput, null, 4)}
+                                                    </code>
+                                                </pre>
+                                            </details>
                                         </>
                                     }
                                     {formatterFnOutput &&
                                         <>
                                             <hr />
-                                            Formatter function output to be stored in Redis :
-                                            <pre>
-                                                <code>
-                                                    {JSON.stringify(formatterFnOutput, null, 4)}
-                                                </code>
-                                            </pre>
+                                            <details>
+                                                <summary>
+                                                    Formatter function output to be stored in Redis :
+                                                </summary>
+                                                <pre>
+                                                    <code>
+                                                        {JSON.stringify(formatterFnOutput, null, 4)}
+                                                    </code>
+                                                </pre>
+                                            </details>
                                         </>
                                     }
 

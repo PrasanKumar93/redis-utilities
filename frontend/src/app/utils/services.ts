@@ -28,6 +28,10 @@ export const testJSONFormatterFnSchema = z.object({
   paramsObj: z.record(z.string(), z.any()),
 });
 
+const getSampleInputForJSONFormatterFnSchema = z.object({
+  serverFolderPath: z.string(),
+});
+
 //#endregion
 
 // #region helper functions
@@ -104,6 +108,23 @@ const testJSONFormatterFn = async (
   return testResult;
 };
 
+const getSampleInputForJSONFormatterFn = async (
+  input: z.infer<typeof getSampleInputForJSONFormatterFnSchema>
+) => {
+  try {
+    getSampleInputForJSONFormatterFnSchema.parse(input); // validate input
+
+    const response = await postRequest(
+      "/getSampleInputForJSONFormatterFn",
+      input
+    );
+    return response?.data;
+  } catch (axiosError: any) {
+    consoleLogError(axiosError);
+    errorToast("Error in /getSampleInputForJSONFormatterFn API");
+  }
+};
+
 //#endregion
 
 export {
@@ -111,4 +132,5 @@ export {
   importFilesToRedis,
   resumeImportFilesToRedis,
   testJSONFormatterFn,
+  getSampleInputForJSONFormatterFn,
 };

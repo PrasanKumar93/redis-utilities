@@ -23,6 +23,10 @@ export const testJSONFormatterFnSchema = z.object({
   paramsObj: z.record(z.string(), z.any()),
 });
 
+export const getSampleInputForJSONFormatterFnSchema = z.object({
+  serverFolderPath: z.string(),
+});
+
 //--- types ---
 
 interface IImportStats {

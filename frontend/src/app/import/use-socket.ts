@@ -30,7 +30,7 @@ const useSocket = () => {
     totalTimeInMs: 0,
   });
   const [displayErrors, setDisplayErrors] = useState<ImportFileError[]>([]);
-  const [displayStatus, setDisplayStatus] = useState("");
+  const [displayStatus, setDisplayStatus] = useState("NA");
   const [bodyClasses, setBodyClasses] = useState(new Set<string>());
   const socketRef = useRef<Socket | null>(null);
 

@@ -8,7 +8,11 @@ import _ from "lodash";
 import { Socket } from "socket.io";
 
 import { RedisWrapper } from "./utils/redis.js";
-import { readFiles, readFilesExt } from "./utils/file-reader.js";
+import {
+  readFiles,
+  readFilesExt,
+  readSingleFileFromPaths,
+} from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
 import { runJSFunction } from "./utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "./utils/constants.js";
@@ -325,9 +329,27 @@ const testJSONFormatterFn = async (
   return functionResult;
 };
 
+const getSampleInputForJSONFormatterFn = async (
+  input: z.infer<typeof InputSchemas.getSampleInputForJSONFormatterFnSchema>
+) => {
+  InputSchemas.getSampleInputForJSONFormatterFnSchema.parse(input); // validate input
+
+  const jsonGlob = getJSONGlob(input.serverFolderPath);
+  const { filePath, content, error } = await readSingleFileFromPaths(
+    [jsonGlob],
+    []
+  );
+
+  if (error) {
+    throw error;
+  }
+  return { filePath, content };
+};
+
 export {
   testRedisConnection,
   importFilesToRedis,
   resumeImportFilesToRedis,
   testJSONFormatterFn,
+  getSampleInputForJSONFormatterFn,
 };

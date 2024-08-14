@@ -83,6 +83,48 @@ const readFilesExt = async (
   }
 };
 
-export { readFiles, readFilesExt };
+const readSingleFileFromPaths = async (
+  include: string[],
+  exclude: string[] = []
+) => {
+  let filePath = "";
+  let content = "";
+  let error: any = null;
+
+  //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
+  let filePaths = await fg(include, {
+    caseSensitiveMatch: false,
+    dot: true, // allow files that begin with a period (.)
+    ignore: exclude,
+  });
+
+  if (filePaths?.length > 0) {
+    const loopCount = filePaths.length > 3 ? 3 : filePaths.length; // try to read 3 files max in case of error
+
+    for (let i = 0; i < loopCount; i++) {
+      filePath = filePaths[i];
+
+      try {
+        content = await fs.readFile(filePath, "utf8");
+        content = JSON.parse(content);
+
+        break; // read only one file successfully
+      } catch (err) {
+        content = "";
+        error = LoggerCls.getPureError(err);
+        LoggerCls.error(
+          `Error in readSingleFileFromPaths :  ${filePath}`,
+          error
+        );
+      }
+    }
+  } else {
+    error = `No file found for the given path: ${include.join(", ")}`;
+  }
+
+  return { filePath, content, error };
+};
+
+export { readFiles, readFilesExt, readSingleFileFromPaths };
 
 export type { IFileReaderData };
