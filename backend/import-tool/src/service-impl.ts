@@ -14,7 +14,7 @@ import {
   readSingleFileFromPaths,
 } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
-import { runJSFunction } from "./utils/validate-js.js";
+import { runJSFunction, validateJS } from "./utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "./utils/constants.js";
 
 import * as InputSchemas from "./input-schema.js";
@@ -164,13 +164,35 @@ const setImportTimeAndStatus = (
   }
 };
 
+const formatJSONContent = async (
+  data: IFileReaderData,
+  importState: IImportFilesState
+) => {
+  if (importState.input?.jsFunctionString && data?.content) {
+    const jsFunctionString = importState.input.jsFunctionString;
+
+    const modifiedContent = await runJSFunction(
+      jsFunctionString,
+      data.content,
+      true,
+      null
+    );
+    if (modifiedContent) {
+      data.content = modifiedContent;
+    }
+  }
+};
+
 const readEachFileCallback = async (
   data: IFileReaderData,
   redisWrapper: RedisWrapper,
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>,
   importState: IImportFilesState
 ) => {
+  await formatJSONContent(data, importState);
+
   await processFileData(data, redisWrapper, input);
+
   updateStatsAndErrors(data, importState.stats, importState.fileErrors);
   emitSocketMessages({
     socketClient: importState.socketClient,
@@ -190,6 +212,12 @@ const importFilesToRedis = async (
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
 ) => {
   InputSchemas.importFilesToRedisSchema.parse(input); // validate input
+
+  if (input.jsFunctionString) {
+    let disableFlags = DISABLE_JS_FLAGS;
+    //disableFlags.NAMES_CONSOLE = false; // allow console.log
+    validateJS(input.jsFunctionString, disableFlags);
+  }
 
   let startTimeInMs = 0;
   let importState: IImportFilesState = {};
@@ -320,10 +348,14 @@ const testJSONFormatterFn = async (
 ) => {
   InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
 
+  let disableFlags = DISABLE_JS_FLAGS;
+  //disableFlags.NAMES_CONSOLE = false; // allow console.log
+
   const functionResult = await runJSFunction(
     input.jsFunctionString,
     input.paramsObj,
-    DISABLE_JS_FLAGS
+    false,
+    disableFlags
   );
 
   return functionResult;

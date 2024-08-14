@@ -105,6 +105,7 @@ const readSingleFileFromPaths = async (
       filePath = filePaths[i];
 
       try {
+        error = null;
         content = await fs.readFile(filePath, "utf8");
         content = JSON.parse(content);
 

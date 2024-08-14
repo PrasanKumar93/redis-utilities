@@ -11,6 +11,7 @@ export const importFilesToRedisSchema = z.object({
   idField: z.string().optional(),
   keyPrefix: z.string().optional(),
   isStopOnError: z.boolean().optional(),
+  jsFunctionString: z.string().optional(),
 });
 
 export const resumeImportFilesToRedisSchema = z.object({

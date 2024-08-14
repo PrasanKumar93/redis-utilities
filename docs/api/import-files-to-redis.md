@@ -10,7 +10,8 @@ POST http://localhost:3001/api/importFilesToRedis
 "keyPrefix":"products:",
 "idField":"meta.requestId"
 //,"socketId":"1"
-//,"isStopOnError":true
+//,"isStopOnError":true,
+"jsFunctionString": "function formatter(jsonObj) { return jsonObj; }"
 }
 ```
 
@@ -25,6 +26,7 @@ Note:
   - `socketId` : If provided, it will send the import process status to the client after processing each file.
 
   - `isStopOnError` : If true, it will stop the import process if any error occurs.
+  - `jsFunctionString` : It is the JS function which will be used to format the JSON data before adding it to Redis.
 
 ## Response
 

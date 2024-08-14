@@ -29,7 +29,7 @@ const getCheckNamesAndConstructs = (df: DisableJsFlagsType) => {
 
 const validateJS = (
   code: string,
-  disableFlags?: DisableJsFlagsType
+  disableFlags: DisableJsFlagsType | null = null
 ): boolean => {
   let isValid = true;
   let error: any | null = null;
@@ -37,6 +37,7 @@ const validateJS = (
   const disallowedArr: string[] = [];
 
   if (!disableFlags) {
+    // default all checks
     disableFlags = DISABLE_JS_FLAGS;
   }
 
@@ -92,7 +93,9 @@ const validateJS = (
       ArrowFunctionExpression: incrementFunctionCount,
 
       CallExpression(node) {
-        addDisallowedArrayLoops(node);
+        if (disableFlags.ARRAY_LOOPS) {
+          addDisallowedArrayLoops(node);
+        }
       },
     });
 
@@ -127,25 +130,27 @@ const validateJS = (
 function runJSFunction(
   functionString: string,
   paramsObj: any,
-  disableFlags?: DisableJsFlagsType
+  skipValidation: boolean = false,
+  disableFlags: DisableJsFlagsType | null = null
 ): any {
   let result: any | null = null;
 
   if (functionString) {
     paramsObj = paramsObj || {};
 
-    LoggerCls.log(functionString, paramsObj);
+    // LoggerCls.log(functionString, paramsObj);
 
-    const isValid = validateJS(functionString, disableFlags);
-
-    LoggerCls.log("isValid function : " + isValid);
+    if (!skipValidation) {
+      const isValid = validateJS(functionString, disableFlags);
+      LoggerCls.log("isValid function : " + isValid);
+    }
 
     try {
       const userFunction = eval(`(${functionString})`);
 
       result = userFunction(paramsObj);
 
-      LoggerCls.info("User function result : ", result);
+      //  LoggerCls.info("User function result : ", result);
     } catch (error) {
       LoggerCls.error("Error executing user function:", error);
       throw error;

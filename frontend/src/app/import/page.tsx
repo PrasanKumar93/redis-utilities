@@ -81,8 +81,10 @@ const Page = () => {
                 const result = await getSampleInputForJSONFormatterFn({
                     serverFolderPath
                 });
-                if (result?.data) {
-                    setFormatterFnInput(result.data);
+                if (result?.data?.content) {
+                    console.log("sample file path :", result.data?.filePath);
+                    console.log("sample file data :", result.data.content);
+                    setFormatterFnInput(result.data.content);
                 }
                 else if (result?.error) {
                     setFormatterFnInput({});
@@ -124,7 +126,8 @@ const Page = () => {
             keyPrefix,
             idField,
             socketId,
-            isStopOnError
+            isStopOnError,
+            jsFunctionString: formatterFn
         });
         if (result?.data?.stats) {
             setDisplayStats(result.data.stats);
@@ -415,15 +418,16 @@ const Page = () => {
                                 </div>
                                 <div className={"tab-container "
                                     + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "hide-tab-container" : "")}>
-                                    Status : {displayStatus}
+                                    Status : {displayStatus || "Not started"}
 
                                     {formatterFnInput &&
                                         <>
                                             <hr />
                                             <details>
-                                                <summary>
+                                                <summary className="summary-tag">
                                                     Formatter function input (jsonObj) is file content :
                                                 </summary>
+
                                                 <pre>
                                                     <code>
                                                         {JSON.stringify(formatterFnInput, null, 4)}
@@ -435,8 +439,9 @@ const Page = () => {
                                     {formatterFnOutput &&
                                         <>
                                             <hr />
+
                                             <details>
-                                                <summary>
+                                                <summary className="summary-tag">
                                                     Formatter function output to be stored in Redis :
                                                 </summary>
                                                 <pre>
