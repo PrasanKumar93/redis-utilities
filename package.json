@@ -1,0 +1,16 @@
+{
+  "name": "redis-utilities",
+  "version": "0.1.0",
+  "description": "Utilities to support common redis operations like import, export, etc.",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "install": "cd frontend && npm install && cd .. && cd backend/import-tool && npm install",
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend/import-tool && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
