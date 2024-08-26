@@ -98,6 +98,22 @@ const Page = () => {
         getSampleJSONInput();
     }, [serverFolderPath]);
 
+    useEffect(() => {
+
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            evtClickPause();
+            event.preventDefault();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+
+    }, []);
+
+
     const evtClickEnterConUrl = async () => {
 
         if (testRedisUrl) {
