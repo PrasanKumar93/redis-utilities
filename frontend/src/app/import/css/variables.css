@@ -55,6 +55,9 @@
     --gradient-clr-1: #22c1c3;
     --gradient-clr-2: #fdbb2d;
     --gradient-clr: #000000;
+
+    --fn-info-bg: #ffffff;
+    --fn-info-clr: #000000;
 }
 
 .pg001-body.light-theme {

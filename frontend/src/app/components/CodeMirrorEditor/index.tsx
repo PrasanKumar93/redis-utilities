@@ -11,6 +11,7 @@ interface CodeMirrorEditorProps {
     className?: string;
     tabIndex?: number;
     onBlur?: (code: string) => void;
+    disabled?: boolean;
 }
 
 const CodeMirrorEditor = React.forwardRef<EditorView | null, CodeMirrorEditorProps>(
@@ -18,7 +19,8 @@ const CodeMirrorEditor = React.forwardRef<EditorView | null, CodeMirrorEditorPro
         initialValue = '',
         className = '',
         tabIndex = 99,
-        onBlur
+        onBlur,
+        disabled = false
     }, ref) => {
         const editorContainerRef = useRef<HTMLDivElement>(null);
         const editorViewRef = useRef<EditorView | null>(null);
@@ -47,6 +49,7 @@ const CodeMirrorEditor = React.forwardRef<EditorView | null, CodeMirrorEditorPro
                     basicSetup,
                     javascript(),
                     oneDark,
+                    EditorView.editable.of(!disabled), // editor read-only if disabled
                 ],
             });
 
@@ -65,7 +68,7 @@ const CodeMirrorEditor = React.forwardRef<EditorView | null, CodeMirrorEditorPro
                 editorViewRef.current?.destroy();
                 editorViewRef.current = null;
             };
-        }, [initialValue, ref]);
+        }, [initialValue, ref, disabled]);
 
         return <div ref={editorContainerRef}
             className={`code-mirror-container ${className}`}

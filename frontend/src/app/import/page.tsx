@@ -25,24 +25,28 @@ import { config } from "../config";
 import { useSocket } from "./use-socket";
 
 
-const defaultFunctionString = `function customJSONFormatter(jsonObj){
+const infoIconFunctionString = `function customJSONFormatter(jsonObj){
 
-/**
-
-1> Can modify jsonObj as needed
+// Can modify jsonObj as needed
 
 jsonObj.insertedAt = new Date() // add new field
-jsonObj.productDetails.brandName = jsonObj.productDetails.brandName.toUpperCase() //update field
+jsonObj.brandName = jsonObj.brandName.toUpperCase() //update field
 delete jsonObj.meta //delete field
 
-2> Can custom assign jsonObj
+// OR can assign new jsonObj
+
 jsonObj = {
-  productId: jsonObj.productDetails.id,
-  productName: jsonObj.productDetails.productDisplayName,
-  price: jsonObj.productDetails.price,
+  productId: jsonObj.id,
+  productName: jsonObj.productDisplayName,
+  price: jsonObj.price,
   insertedAt: new Date(),
 }
-*/
+
+ return jsonObj; // mandatory return 
+}`;
+
+const defaultFunctionString = `function customJSONFormatter(jsonObj){
+
 
 
  return jsonObj; // mandatory return 
@@ -342,7 +346,26 @@ const Page = () => {
                                             </div>
                                         </div>
                                         <div className="import-formatter-func-section">
-                                            <div className="roboto-medium">Formatter function</div>
+                                            <div className="roboto-medium import-formatter-func-title-container">
+                                                <div>Formatter function</div>
+
+                                                <div className="import-formatter-func-icon-container">
+                                                    <div className="fas fa-info-circle import-formatter-func-icon"></div>
+                                                    <div className="import-formatter-func-info-container">
+                                                        <div className="pg001-triangle-arrow-top"></div>
+                                                        <div className="import-formatter-func-info-body">
+
+                                                            <CodeMirrorEditor
+                                                                initialValue={infoIconFunctionString}
+                                                                className="import-formatter-func-textarea"
+                                                                disabled={true}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
                                             <div className="import-formatter-func-field">
 
                                                 <CodeMirrorEditor

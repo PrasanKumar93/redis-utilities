@@ -37,6 +37,13 @@
     /* max-width: 100%; */
 }
 
+.pg001-triangle-arrow-top {
+    width: 12px;
+    height: 12px;
+    clip-path: polygon(0 100%, 100% 100%, 50% 0);
+    background-color: var(--fn-info-bg);
+}
+
 .pg001-outer-container {
     flex-grow: 1;
     display: flex;
@@ -211,6 +218,44 @@
 
                             .import-formatter-func-section {
                                 margin-top: var(--space-8);
+
+                                .import-formatter-func-title-container {
+                                    display: flex;
+
+                                    .import-formatter-func-icon-container {
+                                        margin-left: var(--space-8);
+                                        position: relative;
+
+                                        .import-formatter-func-icon {
+                                            cursor: pointer;
+                                        }
+
+                                        .import-formatter-func-info-container {
+                                            transform: scale(0);
+                                            transform-origin: 6px 0;
+                                            position: absolute;
+                                            z-index: 2;
+                                            transition: all .1s;
+
+                                            .import-formatter-func-info-body {
+                                                max-width: 45vw;
+
+                                                padding: var(--space-8);
+                                                background: var(--fn-info-bg);
+                                                color: var(--fn-info-clr);
+                                                border-radius: 0 5px 5px 5px;
+                                                box-shadow: 0 0 10px var(--fn-info-bg);
+                                            }
+                                        }
+                                    }
+
+                                    .import-formatter-func-icon-container:hover {
+                                        .import-formatter-func-info-container {
+                                            transform: scale(1);
+                                            transition: all .1s;
+                                        }
+                                    }
+                                }
 
                                 .import-formatter-func-field {
                                     margin-top: var(--space-2);
