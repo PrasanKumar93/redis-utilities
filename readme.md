@@ -6,6 +6,8 @@ Utilities to support common redis operations like import, export, etc.
 
 ## Setup
 
+At project root, run the following commands:
+
 ```sh
 # Install dependencies for frontend and backend
 npm install
@@ -15,7 +17,24 @@ npm run backend
 npm run frontend
 ```
 
-### API docs
+## (Optional) Backend environment variables
+
+```env title="backend/import-tool/.env"
+API_PORT=3001
+ENCRYPTION_KEY=".......="
+```
+
+`openssl rand -base64 32` command in terminal to generate a new key
+
+## (Optional) Frontend environment variables
+
+```env title="frontend/.env"
+NEXT_PUBLIC_ENCRYPTION_KEY=".......="
+```
+
+NEXT_PUBLIC_ENCRYPTION_KEY same as ENCRYPTION_KEY in backend
+
+## API docs
 
 - [Test Redis Connection](./docs/api/test-redis-connection.md)
 - [Import Files to Redis](./docs/api/import-files-to-redis.md)

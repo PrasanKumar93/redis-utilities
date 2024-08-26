@@ -1,4 +1,5 @@
 import type { IFileReaderData } from "./utils/file-reader.js";
+import type { IEncryptedElm } from "./utils/crypto-node-util.js";
 import type { IImportStats } from "./input-schema.js";
 import type { IImportFilesState } from "./state.js";
 
@@ -16,16 +17,36 @@ import {
 import { LoggerCls } from "./utils/logger.js";
 import { runJSFunction, validateJS } from "./utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "./utils/constants.js";
+import { decryptData } from "./utils/crypto-node-util.js";
 
 import * as InputSchemas from "./input-schema.js";
 import { socketState, ImportStatus } from "./state.js";
+
+const getInputRedisConUrl = (
+  redisConUrl?: string,
+  redisConUrlEncrypted?: IEncryptedElm
+) => {
+  if (!redisConUrl && redisConUrlEncrypted) {
+    redisConUrl = decryptData(redisConUrlEncrypted);
+  }
+
+  if (!redisConUrl) {
+    throw new Error("Redis connection URL is missing !");
+  }
+  return redisConUrl;
+};
 
 const testRedisConnection = async (
   input: z.infer<typeof InputSchemas.testRedisConnectionSchema>
 ) => {
   InputSchemas.testRedisConnectionSchema.parse(input); // validate input
 
-  const redisWrapper = new RedisWrapper(input.redisConUrl);
+  let redisConUrl = getInputRedisConUrl(
+    input.redisConUrl,
+    input.redisConUrlEncrypted
+  );
+
+  const redisWrapper = new RedisWrapper(redisConUrl);
 
   await redisWrapper.connect();
   await redisWrapper.client?.ping();
@@ -240,7 +261,11 @@ const importFilesToRedis = async (
   importState.filePaths = [];
   importState.filePathIndex = 0;
 
-  const redisWrapper = new RedisWrapper(input.redisConUrl);
+  let redisConUrl = getInputRedisConUrl(
+    input.redisConUrl,
+    input.redisConUrlEncrypted
+  );
+  const redisWrapper = new RedisWrapper(redisConUrl);
   await redisWrapper.connect();
 
   const jsonGlob = getJSONGlob(input.serverFolderPath);
@@ -305,7 +330,11 @@ const resumeImportFilesToRedis = async (
 
       let input = importState.input;
 
-      const redisWrapper = new RedisWrapper(input.redisConUrl);
+      let redisConUrl = getInputRedisConUrl(
+        input.redisConUrl,
+        input.redisConUrlEncrypted
+      );
+      const redisWrapper = new RedisWrapper(redisConUrl);
       await redisWrapper.connect();
 
       startTimeInMs = performance.now();

@@ -18,6 +18,7 @@ import {
     getSampleInputForJSONFormatterFn
 } from "../utils/services";
 import { infoToast } from "../utils/toast-util";
+import { encryptData } from "../utils/crypto-util";
 
 import { IMPORT_ANIMATE_CSS, IMPORT_STATUS, IMPORT_PAGE_TABS } from "../constants";
 import { config } from "../config";
@@ -118,7 +119,11 @@ const Page = () => {
 
         if (testRedisUrl) {
             setRedisConUrl("");
-            const result = await testRedisConnection({ redisConUrl: testRedisUrl });
+
+            const encryptedRedisUrl = await encryptData(testRedisUrl);
+            const result = await testRedisConnection({
+                redisConUrlEncrypted: encryptedRedisUrl
+            });
             if (result?.data) {
                 setRedisConUrl(testRedisUrl);
 
@@ -140,8 +145,10 @@ const Page = () => {
     const startImportFiles = async () => {
         setDisplayErrors([]);
 
+        const encryptedRedisUrl = await encryptData(testRedisUrl);
+
         const result = await importFilesToRedis({
-            redisConUrl,
+            redisConUrlEncrypted: encryptedRedisUrl,
             serverFolderPath,
             keyPrefix,
             idField,

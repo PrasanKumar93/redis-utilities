@@ -6,6 +6,11 @@
 POST http://localhost:3001/api/importFilesToRedis
 {
 "redisConUrl":"redis://localhost:6379",
+"redisConUrlEncrypted":{
+  "encryptedData":"",
+  "iv":"",
+  "authTag":""
+ },
 "serverFolderPath":"/Users/user1/Documents/data/product-data",
 "keyPrefix":"products:",
 "idField":"meta.requestId"
@@ -18,6 +23,8 @@ POST http://localhost:3001/api/importFilesToRedis
 Note:
 
 - `redisConUrl`: Redis connection URL.
+  Either redisConUrl or redisConUrlEncrypted should be provided.
+
 - `serverFolderPath` can be absolute path of disk or relative path in the repo.
 - Optional
 

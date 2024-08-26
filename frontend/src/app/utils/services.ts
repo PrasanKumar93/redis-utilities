@@ -5,12 +5,18 @@ import { postRequest } from "./axios-util";
 import { errorToast } from "./toast-util";
 
 //#region API input schema
+const zodEncryptedData = z.object({
+  encryptedData: z.string(),
+  iv: z.string(),
+  authTag: z.string(),
+});
+
 const testRedisConnectionSchema = z.object({
-  redisConUrl: z.string(),
+  redisConUrlEncrypted: zodEncryptedData,
 });
 
 const importFilesToRedisSchema = z.object({
-  redisConUrl: z.string(),
+  redisConUrlEncrypted: zodEncryptedData,
   serverFolderPath: z.string(),
   socketId: z.string().optional(),
   idField: z.string().optional(),
@@ -51,6 +57,7 @@ const testRedisConnection = async (
 ) => {
   try {
     testRedisConnectionSchema.parse(input); // validate input
+
     const response = await postRequest("/testRedisConnection", input);
     return response?.data;
   } catch (axiosError: any) {

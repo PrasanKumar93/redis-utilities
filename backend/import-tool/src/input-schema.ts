@@ -1,11 +1,20 @@
 import { z } from "zod";
 
+const zodEncryptedData = z.object({
+  encryptedData: z.string(),
+  iv: z.string(),
+  authTag: z.string(),
+});
+
 export const testRedisConnectionSchema = z.object({
-  redisConUrl: z.string(),
+  redisConUrl: z.string().optional(), // one of the two fields is required
+  redisConUrlEncrypted: zodEncryptedData.optional(),
 });
 
 export const importFilesToRedisSchema = z.object({
-  redisConUrl: z.string(),
+  redisConUrl: z.string().optional(),
+  redisConUrlEncrypted: zodEncryptedData.optional(),
+
   serverFolderPath: z.string(),
   socketId: z.string().optional(),
   idField: z.string().optional(),
