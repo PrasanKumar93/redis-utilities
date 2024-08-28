@@ -48,16 +48,18 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-8);
-    background: linear-gradient(var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-4));
-    background-size: 100% 400%;
+    background: linear-gradient(var(--white), var(--primary-1));
+    color: var(--primary-2-clr);
     transition: all .5s;
 
     .heading {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--secondary-1);
+        padding: var(--space-8);
+        background: linear-gradient(90deg, var(--primary-6), var(--primary-10));
+        color: var(--primary-clr-8);
+        box-shadow: 0 0 8px #000;
         font-size: var(--font-size-24);
         letter-spacing: 2px;
         transition: all .5s;
@@ -80,6 +82,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: var(--space-8);
         transition: all .5s;
 
         .con-url-container {
@@ -92,7 +95,6 @@
                 display: flex;
                 margin-right: var(--space-4);
                 font-size: var(--font-size-14);
-                color: var(--primary-clr-6);
             }
 
             .con-url-textbox {
@@ -100,7 +102,7 @@
             }
 
             .con-url-submit-icon {
-                color: var(--primary-11);
+                color: var(--primary-10);
                 font-size: var(--font-size-24);
                 cursor: pointer;
                 transition: all 0.5s;
@@ -126,7 +128,6 @@
 
             .folder-path-lbl {
                 margin: var(--space-4);
-                color: var(--primary-clr-6);
                 font-size: var(--font-size-14);
             }
 
@@ -140,7 +141,7 @@
             }
 
             .folder-path-submit-icon {
-                color: var(--primary-11);
+                color: var(--primary-10);
                 font-size: var(--font-size-24);
                 cursor: pointer;
                 transition: all 0.5s;
@@ -153,8 +154,7 @@
 
         flex-direction: column;
         flex-grow: 1;
-        margin-top: var(--space-8);
-        color: var(--primary-clr-8);
+        padding: var(--space-8);
 
         .final-folder-path-container {
             display: flex;
@@ -185,15 +185,17 @@
                 box-sizing: border-box;
 
                 .options-container {
+                    z-index: 1;
+                    /* To show info icon hover element on top */
                     animation: fade-in-out-to-top .5s .75s forwards;
 
                     fieldset {
                         margin: 0;
                         border-radius: 5px;
-                        border-color: var(--secondary-1);
+                        border-color: var(--primary-6);
 
                         legend {
-                            color: var(--secondary-1);
+                            color: var(--primary-6);
                             padding: 0 var(--space-4);
                             font-size: var(--font-size-16);
                         }
@@ -238,8 +240,7 @@
                                             transition: all .1s;
 
                                             .import-formatter-func-info-body {
-                                                max-width: 45vw;
-
+                                                width: 45vw;
                                                 padding: var(--space-8);
                                                 background: var(--fn-info-bg);
                                                 color: var(--fn-info-clr);
@@ -262,7 +263,7 @@
                                     max-width: 45vw;
 
                                     .import-formatter-func-textarea {
-                                        height: 180px;
+                                        height: 140px;
                                         padding: var(--space-4);
                                     }
                                 }
@@ -276,7 +277,7 @@
                     align-items: center;
                     justify-content: center;
                     column-gap: 48px;
-                    margin-top: var(--space-16);
+                    margin-top: var(--space-8);
                     animation: fade-in-out-to-top .5s 1s forwards;
 
                     .action-icons {
@@ -333,8 +334,8 @@
                         max-width: 50%;
                         padding: var(--space-16);
                         margin-top: var(--space-8);
-                        background: var(--primary-6);
-                        color: var(--primary-clr-6);
+                        background: var(--primary-2);
+                        color: var(--primary-clr-2);
                         border-radius: 5px;
                         font-size: var(--font-size-14);
                         position: relative;
@@ -394,34 +395,50 @@
 
                         .tab-title {
                             padding: var(--space-8);
-                            background: var(--primary-7);
-                            color: var(--primary-clr-7);
-                            border: 2px solid var(--secondary-1);
+                            border: 2px solid var(--primary-6);
+                            border-bottom: none;
                             border-bottom: none;
                             border-radius: 5px 5px 0 0;
                             cursor: pointer;
                         }
 
                         .tab-title-active {
-                            background-color: var(--secondary-1);
-                            color: var(--secondary-clr-1);
+                            background-color: var(--primary-6);
+                            color: var(--primary-clr-6);
                         }
                     }
 
                     .tab-container {
                         flex-grow: 1;
-                        padding: var(--space-8);
-                        background: var(--primary-6);
-                        color: var(--primary-clr-6);
-                        border: 2px solid var(--secondary-1);
+                        padding: var(--space-4);
+                        background: var(--primary-2);
+                        color: var(--primary-clr-2);
+                        border: 2px solid var(--primary-6);
                         border-radius: 0 5px 5px 5px;
 
                         overflow: auto;
-                        max-height: calc(100vh - 150px);
+                        max-height: calc(100vh - 170px);
                         max-width: 100%;
+
+                        .tab-container-status {
+                            padding: var(--space-4);
+                            background-color: var(--primary-5);
+                            color: var(--primary-clr-5);
+                        }
+
+                        details {
+                            margin-top: var(--space-4);
+                            background-color: var(--primary-1);
+                            color: var(--primary-clr-1);
+                        }
+
+                        pre {
+                            margin: 0;
+                        }
 
                         code {
                             display: block;
+                            padding-left: var(--space-16);
                             white-space: pre-wrap;
                             word-wrap: break-word;
                         }
@@ -432,12 +449,11 @@
                         }
 
                         .error-log {
-                            border-bottom: 1px dashed var(--primary-clr-6);
-                            padding: 10px;
-                        }
-
-                        .error-log-msg {
-                            margin-top: 10px;
+                            padding: var(--space-8);
+                            margin-bottom: var(--space-8);
+                            background-color: var(--error-clr);
+                            color: var(--error-txt-clr);
+                            border-radius: 5px;
                         }
                     }
 
@@ -457,13 +473,9 @@
 
     .con-url-outer-container {
         flex-grow: 0;
-        margin-top: var(--space-8);
-
-        color: var(--primary-clr-6);
 
         .con-url-textbox {
             background: transparent;
-            color: var(--primary-clr-10);
             pointer-events: none;
         }
 
@@ -480,8 +492,6 @@
 
 .pg001-body.choose-folder-path {
     .pg001-outer-container {
-        background-position: 100% 20%;
-
         .folder-path-outer-container {
             display: flex;
         }
@@ -490,8 +500,6 @@
 
 .pg001-body.show-import-process-ctr {
     .pg001-outer-container {
-        background-position: 100% 100%;
-
         .import-process-outer-container {
             display: flex;
 

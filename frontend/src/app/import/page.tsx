@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import './css/typography.css';
 import './css/variables.css';
 import './css/page.css';
+import './css/theme.css';
 
 import CodeMirrorEditor from '../components/CodeMirrorEditor';
 
@@ -20,7 +21,12 @@ import {
 import { infoToast } from "../utils/toast-util";
 import { encryptData } from "../utils/crypto-util";
 
-import { IMPORT_ANIMATE_CSS, IMPORT_STATUS, IMPORT_PAGE_TABS } from "../constants";
+import {
+    IMPORT_ANIMATE_CSS,
+    IMPORT_STATUS,
+    IMPORT_PAGE_TABS,
+    IMPORT_PAGE_THEMES
+} from "../constants";
 import { config } from "../config";
 
 import { useSocket } from "./use-socket";
@@ -69,6 +75,7 @@ const Page = () => {
     const [isValidFormatterFn, setIsValidFormatterFn] = useState(true);
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
+    const [themeName, setThemeName] = useState(IMPORT_PAGE_THEMES[0]);
 
     const {
         socketId,
@@ -214,12 +221,9 @@ const Page = () => {
 
     const evtClickToggleTheme = () => {
 
-        if (bodyClasses.has(IMPORT_ANIMATE_CSS.LIGHT_THEME)) {
-            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.LIGHT_THEME);
-        }
-        else {
-            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.LIGHT_THEME);
-        }
+        let themeIndex = IMPORT_PAGE_THEMES.indexOf(themeName);
+        themeIndex = (themeIndex + 1) >= IMPORT_PAGE_THEMES.length ? 0 : (themeIndex + 1);
+        setThemeName(IMPORT_PAGE_THEMES[themeIndex]);
     }
 
     const validateFormatterFn = async (code: string) => {
@@ -264,6 +268,7 @@ const Page = () => {
     return (
         <div className={"pg001-body roboto-regular "
             + (displayErrors.length ? "import-error " : "")
+            + (themeName + " ")
             + Array.from(bodyClasses).join(" ")
         }
             id="pg001-body">
@@ -464,13 +469,15 @@ const Page = () => {
                                 </div>
                                 <div className={"tab-container "
                                     + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "hide-tab-container" : "")}>
-                                    Status : {displayStatus || "Not started"}
 
+                                    <div className="tab-container-status roboto-bold-italic">
+                                        Status : {displayStatus || "Not started"}
+                                    </div>
                                     {formatterFnInput &&
                                         <>
                                             <hr />
                                             <details>
-                                                <summary className="summary-tag">
+                                                <summary className="summary-tag roboto-medium-italic">
                                                     Formatter function input (jsonObj) is file content :
                                                 </summary>
 
@@ -487,7 +494,7 @@ const Page = () => {
                                             <hr />
 
                                             <details>
-                                                <summary className="summary-tag">
+                                                <summary className="summary-tag roboto-medium-italic">
                                                     Formatter function output to be stored in Redis :
                                                 </summary>
                                                 <pre>

@@ -1,5 +1,4 @@
 const IMPORT_ANIMATE_CSS = {
-  LIGHT_THEME: "light-theme",
   CHOOSE_FOLDER_PATH: "choose-folder-path",
   SHOW_IMPORT_PROCESS_CTR: "show-import-process-ctr",
   IMPORT_START: "import-start",
@@ -21,4 +20,18 @@ enum IMPORT_PAGE_TABS {
   ERRORS = 1,
 }
 
-export { IMPORT_ANIMATE_CSS, IMPORT_STATUS, IMPORT_PAGE_TABS };
+const IMPORT_PAGE_THEMES = [
+  "theme-blue",
+  "theme-blue-gray",
+  "theme-teal",
+  "theme-orange",
+  "theme-gray",
+  "theme-brown",
+];
+
+export {
+  IMPORT_ANIMATE_CSS,
+  IMPORT_STATUS,
+  IMPORT_PAGE_TABS,
+  IMPORT_PAGE_THEMES,
+};
