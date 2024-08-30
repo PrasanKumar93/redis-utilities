@@ -2,6 +2,7 @@ import type { IImportFilesState } from "../state.js";
 
 import fs from "fs-extra";
 import fg from "fast-glob";
+import zlib from "node:zlib";
 
 import { LoggerCls } from "./logger.js";
 
@@ -12,6 +13,28 @@ interface IFileReaderData {
   error: any;
   filePathIndex: number;
 }
+
+const decompressGZip = async (filePath: string) => {
+  let content = "";
+
+  try {
+    let buffer = await fs.readFile(filePath);
+
+    // Check if the buffer starts with the gzip magic number
+    const isCompressed = buffer[0] === 0x1f && buffer[1] === 0x8b;
+
+    if (isCompressed) {
+      buffer = zlib.gunzipSync(buffer);
+    }
+    content = buffer.toString("utf-8");
+  } catch (err) {
+    LoggerCls.error(`Error in decompressFileContent`, err);
+    throw err;
+  }
+
+  return content;
+};
+
 const readFiles = async (
   include: string[],
   exclude: string[] = [],
@@ -56,7 +79,11 @@ const readFilesExt = async (
         let content = "";
         let error: any = null;
         try {
-          content = await fs.readFile(filePath, "utf8");
+          if (filePath.endsWith(".json.gz")) {
+            content = await decompressGZip(filePath);
+          } else {
+            content = await fs.readFile(filePath, "utf8");
+          }
           content = JSON.parse(content);
         } catch (err) {
           content = "";
@@ -106,7 +133,11 @@ const readSingleFileFromPaths = async (
 
       try {
         error = null;
-        content = await fs.readFile(filePath, "utf8");
+        if (filePath.endsWith(".json.gz")) {
+          content = await decompressGZip(filePath);
+        } else {
+          content = await fs.readFile(filePath, "utf8");
+        }
         content = JSON.parse(content);
 
         break; // read only one file successfully

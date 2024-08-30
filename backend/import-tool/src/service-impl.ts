@@ -66,7 +66,8 @@ const getJSONGlob = (serverFolderPath: string) => {
     serverFolderPath += "/";
   }
   let jsonGlob = serverFolderPath + "**/*.json";
-  return jsonGlob;
+  let jsonGzGlob = serverFolderPath + "**/*.json.gz";
+  return [jsonGlob, jsonGzGlob];
 };
 
 const getFileKey = (
@@ -81,7 +82,14 @@ const getFileKey = (
     //key = content[idField];
     key = _.get(content, idField); // to support nested id with dot
   } else {
-    key = path.basename(filePath, ".json"); // filename as key (default)
+    // filename as key (default)
+    if (filePath.endsWith(".json.gz")) {
+      key = path.basename(filePath, ".json.gz");
+    } else if (filePath.endsWith(".json")) {
+      key = path.basename(filePath, ".json");
+    } else {
+      key = path.basename(filePath);
+    }
   }
 
   key = keyPrefix ? keyPrefix + key : key;
@@ -268,7 +276,7 @@ const importFilesToRedis = async (
   const redisWrapper = new RedisWrapper(redisConUrl);
   await redisWrapper.connect();
 
-  const jsonGlob = getJSONGlob(input.serverFolderPath);
+  const jsonGlobArr = getJSONGlob(input.serverFolderPath);
 
   startTimeInMs = performance.now();
   importState.isPaused = false;
@@ -279,7 +287,7 @@ const importFilesToRedis = async (
   });
 
   let allFilesPromObj: any = readFiles(
-    [jsonGlob],
+    jsonGlobArr,
     [],
     input.isStopOnError,
     importState.filePaths,
@@ -395,9 +403,9 @@ const getSampleInputForJSONFormatterFn = async (
 ) => {
   InputSchemas.getSampleInputForJSONFormatterFnSchema.parse(input); // validate input
 
-  const jsonGlob = getJSONGlob(input.serverFolderPath);
+  const jsonGlobArr = getJSONGlob(input.serverFolderPath);
   const { filePath, content, error } = await readSingleFileFromPaths(
-    [jsonGlob],
+    jsonGlobArr,
     []
   );
 

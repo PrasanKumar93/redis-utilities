@@ -88,25 +88,6 @@ const Page = () => {
     } = useSocket();
 
     useEffect(() => {
-        const getSampleJSONInput = async () => {
-            if (serverFolderPath) {
-                const result = await getSampleInputForJSONFormatterFn({
-                    serverFolderPath
-                });
-                if (result?.data?.content) {
-                    console.log("sample file path :", result.data?.filePath);
-                    console.log("sample file data :", result.data.content);
-                    setFormatterFnInput(result.data.content);
-                }
-                else if (result?.error) {
-                    setFormatterFnInput({});
-                }
-            }
-        }
-        getSampleJSONInput();
-    }, [serverFolderPath]);
-
-    useEffect(() => {
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             evtClickPause();
@@ -140,11 +121,23 @@ const Page = () => {
         }
     }
 
-    const evtClickEnterFolderPath = () => {
+    const evtClickEnterFolderPath = async () => {
 
         if (serverFolderPath) {
             removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
             addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
+
+            const result = await getSampleInputForJSONFormatterFn({
+                serverFolderPath
+            });
+            if (result?.data?.content) {
+                console.log("sample file path :", result.data?.filePath);
+                console.log("sample file data :", result.data.content);
+                setFormatterFnInput(result.data.content);
+            }
+            else if (result?.error) {
+                setFormatterFnInput({});
+            }
         }
 
     }
@@ -322,7 +315,7 @@ const Page = () => {
 
                             <div className="fas fa-arrow-circle-right folder-path-submit-icon"
                                 title="Next"
-                                onClick={(evt) => evtClickEnterFolderPath()}></div>
+                                onClick={evtClickEnterFolderPath}></div>
                         </div>
 
 
