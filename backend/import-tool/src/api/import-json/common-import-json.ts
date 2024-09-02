@@ -1,13 +1,14 @@
 import type { IFileReaderData } from "../../utils/file-reader.js";
 import type { IImportStats } from "../../input-schema.js";
-import type { IImportFilesState } from "../../state.js";
+import type { IImportFilesState, IImportCommonState } from "../../state.js";
 
 import path from "node:path";
 import _ from "lodash";
 import { z } from "zod";
 import { Socket } from "socket.io";
 
-import { ImportStatus } from "../../state.js";
+import { socketState, ImportStatus } from "../../state.js";
+
 import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
 import { LoggerCls } from "../../utils/logger.js";
@@ -17,15 +18,16 @@ const getFileKey = (
   filePath: string,
   idField: string = "",
   content: any,
-  keyPrefix: string = ""
+  keyPrefix: string = "",
+  index: number = 0
 ) => {
   let key = "";
   if (idField && content) {
     // JSON id field as key
     //key = content[idField];
     key = _.get(content, idField); // to support nested id with dot
-  } else {
-    // filename as key (default)
+  } else if (filePath) {
+    // filename as key
     if (filePath.endsWith(".json.gz")) {
       key = path.basename(filePath, ".json.gz");
     } else if (filePath.endsWith(".json")) {
@@ -33,6 +35,8 @@ const getFileKey = (
     } else {
       key = path.basename(filePath);
     }
+  } else if (index >= 0) {
+    key = (index + 1).toString();
   }
 
   key = keyPrefix ? keyPrefix + key : key;
@@ -53,6 +57,7 @@ const updateStatsAndErrors = (
       const fileError = {
         filePath: data.filePath,
         error: data.error,
+        fileIndex: data.fileIndex,
       };
       storeFileErrors.push(fileError);
     } else {
@@ -71,15 +76,16 @@ const processFileData = async (
       data.filePath,
       input.idField,
       data.content,
-      input.keyPrefix
+      input.keyPrefix,
+      data.fileIndex
     );
 
     const isKeyExists = await redisWrapper.client?.exists(key);
     await redisWrapper.client?.json.set(key, ".", data.content);
     if (isKeyExists) {
-      LoggerCls.info(`Updated file: ${data.filePath}`);
+      LoggerCls.info(`Updated key: ${key}`);
     } else {
-      LoggerCls.log(`Added file: ${data.filePath}`);
+      LoggerCls.log(`Added key: ${key}`);
     }
   }
 };
@@ -116,8 +122,9 @@ const emitSocketMessages = (info: {
 
     if (info.data?.error) {
       const fileError = {
-        filePath: info.data.filePath,
+        filePath: info.data?.filePath || "",
         error: info.data.error,
+        fileIndex: info.data.fileIndex,
       };
       info.socketClient.emit("importFileError", fileError);
     }
@@ -138,13 +145,13 @@ const readEachFileCallback = async (
 
   await processFileData(data, redisWrapper, input);
 
-  updateStatsAndErrors(data, importState.stats, importState.fileErrors);
+  updateStatsAndErrors(data, importState.stats, importState.importErrors);
   emitSocketMessages({
     socketClient: importState.socketClient,
     stats: importState.stats,
     data,
   });
-  importState.filePathIndex = data.filePathIndex;
+  importState.fileIndex = data.fileIndex;
 
   if (data?.error && input.isStopOnError) {
     importState.currentStatus = ImportStatus.ERROR_STOPPED;
@@ -181,4 +188,68 @@ const setImportTimeAndStatus = (
   }
 };
 
-export { readEachFileCallback, emitSocketMessages, setImportTimeAndStatus };
+const getInitialImportState = (
+  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+) => {
+  let importState: IImportCommonState = {};
+  if (input?.socketId) {
+    if (!socketState[input.socketId]) {
+      socketState[input.socketId] = {};
+    }
+    importState = socketState[input.socketId];
+  }
+
+  importState.input = input;
+  importState.stats = {
+    totalFiles: 0,
+    processed: 0,
+    failed: 0,
+    totalTimeInMs: 0,
+  };
+  importState.importErrors = [];
+  importState.fileIndex = 0;
+
+  importState.isPaused = false;
+  importState.currentStatus = ImportStatus.IN_PROGRESS;
+
+  return importState;
+};
+
+const getResumeImportState = (
+  resumeInput: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+) => {
+  let importResState: IImportCommonState = {};
+  let fileIndex = 0;
+
+  if (resumeInput?.socketId && socketState[resumeInput.socketId]) {
+    importResState = socketState[resumeInput.socketId];
+
+    if (importResState.currentStatus == ImportStatus.IN_PROGRESS) {
+      throw new Error("Import is already in progress for this socketId");
+    }
+
+    if (importResState.input) {
+      importResState.input.isStopOnError = resumeInput.isStopOnError;
+
+      //if error occurred, resume from last file
+      fileIndex = importResState.fileIndex || 0;
+      if (importResState.currentStatus == ImportStatus.PAUSED) {
+        // if paused, resume from next file
+        fileIndex++;
+      }
+
+      importResState.isPaused = false;
+      importResState.currentStatus = ImportStatus.IN_PROGRESS;
+    }
+  }
+
+  return { importResState, fileIndex };
+};
+
+export {
+  readEachFileCallback,
+  emitSocketMessages,
+  setImportTimeAndStatus,
+  getInitialImportState,
+  getResumeImportState,
+};

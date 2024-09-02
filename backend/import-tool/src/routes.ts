@@ -7,6 +7,8 @@ import { testJSONFormatterFn } from "./api/test-json-formatter-fn.js";
 import { getSampleInputForJSONFormatterFn } from "./api/get-sample-input-for-json-formatter-fn.js";
 import { importJSONFilesToRedis } from "./api/import-json/import-json-files-to-redis.js";
 import { resumeImportJSONFilesToRedis } from "./api/import-json/resume-import-json-files-to-redis.js";
+import { importArrayFileToRedis } from "./api/import-json/import-array-file-to-redis.js";
+import { resumeImportArrayFileToRedis } from "./api/import-json/resume-import-array-file-to-redis.js";
 
 const router = express.Router();
 
@@ -103,6 +105,47 @@ router.post(
     } catch (err) {
       err = LoggerCls.getPureError(err);
       LoggerCls.error("/getSampleInputForJSONFormatterFn API failed !", err);
+      result.error = err;
+      res.status(CONSTANTS.HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+
+    res.send(result);
+  }
+);
+
+router.post("/importArrayFileToRedis", async (req: Request, res: Response) => {
+  const result: any = {
+    data: null,
+    error: null,
+  };
+  const input = req.body;
+
+  try {
+    result.data = await importArrayFileToRedis(input);
+  } catch (err) {
+    err = LoggerCls.getPureError(err);
+    LoggerCls.error("/importArrayFileToRedis API failed !", err);
+    result.error = err;
+    res.status(CONSTANTS.HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+  }
+
+  res.send(result);
+});
+
+router.post(
+  "/resumeImportArrayFileToRedis",
+  async (req: Request, res: Response) => {
+    const result: any = {
+      data: null,
+      error: null,
+    };
+    const input = req.body;
+
+    try {
+      result.data = await resumeImportArrayFileToRedis(input);
+    } catch (err) {
+      err = LoggerCls.getPureError(err);
+      LoggerCls.error("/resumeImportArrayFileToRedis API failed !", err);
       result.error = err;
       res.status(CONSTANTS.HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
     }

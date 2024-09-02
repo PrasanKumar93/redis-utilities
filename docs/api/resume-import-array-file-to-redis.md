@@ -1,9 +1,9 @@
-# resumeImportFilesToRedis
+# resumeImportArrayFileToRedis
 
 ## Request
 
 ```json
-POST http://localhost:3001/api/resumeImportFilesToRedis
+POST http://localhost:3001/api/resumeImportArrayFileToRedis
 {
 "socketId":"1",
 "isStopOnError":true

@@ -13,21 +13,28 @@ enum ImportStatus {
   PARTIAL_SUCCESS = "partialSuccess",
 }
 
-interface IImportFilesState {
+interface IImportCommonState {
   socketClient?: Socket | null;
-  filePaths?: string[];
-  filePathIndex?: number;
   stats?: IImportStats;
-  fileErrors?: any[];
   input?: z.infer<typeof InputSchemas.importFilesToRedisSchema>;
   currentStatus?: ImportStatus;
   isPaused?: boolean;
+  importErrors?: any[];
+  fileIndex?: number;
+}
+
+interface IImportFilesState extends IImportCommonState {
+  filePaths?: string[];
+}
+
+interface IImportArrayFileState extends IImportCommonState {
+  fileContents?: string[];
 }
 
 const socketState: {
-  [socketId: string]: IImportFilesState;
+  [socketId: string]: IImportFilesState | IImportArrayFileState;
 } = {};
 
 export { socketState, ImportStatus };
 
-export type { IImportFilesState };
+export type { IImportFilesState, IImportArrayFileState, IImportCommonState };

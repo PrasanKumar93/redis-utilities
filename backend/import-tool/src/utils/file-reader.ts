@@ -1,4 +1,4 @@
-import type { IImportFilesState } from "../state.js";
+import type { IImportFilesState, IImportArrayFileState } from "../state.js";
 
 import fs from "fs-extra";
 import fg from "fast-glob";
@@ -8,10 +8,11 @@ import { LoggerCls } from "./logger.js";
 
 interface IFileReaderData {
   filePath: string;
+  fileIndex: number;
+
   content: string;
   totalFiles: number;
   error: any;
-  filePathIndex: number;
 }
 
 const getJSONGlobForFolderPath = (serverFolderPath: string) => {
@@ -75,39 +76,37 @@ const readJsonFilesFromPaths = async (
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
   if (filePaths?.length) {
     const totalFiles = filePaths.length;
-    if (filePaths?.length) {
-      for (let i = startIndex; i < filePaths.length; i++) {
-        let filePathIndex = i;
-        const filePath = filePaths[filePathIndex];
-        let content = "";
-        let error: any = null;
-        try {
-          if (filePath.endsWith(".json.gz")) {
-            content = await decompressGZip(filePath);
-          } else {
-            content = await fs.readFile(filePath, "utf8");
-          }
-          content = JSON.parse(content);
-        } catch (err) {
-          content = "";
-          error = LoggerCls.getPureError(err);
-          LoggerCls.error(`Error reading/ parsing file:  ${filePath}`, error);
+    for (let i = startIndex; i < filePaths.length; i++) {
+      let fileIndex = i;
+      const filePath = filePaths[fileIndex];
+      let content = "";
+      let error: any = null;
+      try {
+        if (filePath.endsWith(".json.gz")) {
+          content = await decompressGZip(filePath);
+        } else {
+          content = await fs.readFile(filePath, "utf8");
         }
-        await recursiveCallback({
-          filePath,
-          content,
-          totalFiles,
-          error,
-          filePathIndex,
-        });
+        content = JSON.parse(content);
+      } catch (err) {
+        content = "";
+        error = LoggerCls.getPureError(err);
+        LoggerCls.error(`Error reading/ parsing file:  ${filePath}`, error);
+      }
+      await recursiveCallback({
+        filePath,
+        content,
+        totalFiles,
+        error,
+        fileIndex,
+      });
 
-        if (error && isStopOnError) {
-          LoggerCls.error("Stopped on error");
-          break;
-        } else if (importState?.isPaused) {
-          LoggerCls.info("Paused on user request");
-          break;
-        }
+      if (error && isStopOnError) {
+        LoggerCls.error("Stopped on error");
+        break;
+      } else if (importState?.isPaused) {
+        LoggerCls.info("Paused on user request");
+        break;
       }
     }
   }
@@ -151,11 +150,73 @@ const readSingleJSONFileFromPaths = async (
   return { filePath, content, error };
 };
 
+const readJSONArrayFileFromPath = async (
+  filePath: string
+): Promise<string[]> => {
+  let fileContents: string[] = [];
+
+  try {
+    let content = "";
+    if (filePath.endsWith(".json.gz")) {
+      content = await decompressGZip(filePath);
+    } else {
+      content = await fs.readFile(filePath, "utf8");
+    }
+    fileContents = JSON.parse(content);
+
+    if (!Array.isArray(fileContents)) {
+      throw new Error("File content is not an array in " + filePath);
+    }
+  } catch (err) {
+    LoggerCls.error(`Error reading file:  ${filePath}`, err);
+    throw err;
+  }
+
+  return fileContents;
+};
+
+const loadItemsFromArray = async (
+  fileContents: any[],
+  isStopOnError: boolean = false,
+  startIndex: number = 0,
+  importState: IImportArrayFileState | null = null,
+  recursiveCallback: (data: IFileReaderData) => Promise<void>
+) => {
+  // similar to readJsonFilesFromPaths
+
+  if (fileContents?.length) {
+    const totalFiles = fileContents.length;
+    for (let i = startIndex; i < fileContents.length; i++) {
+      let fileIndex = i;
+      let content = fileContents[fileIndex];
+      let error: any = null;
+      await recursiveCallback({
+        filePath: "",
+        content,
+        totalFiles,
+        error,
+        fileIndex,
+      });
+
+      // if (error && isStopOnError) {
+      //   LoggerCls.error("Stopped on error");
+      //   break;
+      // } else
+      if (importState?.isPaused) {
+        LoggerCls.info("Paused on user request");
+        break;
+      }
+    }
+  }
+};
+
 export {
   getFilePathsFromGlobPattern,
   getJSONGlobForFolderPath,
   readJsonFilesFromPaths,
   readSingleJSONFileFromPaths,
+  readJSONArrayFileFromPath,
+  loadItemsFromArray,
 };
 
 export type { IFileReaderData };

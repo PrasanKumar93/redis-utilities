@@ -15,12 +15,15 @@ export const importFilesToRedisSchema = z.object({
   redisConUrl: z.string().optional(),
   redisConUrlEncrypted: zodEncryptedData.optional(),
 
-  serverFolderPath: z.string(),
   socketId: z.string().optional(),
   idField: z.string().optional(),
   keyPrefix: z.string().optional(),
   isStopOnError: z.boolean().optional(),
   jsFunctionString: z.string().optional(),
+
+  // one of the below fields is required
+  serverFolderPath: z.string().optional(),
+  serverArrayFilePath: z.string().optional(),
 });
 
 export const resumeImportFilesToRedisSchema = z.object({

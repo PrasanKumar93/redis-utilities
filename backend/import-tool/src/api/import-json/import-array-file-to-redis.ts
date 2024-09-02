@@ -1,4 +1,4 @@
-import type { IImportFilesState } from "../../state.js";
+import type { IImportArrayFileState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -16,17 +16,16 @@ import { RedisWrapper } from "../../utils/redis.js";
 import { validateJS } from "../../utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "../../utils/constants.js";
 import {
-  getFilePathsFromGlobPattern,
-  readJsonFilesFromPaths,
-  getJSONGlobForFolderPath,
+  readJSONArrayFileFromPath,
+  loadItemsFromArray,
 } from "../../utils/file-reader.js";
 
-const importJSONFilesToRedis = async (
+const importArrayFileToRedis = async (
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
 ) => {
   // Validate input ----------------------
-  if (!input.serverFolderPath) {
-    throw new Error("serverFolderPath is required");
+  if (!input.serverArrayFilePath) {
+    throw new Error("serverArrayFilePath is required");
   }
   InputSchemas.importFilesToRedisSchema.parse(input);
   if (input.jsFunctionString) {
@@ -47,10 +46,7 @@ const importJSONFilesToRedis = async (
   let startTimeInMs = 0;
 
   let importInitState = getInitialImportState(input);
-  let importState = importInitState as IImportFilesState;
-  console.log("importState.socketClient", importState.socketClient);
-
-  const jsonGlobArr = getJSONGlobForFolderPath(input.serverFolderPath);
+  let importState = importInitState as IImportArrayFileState;
 
   startTimeInMs = performance.now();
   emitSocketMessages({
@@ -58,11 +54,13 @@ const importJSONFilesToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  importState.filePaths = await getFilePathsFromGlobPattern(jsonGlobArr, []);
+  importState.fileContents = await readJSONArrayFileFromPath(
+    input.serverArrayFilePath
+  );
 
   let startIndex = 0;
-  await readJsonFilesFromPaths(
-    importState.filePaths,
+  await loadItemsFromArray(
+    importState.fileContents,
     input.isStopOnError,
     startIndex,
     importState,
@@ -81,4 +79,4 @@ const importJSONFilesToRedis = async (
   };
 };
 
-export { importJSONFilesToRedis };
+export { importArrayFileToRedis };
