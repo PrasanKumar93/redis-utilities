@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { getInputRedisConUrl } from "./common.js";
+import { getInputRedisConUrl } from "./common-api.js";
 import { RedisWrapper } from "../utils/redis.js";
 import * as InputSchemas from "../input-schema.js";
 

@@ -1,14 +1,12 @@
 import express, { Request, Response } from "express";
 
 import { CONSTANTS } from "./utils/constants.js";
-import {
-  importJSONFilesToRedis,
-  resumeImportJSONFilesToRedis,
-} from "./service-impl.js";
 import { LoggerCls } from "./utils/logger.js";
 import { testRedisConnection } from "./api/test-redis-connection.js";
 import { testJSONFormatterFn } from "./api/test-json-formatter-fn.js";
 import { getSampleInputForJSONFormatterFn } from "./api/get-sample-input-for-json-formatter-fn.js";
+import { importJSONFilesToRedis } from "./api/import-json/import-json-files-to-redis.js";
+import { resumeImportJSONFilesToRedis } from "./api/import-json/resume-import-json-files-to-redis.js";
 
 const router = express.Router();
 
