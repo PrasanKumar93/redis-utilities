@@ -1,5 +1,4 @@
 import type { IFileReaderData } from "./utils/file-reader.js";
-import type { IEncryptedElm } from "./utils/crypto-node-util.js";
 import type { IImportStats } from "./input-schema.js";
 import type { IImportFilesState } from "./state.js";
 
@@ -10,65 +9,19 @@ import { Socket } from "socket.io";
 
 import { RedisWrapper } from "./utils/redis.js";
 import {
-  readFiles,
-  readFilesExt,
-  readSingleFileFromPaths,
+  getFilePathsFromGlobPattern,
+  readJsonFilesFromPaths,
+  getJSONGlobForFolderPath,
 } from "./utils/file-reader.js";
 import { LoggerCls } from "./utils/logger.js";
 import { runJSFunction, validateJS } from "./utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "./utils/constants.js";
-import { decryptData } from "./utils/crypto-node-util.js";
 
 import * as InputSchemas from "./input-schema.js";
 import { socketState, ImportStatus } from "./state.js";
+import { getInputRedisConUrl } from "./api/common.js";
 
-const getInputRedisConUrl = (
-  redisConUrl?: string,
-  redisConUrlEncrypted?: IEncryptedElm
-) => {
-  if (!redisConUrl && redisConUrlEncrypted) {
-    redisConUrl = decryptData(redisConUrlEncrypted);
-  }
-
-  if (!redisConUrl) {
-    throw new Error("Redis connection URL is missing !");
-  }
-  return redisConUrl;
-};
-
-const testRedisConnection = async (
-  input: z.infer<typeof InputSchemas.testRedisConnectionSchema>
-) => {
-  InputSchemas.testRedisConnectionSchema.parse(input); // validate input
-
-  let redisConUrl = getInputRedisConUrl(
-    input.redisConUrl,
-    input.redisConUrlEncrypted
-  );
-
-  const redisWrapper = new RedisWrapper(redisConUrl);
-
-  await redisWrapper.connect();
-  await redisWrapper.client?.ping();
-  await redisWrapper.disconnect();
-
-  return "Connection to Redis successful !";
-};
-
-//#region importFilesToRedis
-
-const getJSONGlob = (serverFolderPath: string) => {
-  if (serverFolderPath.match(/\\/)) {
-    //windows OS path
-    serverFolderPath = serverFolderPath.replace(/\\/g, "/");
-  }
-  if (!serverFolderPath.endsWith("/")) {
-    serverFolderPath += "/";
-  }
-  let jsonGlob = serverFolderPath + "**/*.json";
-  let jsonGzGlob = serverFolderPath + "**/*.json.gz";
-  return [jsonGlob, jsonGzGlob];
-};
+//#region importJSONFilesToRedis
 
 const getFileKey = (
   filePath: string,
@@ -237,7 +190,7 @@ const readEachFileCallback = async (
   }
 };
 
-const importFilesToRedis = async (
+const importJSONFilesToRedis = async (
   input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
 ) => {
   InputSchemas.importFilesToRedisSchema.parse(input); // validate input
@@ -276,7 +229,7 @@ const importFilesToRedis = async (
   const redisWrapper = new RedisWrapper(redisConUrl);
   await redisWrapper.connect();
 
-  const jsonGlobArr = getJSONGlob(input.serverFolderPath);
+  const jsonGlobArr = getJSONGlobForFolderPath(input.serverFolderPath);
 
   startTimeInMs = performance.now();
   importState.isPaused = false;
@@ -286,23 +239,22 @@ const importFilesToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  let allFilesPromObj: any = readFiles(
-    jsonGlobArr,
-    [],
-    input.isStopOnError,
+  importState.filePaths = await getFilePathsFromGlobPattern(jsonGlobArr, []);
+
+  let startIndex = 0;
+  await readJsonFilesFromPaths(
     importState.filePaths,
+    input.isStopOnError,
+    startIndex,
     importState,
     async (data) => {
       await readEachFileCallback(data, redisWrapper, input, importState);
     }
   );
 
-  allFilesPromObj = allFilesPromObj.then(() => {
-    setImportTimeAndStatus(startTimeInMs, importState);
-    return redisWrapper.disconnect();
-  });
+  setImportTimeAndStatus(startTimeInMs, importState);
+  await redisWrapper.disconnect();
 
-  await allFilesPromObj;
   return {
     stats: importState.stats,
     fileErrors: importState.fileErrors,
@@ -310,14 +262,13 @@ const importFilesToRedis = async (
   };
 };
 
-const resumeImportFilesToRedis = async (
+const resumeImportJSONFilesToRedis = async (
   resumeInput: z.infer<typeof InputSchemas.resumeImportFilesToRedisSchema>
 ) => {
   InputSchemas.resumeImportFilesToRedisSchema.parse(resumeInput); // validate input
 
   let startTimeInMs = 0;
   let importState: IImportFilesState = {};
-  let allFilesPromObj: Promise<any> = Promise.resolve();
 
   if (resumeInput.socketId && socketState[resumeInput.socketId]) {
     importState = socketState[resumeInput.socketId];
@@ -353,7 +304,7 @@ const resumeImportFilesToRedis = async (
         currentStatus: importState.currentStatus,
       });
 
-      allFilesPromObj = readFilesExt(
+      await readJsonFilesFromPaths(
         importState.filePaths,
         input.isStopOnError,
         filePathIndex,
@@ -363,14 +314,11 @@ const resumeImportFilesToRedis = async (
         }
       );
 
-      allFilesPromObj = allFilesPromObj.then(() => {
-        setImportTimeAndStatus(startTimeInMs, importState);
-        return redisWrapper.disconnect();
-      });
+      setImportTimeAndStatus(startTimeInMs, importState);
+      await redisWrapper.disconnect();
     }
   }
 
-  await allFilesPromObj;
   return {
     stats: importState.stats,
     fileErrors: importState.fileErrors,
@@ -380,45 +328,4 @@ const resumeImportFilesToRedis = async (
 
 //#endregion
 
-const testJSONFormatterFn = async (
-  input: z.infer<typeof InputSchemas.testJSONFormatterFnSchema>
-) => {
-  InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
-
-  let disableFlags = DISABLE_JS_FLAGS;
-  //disableFlags.NAMES_CONSOLE = false; // allow console.log
-
-  const functionResult = await runJSFunction(
-    input.jsFunctionString,
-    input.paramsObj,
-    false,
-    disableFlags
-  );
-
-  return functionResult;
-};
-
-const getSampleInputForJSONFormatterFn = async (
-  input: z.infer<typeof InputSchemas.getSampleInputForJSONFormatterFnSchema>
-) => {
-  InputSchemas.getSampleInputForJSONFormatterFnSchema.parse(input); // validate input
-
-  const jsonGlobArr = getJSONGlob(input.serverFolderPath);
-  const { filePath, content, error } = await readSingleFileFromPaths(
-    jsonGlobArr,
-    []
-  );
-
-  if (error) {
-    throw error;
-  }
-  return { filePath, content };
-};
-
-export {
-  testRedisConnection,
-  importFilesToRedis,
-  resumeImportFilesToRedis,
-  testJSONFormatterFn,
-  getSampleInputForJSONFormatterFn,
-};
+export { importJSONFilesToRedis, resumeImportJSONFilesToRedis };

@@ -14,6 +14,19 @@ interface IFileReaderData {
   filePathIndex: number;
 }
 
+const getJSONGlobForFolderPath = (serverFolderPath: string) => {
+  if (serverFolderPath.match(/\\/)) {
+    //windows OS path
+    serverFolderPath = serverFolderPath.replace(/\\/g, "/");
+  }
+  if (!serverFolderPath.endsWith("/")) {
+    serverFolderPath += "/";
+  }
+  let jsonGlob = serverFolderPath + "**/*.json";
+  let jsonGzGlob = serverFolderPath + "**/*.json.gz";
+  return [jsonGlob, jsonGzGlob];
+};
+
 const decompressGZip = async (filePath: string) => {
   let content = "";
 
@@ -35,34 +48,24 @@ const decompressGZip = async (filePath: string) => {
   return content;
 };
 
-const readFiles = async (
+const getFilePathsFromGlobPattern = async (
   include: string[],
-  exclude: string[] = [],
-  isStopOnError: boolean = false,
-  storeFilePaths: string[] = [],
-  importState: IImportFilesState | null = null,
-  recursiveCallback: (data: IFileReaderData) => Promise<void>
+  exclude: string[] = []
 ) => {
+  let filePaths: string[] = [];
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
   if (include?.length) {
-    let filePaths = await fg(include, {
+    filePaths = await fg(include, {
       caseSensitiveMatch: false,
       dot: true, // allow files that begin with a period (.)
       ignore: exclude,
     });
-
-    storeFilePaths.push(...filePaths);
-    let startIndex = 0;
-    await readFilesExt(
-      filePaths,
-      isStopOnError,
-      startIndex,
-      importState,
-      recursiveCallback
-    );
   }
+
+  return filePaths;
 };
-const readFilesExt = async (
+
+const readJsonFilesFromPaths = async (
   filePaths: string[],
   isStopOnError: boolean = false,
   startIndex: number = 0,
@@ -110,7 +113,7 @@ const readFilesExt = async (
   }
 };
 
-const readSingleFileFromPaths = async (
+const readSingleJSONFileFromPaths = async (
   include: string[],
   exclude: string[] = []
 ) => {
@@ -118,38 +121,29 @@ const readSingleFileFromPaths = async (
   let content = "";
   let error: any = null;
 
-  //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
-  let filePaths = await fg(include, {
-    caseSensitiveMatch: false,
-    dot: true, // allow files that begin with a period (.)
-    ignore: exclude,
-  });
+  let filePaths = await getFilePathsFromGlobPattern(include, exclude);
 
   if (filePaths?.length > 0) {
-    const loopCount = filePaths.length > 3 ? 3 : filePaths.length; // try to read 3 files max in case of error
+    const isStopOnError = false;
+    const startIndex = 0;
+    const state: IImportFilesState = {
+      isPaused: false,
+    };
 
-    for (let i = 0; i < loopCount; i++) {
-      filePath = filePaths[i];
+    await readJsonFilesFromPaths(
+      filePaths,
+      isStopOnError,
+      startIndex,
+      state,
+      async (data) => {
+        if (!data.error && data.content) {
+          filePath = data.filePath;
+          content = data.content;
 
-      try {
-        error = null;
-        if (filePath.endsWith(".json.gz")) {
-          content = await decompressGZip(filePath);
-        } else {
-          content = await fs.readFile(filePath, "utf8");
+          state.isPaused = true; // stop reading after one file
         }
-        content = JSON.parse(content);
-
-        break; // read only one file successfully
-      } catch (err) {
-        content = "";
-        error = LoggerCls.getPureError(err);
-        LoggerCls.error(
-          `Error in readSingleFileFromPaths :  ${filePath}`,
-          error
-        );
       }
-    }
+    );
   } else {
     error = `No file found for the given path: ${include.join(", ")}`;
   }
@@ -157,6 +151,11 @@ const readSingleFileFromPaths = async (
   return { filePath, content, error };
 };
 
-export { readFiles, readFilesExt, readSingleFileFromPaths };
+export {
+  getFilePathsFromGlobPattern,
+  getJSONGlobForFolderPath,
+  readJsonFilesFromPaths,
+  readSingleJSONFileFromPaths,
+};
 
 export type { IFileReaderData };

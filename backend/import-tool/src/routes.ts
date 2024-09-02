@@ -2,13 +2,13 @@ import express, { Request, Response } from "express";
 
 import { CONSTANTS } from "./utils/constants.js";
 import {
-  testRedisConnection,
-  importFilesToRedis,
-  resumeImportFilesToRedis,
-  testJSONFormatterFn,
-  getSampleInputForJSONFormatterFn,
+  importJSONFilesToRedis,
+  resumeImportJSONFilesToRedis,
 } from "./service-impl.js";
 import { LoggerCls } from "./utils/logger.js";
+import { testRedisConnection } from "./api/test-redis-connection.js";
+import { testJSONFormatterFn } from "./api/test-json-formatter-fn.js";
+import { getSampleInputForJSONFormatterFn } from "./api/get-sample-input-for-json-formatter-fn.js";
 
 const router = express.Router();
 
@@ -39,7 +39,7 @@ router.post("/importFilesToRedis", async (req: Request, res: Response) => {
   const input = req.body;
 
   try {
-    result.data = await importFilesToRedis(input);
+    result.data = await importJSONFilesToRedis(input);
   } catch (err) {
     err = LoggerCls.getPureError(err);
     LoggerCls.error("/importFilesToRedis API failed !", err);
@@ -60,7 +60,7 @@ router.post(
     const input = req.body;
 
     try {
-      result.data = await resumeImportFilesToRedis(input);
+      result.data = await resumeImportJSONFilesToRedis(input);
     } catch (err) {
       err = LoggerCls.getPureError(err);
       LoggerCls.error("/resumeImportFilesToRedis API failed !", err);
