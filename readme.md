@@ -40,8 +40,7 @@ NEXT_PUBLIC_ENCRYPTION_KEY same as ENCRYPTION_KEY in backend
 - [Get Sample Input for JSON Formatter Function ](./docs/api/get-sample-input-for-json-formatter-fn.md)
 - [Test JSON Formatter Function](./docs/api/test-json-formatter-fn.md)
 
-- [Import Files to Redis](./docs/api/import-files-to-redis.md)
+- [Import Data to Redis](./docs/api/import-data-to-redis.md)
 - [Resume Import Files to Redis](./docs/api/resume-import-files-to-redis.md)
 
-- [Import Array File to Redis](./docs/api/import-array-file-to-redis.md)
 - [Resume Import Array File to Redis](./docs/api/resume-import-array-file-to-redis.md)

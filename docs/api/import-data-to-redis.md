@@ -1,9 +1,9 @@
-# importArrayFileToRedis
+# importDataToRedis
 
 ## Request
 
 ```json
-POST http://localhost:3001/api/importArrayFileToRedis
+POST http://localhost:3001/api/importDataToRedis
 {
 "redisConUrl":"redis://localhost:6379",
 "redisConUrlEncrypted":{
@@ -11,7 +11,8 @@ POST http://localhost:3001/api/importArrayFileToRedis
   "iv":"",
   "authTag":""
  },
-"serverArrayFilePath":"/Users/user1/Documents/data/product-data-arr.json",
+"uploadType":"jsonFolder",
+"uploadPath":"/Users/user1/Documents/data/product-data",
 "keyPrefix":"products:",
 "idField":"meta.requestId"
 //,"socketId":"1"
@@ -25,7 +26,7 @@ Note:
 - `redisConUrl`: Redis connection URL.
   Either redisConUrl or redisConUrlEncrypted should be provided.
 
-- `serverArrayFilePath` can be absolute path of disk or relative path in the repo.
+- [sample-upload-types](./sample-upload-types.md)
 - Optional
 
   - `keyPrefix` : Prefix which will be added to the key in Redis.

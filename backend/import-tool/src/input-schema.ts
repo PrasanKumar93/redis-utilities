@@ -11,7 +11,7 @@ export const testRedisConnectionSchema = z.object({
   redisConUrlEncrypted: zodEncryptedData.optional(),
 });
 
-export const importFilesToRedisSchema = z.object({
+export const importDataToRedisSchema = z.object({
   redisConUrl: z.string().optional(),
   redisConUrlEncrypted: zodEncryptedData.optional(),
 
@@ -21,12 +21,11 @@ export const importFilesToRedisSchema = z.object({
   isStopOnError: z.boolean().optional(),
   jsFunctionString: z.string().optional(),
 
-  // one of the below fields is required
-  serverFolderPath: z.string().optional(),
-  serverArrayFilePath: z.string().optional(),
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
-export const resumeImportFilesToRedisSchema = z.object({
+export const resumeImportDataToRedisSchema = z.object({
   socketId: z.string(),
   isStopOnError: z.boolean().optional(),
 });

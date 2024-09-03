@@ -8,7 +8,7 @@ import {
   emitSocketMessages,
   setImportTimeAndStatus,
   getInitialImportState,
-} from "./common-import-json.js";
+} from "./common-import.js";
 import { getInputRedisConUrl } from "../common-api.js";
 
 import * as InputSchemas from "../../input-schema.js";
@@ -21,13 +21,10 @@ import {
 } from "../../utils/file-reader.js";
 
 const importArrayFileToRedis = async (
-  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+  input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
   // Validate input ----------------------
-  if (!input.serverArrayFilePath) {
-    throw new Error("serverArrayFilePath is required");
-  }
-  InputSchemas.importFilesToRedisSchema.parse(input);
+  InputSchemas.importDataToRedisSchema.parse(input);
   if (input.jsFunctionString) {
     let disableFlags = DISABLE_JS_FLAGS;
     //disableFlags.NAMES_CONSOLE = false; // allow console.log
@@ -54,9 +51,7 @@ const importArrayFileToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  importState.fileContents = await readJSONArrayFileFromPath(
-    input.serverArrayFilePath
-  );
+  importState.fileContents = await readJSONArrayFileFromPath(input.uploadPath);
 
   let startIndex = 0;
   await loadItemsFromArray(

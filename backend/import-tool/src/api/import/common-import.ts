@@ -69,7 +69,7 @@ const updateStatsAndErrors = (
 const processFileData = async (
   data: IFileReaderData,
   redisWrapper: RedisWrapper,
-  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+  input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
   if (data?.content) {
     let key = getFileKey(
@@ -138,7 +138,7 @@ const emitSocketMessages = (info: {
 const readEachFileCallback = async (
   data: IFileReaderData,
   redisWrapper: RedisWrapper,
-  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>,
+  input: z.infer<typeof InputSchemas.importDataToRedisSchema>,
   importState: IImportFilesState
 ) => {
   await formatJSONContent(data, importState);
@@ -189,7 +189,7 @@ const setImportTimeAndStatus = (
 };
 
 const getInitialImportState = (
-  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+  input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
   let importState: IImportCommonState = {};
   if (input?.socketId) {
@@ -216,7 +216,7 @@ const getInitialImportState = (
 };
 
 const getResumeImportState = (
-  resumeInput: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+  resumeInput: z.infer<typeof InputSchemas.resumeImportDataToRedisSchema>
 ) => {
   let importResState: IImportCommonState = {};
   let fileIndex = 0;

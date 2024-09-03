@@ -1,4 +1,4 @@
-import type { IImportFilesState } from "../../state.js";
+import type { IImportArrayFileState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -8,22 +8,26 @@ import {
   emitSocketMessages,
   setImportTimeAndStatus,
   getResumeImportState,
-} from "./common-import-json.js";
+} from "./common-import.js";
 import { getInputRedisConUrl } from "../common-api.js";
 
 import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
-import { readJsonFilesFromPaths } from "../../utils/file-reader.js";
+import { loadItemsFromArray } from "../../utils/file-reader.js";
 
-const resumeImportJSONFilesToRedis = async (
-  resumeInput: z.infer<typeof InputSchemas.resumeImportFilesToRedisSchema>
+const resumeImportArrayFileToRedis = async (
+  resumeInput: z.infer<typeof InputSchemas.resumeImportDataToRedisSchema>
 ) => {
-  InputSchemas.resumeImportFilesToRedisSchema.parse(resumeInput); // validate input
+  InputSchemas.resumeImportDataToRedisSchema.parse(resumeInput); // validate input
 
   let { importResState, fileIndex } = getResumeImportState(resumeInput);
-  let importState = importResState as IImportFilesState;
+  let importState = importResState as IImportArrayFileState;
 
-  if (importState?.filePaths?.length && fileIndex >= 0 && importState.input) {
+  if (
+    importState?.fileContents?.length &&
+    fileIndex >= 0 &&
+    importState.input
+  ) {
     let input = importState.input;
 
     let redisConUrl = getInputRedisConUrl(
@@ -39,8 +43,8 @@ const resumeImportJSONFilesToRedis = async (
       currentStatus: importState.currentStatus,
     });
 
-    await readJsonFilesFromPaths(
-      importState.filePaths,
+    await loadItemsFromArray(
+      importState.fileContents,
       input.isStopOnError,
       fileIndex,
       importState,
@@ -59,5 +63,4 @@ const resumeImportJSONFilesToRedis = async (
     currentStatus: importState.currentStatus,
   };
 };
-
-export { resumeImportJSONFilesToRedis };
+export { resumeImportArrayFileToRedis };

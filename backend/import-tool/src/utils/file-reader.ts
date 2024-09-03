@@ -15,16 +15,16 @@ interface IFileReaderData {
   error: any;
 }
 
-const getJSONGlobForFolderPath = (serverFolderPath: string) => {
-  if (serverFolderPath.match(/\\/)) {
+const getJSONGlobForFolderPath = (folderPath: string) => {
+  if (folderPath.match(/\\/)) {
     //windows OS path
-    serverFolderPath = serverFolderPath.replace(/\\/g, "/");
+    folderPath = folderPath.replace(/\\/g, "/");
   }
-  if (!serverFolderPath.endsWith("/")) {
-    serverFolderPath += "/";
+  if (!folderPath.endsWith("/")) {
+    folderPath += "/";
   }
-  let jsonGlob = serverFolderPath + "**/*.json";
-  let jsonGzGlob = serverFolderPath + "**/*.json.gz";
+  let jsonGlob = folderPath + "**/*.json";
+  let jsonGzGlob = folderPath + "**/*.json.gz";
   return [jsonGlob, jsonGzGlob];
 };
 

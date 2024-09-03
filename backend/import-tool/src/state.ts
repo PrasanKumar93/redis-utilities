@@ -16,7 +16,7 @@ enum ImportStatus {
 interface IImportCommonState {
   socketClient?: Socket | null;
   stats?: IImportStats;
-  input?: z.infer<typeof InputSchemas.importFilesToRedisSchema>;
+  input?: z.infer<typeof InputSchemas.importDataToRedisSchema>;
   currentStatus?: ImportStatus;
   isPaused?: boolean;
   importErrors?: any[];

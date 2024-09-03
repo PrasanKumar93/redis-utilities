@@ -8,7 +8,7 @@ import {
   emitSocketMessages,
   setImportTimeAndStatus,
   getInitialImportState,
-} from "./common-import-json.js";
+} from "./common-import.js";
 import { getInputRedisConUrl } from "../common-api.js";
 
 import * as InputSchemas from "../../input-schema.js";
@@ -22,13 +22,10 @@ import {
 } from "../../utils/file-reader.js";
 
 const importJSONFilesToRedis = async (
-  input: z.infer<typeof InputSchemas.importFilesToRedisSchema>
+  input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
   // Validate input ----------------------
-  if (!input.serverFolderPath) {
-    throw new Error("serverFolderPath is required");
-  }
-  InputSchemas.importFilesToRedisSchema.parse(input);
+  InputSchemas.importDataToRedisSchema.parse(input);
   if (input.jsFunctionString) {
     let disableFlags = DISABLE_JS_FLAGS;
     //disableFlags.NAMES_CONSOLE = false; // allow console.log
@@ -50,7 +47,7 @@ const importJSONFilesToRedis = async (
   let importState = importInitState as IImportFilesState;
   console.log("importState.socketClient", importState.socketClient);
 
-  const jsonGlobArr = getJSONGlobForFolderPath(input.serverFolderPath);
+  const jsonGlobArr = getJSONGlobForFolderPath(input.uploadPath);
 
   startTimeInMs = performance.now();
   emitSocketMessages({
