@@ -13,10 +13,10 @@ import CodeMirrorEditor from '../components/CodeMirrorEditor';
 
 import {
     testRedisConnection,
-    importFilesToRedis,
-    resumeImportFilesToRedis,
+    importDataToRedis,
+    resumeImportDataToRedis,
     testJSONFormatterFn,
-    getSampleInputForJSONFormatterFn
+    getSampleInputForJSONFormatterFn,
 } from "../utils/services";
 import { infoToast } from "../utils/toast-util";
 import { encryptData } from "../utils/crypto-util";
@@ -64,7 +64,7 @@ const Page = () => {
     const [testRedisUrl, setTestRedisUrl] = useState(config.DEFAULT_REDIS_URL);
 
     const [redisConUrl, setRedisConUrl] = useState('');
-    const [serverFolderPath, setServerFolderPath] = useState('');
+    const [uploadPath, setUploadPath] = useState('');
     const [keyPrefix, setKeyPrefix] = useState('');
     const [idField, setIdField] = useState('');
     const [isStopOnError, setIsStopOnError] = useState(false);
@@ -123,12 +123,13 @@ const Page = () => {
 
     const evtClickEnterFolderPath = async () => {
 
-        if (serverFolderPath) {
+        if (uploadPath) {
             removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
             addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
 
             const result = await getSampleInputForJSONFormatterFn({
-                serverFolderPath
+                uploadType: "",
+                uploadPath: uploadPath
             });
             if (result?.data?.content) {
                 console.log("sample file path :", result.data?.filePath);
@@ -145,17 +146,19 @@ const Page = () => {
     const startImportFiles = async () => {
         setDisplayErrors([]);
 
-        const encryptedRedisUrl = await encryptData(testRedisUrl);
+        const encryptedRedisUrl = await encryptData(redisConUrl);
 
-        const result = await importFilesToRedis({
+        const result = await importDataToRedis({
             redisConUrlEncrypted: encryptedRedisUrl,
-            serverFolderPath,
+            uploadType: "",
+            uploadPath,
             keyPrefix,
             idField,
             socketId,
             isStopOnError,
             jsFunctionString: formatterFn
         });
+
         if (result?.data?.stats) {
             setDisplayStats(result.data.stats);
         }
@@ -165,10 +168,13 @@ const Page = () => {
     }
     const resumeImportFiles = async () => {
 
-        const result = await resumeImportFilesToRedis({
+        const result = await resumeImportDataToRedis({
             socketId,
-            isStopOnError
+            isStopOnError,
+            uploadType: "",
+            uploadPath: uploadPath
         });
+
         if (result?.data?.stats) {
             setDisplayStats(result.data.stats);
         }
@@ -303,8 +309,8 @@ const Page = () => {
                             <input type="text" className="folder-path-textbox pg001-textbox"
                                 placeholder="/Users/tom/Documents/product-data"
                                 id="folder-path-textbox"
-                                value={serverFolderPath}
-                                onChange={(e) => setServerFolderPath(e.target.value)}
+                                value={uploadPath}
+                                onChange={(e) => setUploadPath(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key.toLowerCase() === 'enter') {
                                         evtClickEnterFolderPath();
@@ -325,7 +331,7 @@ const Page = () => {
                     <div id="final-folder-path-container" className="final-folder-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
                         <div className="roboto-medium">Server Folder Path : </div>
-                        <div id="final-folder-path" className="final-folder-path">{serverFolderPath}</div>
+                        <div id="final-folder-path" className="final-folder-path">{uploadPath}</div>
                     </div>
                     <div className="import-process-container">
 

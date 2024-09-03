@@ -15,19 +15,23 @@ const testRedisConnectionSchema = z.object({
   redisConUrlEncrypted: zodEncryptedData,
 });
 
-const importFilesToRedisSchema = z.object({
+const importDataToRedisSchema = z.object({
   redisConUrlEncrypted: zodEncryptedData,
-  serverFolderPath: z.string(),
   socketId: z.string().optional(),
   idField: z.string().optional(),
   keyPrefix: z.string().optional(),
   isStopOnError: z.boolean().optional(),
   jsFunctionString: z.string().optional(),
+
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
-const resumeImportFilesToRedisSchema = z.object({
+const resumeImportDataToRedisSchema = z.object({
   socketId: z.string(),
   isStopOnError: z.boolean().optional(),
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
 export const testJSONFormatterFnSchema = z.object({
@@ -36,7 +40,8 @@ export const testJSONFormatterFnSchema = z.object({
 });
 
 const getSampleInputForJSONFormatterFnSchema = z.object({
-  serverFolderPath: z.string(),
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
 //#endregion
@@ -66,29 +71,29 @@ const testRedisConnection = async (
   }
 };
 
-const importFilesToRedis = async (
-  input: z.infer<typeof importFilesToRedisSchema>
+const importDataToRedis = async (
+  input: z.infer<typeof importDataToRedisSchema>
 ) => {
   try {
-    importFilesToRedisSchema.parse(input); // validate input
-    const response = await postRequest("/importFilesToRedis", input);
+    importDataToRedisSchema.parse(input); // validate input
+    const response = await postRequest("/importDataToRedis", input);
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /importFilesToRedis API");
+    errorToast("Error in /importDataToRedis API");
   }
 };
 
-const resumeImportFilesToRedis = async (
-  input: z.infer<typeof resumeImportFilesToRedisSchema>
+const resumeImportDataToRedis = async (
+  input: z.infer<typeof resumeImportDataToRedisSchema>
 ) => {
   try {
-    resumeImportFilesToRedisSchema.parse(input); // validate input
-    const response = await postRequest("/resumeImportFilesToRedis", input);
+    resumeImportDataToRedisSchema.parse(input); // validate input
+    const response = await postRequest("/resumeImportDataToRedis", input);
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /resumeImportFilesToRedis API");
+    errorToast("Error in /resumeImportDataToRedis API");
   }
 };
 
@@ -137,8 +142,8 @@ const getSampleInputForJSONFormatterFn = async (
 
 export {
   testRedisConnection,
-  importFilesToRedis,
-  resumeImportFilesToRedis,
+  importDataToRedis,
+  resumeImportDataToRedis,
   testJSONFormatterFn,
   getSampleInputForJSONFormatterFn,
 };
