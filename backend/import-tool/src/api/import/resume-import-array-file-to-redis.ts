@@ -13,7 +13,7 @@ import { getInputRedisConUrl } from "../common-api.js";
 
 import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
-import { loadItemsFromArray } from "../../utils/file-reader.js";
+import { loopJsonArrayFileContents } from "../../utils/file-reader.js";
 
 const resumeImportArrayFileToRedis = async (
   resumeInput: z.infer<typeof InputSchemas.resumeImportDataToRedisSchema>
@@ -43,7 +43,7 @@ const resumeImportArrayFileToRedis = async (
       currentStatus: importState.currentStatus,
     });
 
-    await loadItemsFromArray(
+    await loopJsonArrayFileContents(
       importState.fileContents,
       input.isStopOnError,
       fileIndex,

@@ -28,7 +28,7 @@ interface IImportFilesState extends IImportCommonState {
 }
 
 interface IImportArrayFileState extends IImportCommonState {
-  fileContents?: string[];
+  fileContents?: any[];
 }
 
 const socketState: {

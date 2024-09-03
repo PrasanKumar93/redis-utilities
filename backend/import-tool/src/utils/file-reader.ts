@@ -12,10 +12,10 @@ interface IFileReaderData {
 
   content: any;
   totalFiles: number;
-  error: any;
+  error?: any;
 }
 
-const getJSONGlobForFolderPath = (folderPath: string) => {
+const getJsonGlobForFolderPath = (folderPath: string) => {
   if (folderPath.match(/\\/)) {
     //windows OS path
     folderPath = folderPath.replace(/\\/g, "/");
@@ -66,6 +66,33 @@ const getFilePathsFromGlobPattern = async (
   return filePaths;
 };
 
+const readRawJSONFile = async (
+  filePath: string,
+  isJsonArrayFile: boolean = false
+) => {
+  let content: any = null;
+  if (filePath) {
+    try {
+      if (filePath.endsWith(".json.gz")) {
+        content = await decompressGZip(filePath);
+      } else {
+        content = await fs.readFile(filePath, "utf8");
+      }
+      content = JSON.parse(content);
+    } catch (err) {
+      LoggerCls.error(`Error reading/ parsing JSON file:  ${filePath}`, err);
+      throw err;
+    }
+
+    if (isJsonArrayFile) {
+      if (!Array.isArray(content)) {
+        throw new Error("File content is not an array in " + filePath);
+      }
+    }
+  }
+  return content;
+};
+
 const readJsonFilesFromPaths = async (
   filePaths: string[],
   isStopOnError: boolean = false,
@@ -79,19 +106,13 @@ const readJsonFilesFromPaths = async (
     for (let i = startIndex; i < filePaths.length; i++) {
       let fileIndex = i;
       const filePath = filePaths[fileIndex];
-      let content = "";
       let error: any = null;
+      let content: any = null;
+
       try {
-        if (filePath.endsWith(".json.gz")) {
-          content = await decompressGZip(filePath);
-        } else {
-          content = await fs.readFile(filePath, "utf8");
-        }
-        content = JSON.parse(content);
+        content = await readRawJSONFile(filePath, false);
       } catch (err) {
-        content = "";
-        error = LoggerCls.getPureError(err);
-        LoggerCls.error(`Error reading/ parsing file:  ${filePath}`, error);
+        error = err;
       }
       await recursiveCallback({
         filePath,
@@ -112,7 +133,7 @@ const readJsonFilesFromPaths = async (
   }
 };
 
-const readSingleJSONFileFromPaths = async (
+const readSampleJsonFileFromPaths = async (
   include: string[],
   exclude: string[] = []
 ) => {
@@ -121,73 +142,30 @@ const readSingleJSONFileFromPaths = async (
     filePath: "",
     fileIndex: 0,
     content: "",
-    error: null,
   };
 
   let filePaths = await getFilePathsFromGlobPattern(include, exclude);
 
   if (filePaths?.length > 0) {
     retObj.totalFiles = filePaths.length;
-
-    const isStopOnError = false;
-    const startIndex = 0;
-    const state: IImportFilesState = {
-      isPaused: false,
-    };
-
-    await readJsonFilesFromPaths(
-      filePaths,
-      isStopOnError,
-      startIndex,
-      state,
-      async (data) => {
-        if (!data.error && data.content) {
-          retObj.filePath = data.filePath;
-          retObj.fileIndex = data.fileIndex;
-          retObj.content = data.content;
-
-          state.isPaused = true; // stop reading after one file
-        }
-      }
-    );
+    retObj.filePath = filePaths[0];
+    retObj.fileIndex = 0;
+    retObj.content = await readRawJSONFile(filePaths[0], false);
   } else {
-    retObj.error = `No file found for the given path: ${include.join(", ")}`;
+    throw new Error(`No file found for the given path: ${include.join(", ")}`);
   }
 
   return retObj;
 };
 
-const readJSONArrayFileFromPath = async (filePath: string) => {
-  let fileContents: any[] = [];
-
-  try {
-    let content = "";
-    if (filePath.endsWith(".json.gz")) {
-      content = await decompressGZip(filePath);
-    } else {
-      content = await fs.readFile(filePath, "utf8");
-    }
-    fileContents = JSON.parse(content);
-
-    if (!Array.isArray(fileContents)) {
-      throw new Error("File content is not an array in " + filePath);
-    }
-  } catch (err) {
-    LoggerCls.error(`Error reading file:  ${filePath}`, err);
-    throw err;
-  }
-
-  return fileContents;
-};
-
-const loadItemsFromArray = async (
-  fileContents: any[],
+const loopJsonArrayFileContents = async (
+  fileContents: any[] = [],
   isStopOnError: boolean = false,
   startIndex: number = 0,
   importState: IImportArrayFileState | null = null,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
 ) => {
-  // similar to readJsonFilesFromPaths
+  // structure similar to readJsonFilesFromPaths
 
   if (fileContents?.length) {
     const totalFiles = fileContents.length;
@@ -215,28 +193,23 @@ const loadItemsFromArray = async (
   }
 };
 
-const readSingleValueFromJSONArrayFile = async (filePath: string) => {
+const readSampleDataFromJSONArrayFile = async (filePath: string) => {
   const retObj: IFileReaderData = {
     totalFiles: 0,
     filePath: "",
     fileIndex: 0,
     content: "",
-    error: null,
   };
 
-  try {
-    let fileContents = await readJSONArrayFileFromPath(filePath);
+  let fileContents: any[] = await readRawJSONFile(filePath, true);
 
-    if (fileContents?.length > 0) {
-      retObj.totalFiles = fileContents.length;
-      retObj.filePath = filePath;
-      retObj.fileIndex = 0;
-      retObj.content = fileContents[0];
-    } else {
-      retObj.error = `No item found in the file: ${filePath}`;
-    }
-  } catch (err) {
-    retObj.error = err;
+  if (fileContents?.length > 0) {
+    retObj.totalFiles = fileContents.length;
+    retObj.filePath = filePath;
+    retObj.fileIndex = 0;
+    retObj.content = fileContents[0];
+  } else {
+    throw new Error(`No item found in the file: ${filePath}`);
   }
 
   return retObj;
@@ -244,12 +217,12 @@ const readSingleValueFromJSONArrayFile = async (filePath: string) => {
 
 export {
   getFilePathsFromGlobPattern,
-  getJSONGlobForFolderPath,
+  getJsonGlobForFolderPath,
   readJsonFilesFromPaths,
-  readSingleJSONFileFromPaths,
-  readJSONArrayFileFromPath,
-  loadItemsFromArray,
-  readSingleValueFromJSONArrayFile,
+  readSampleJsonFileFromPaths,
+  loopJsonArrayFileContents,
+  readSampleDataFromJSONArrayFile,
+  readRawJSONFile,
 };
 
 export type { IFileReaderData };

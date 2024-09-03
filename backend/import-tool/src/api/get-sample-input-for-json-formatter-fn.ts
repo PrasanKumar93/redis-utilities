@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import * as InputSchemas from "../input-schema.js";
 import {
-  getJSONGlobForFolderPath,
+  getJsonGlobForFolderPath,
   IFileReaderData,
-  readSingleJSONFileFromPaths,
-  readSingleValueFromJSONArrayFile,
+  readSampleJsonFileFromPaths,
+  readSampleDataFromJSONArrayFile,
 } from "../utils/file-reader.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../utils/constants.js";
 import { getDefaultUploadType } from "./common-api.js";
@@ -21,17 +21,12 @@ const getSampleInputForJSONFormatterFn = async (
   }
 
   if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
-    const jsonGlobArr = getJSONGlobForFolderPath(input.uploadPath);
-    retObj = await readSingleJSONFileFromPaths(jsonGlobArr, []);
+    const jsonGlobArr = getJsonGlobForFolderPath(input.uploadPath);
+    retObj = await readSampleJsonFileFromPaths(jsonGlobArr, []);
   } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
-    retObj = await readSingleValueFromJSONArrayFile(input.uploadPath);
+    retObj = await readSampleDataFromJSONArrayFile(input.uploadPath);
   }
 
-  if (retObj?.error) {
-    throw retObj?.error;
-  }
-
-  delete retObj?.error;
   return retObj;
 };
 

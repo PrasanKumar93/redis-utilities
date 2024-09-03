@@ -16,8 +16,8 @@ import { RedisWrapper } from "../../utils/redis.js";
 import { validateJS } from "../../utils/validate-js.js";
 import { DISABLE_JS_FLAGS } from "../../utils/constants.js";
 import {
-  readJSONArrayFileFromPath,
-  loadItemsFromArray,
+  readRawJSONFile,
+  loopJsonArrayFileContents,
 } from "../../utils/file-reader.js";
 
 const importArrayFileToRedis = async (
@@ -51,10 +51,10 @@ const importArrayFileToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  importState.fileContents = await readJSONArrayFileFromPath(input.uploadPath);
+  importState.fileContents = await readRawJSONFile(input.uploadPath, true);
 
   let startIndex = 0;
-  await loadItemsFromArray(
+  await loopJsonArrayFileContents(
     importState.fileContents,
     input.isStopOnError,
     startIndex,

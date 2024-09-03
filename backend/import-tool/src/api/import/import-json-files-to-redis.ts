@@ -18,7 +18,7 @@ import { DISABLE_JS_FLAGS } from "../../utils/constants.js";
 import {
   getFilePathsFromGlobPattern,
   readJsonFilesFromPaths,
-  getJSONGlobForFolderPath,
+  getJsonGlobForFolderPath,
 } from "../../utils/file-reader.js";
 
 const importJSONFilesToRedis = async (
@@ -47,7 +47,7 @@ const importJSONFilesToRedis = async (
   let importState = importInitState as IImportFilesState;
   console.log("importState.socketClient", importState.socketClient);
 
-  const jsonGlobArr = getJSONGlobForFolderPath(input.uploadPath);
+  const jsonGlobArr = getJsonGlobForFolderPath(input.uploadPath);
 
   startTimeInMs = performance.now();
   emitSocketMessages({
