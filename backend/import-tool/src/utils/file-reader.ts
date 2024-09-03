@@ -10,7 +10,7 @@ interface IFileReaderData {
   filePath: string;
   fileIndex: number;
 
-  content: string;
+  content: any;
   totalFiles: number;
   error: any;
 }
@@ -116,13 +116,19 @@ const readSingleJSONFileFromPaths = async (
   include: string[],
   exclude: string[] = []
 ) => {
-  let filePath = "";
-  let content = "";
-  let error: any = null;
+  const retObj: IFileReaderData = {
+    totalFiles: 0,
+    filePath: "",
+    fileIndex: 0,
+    content: "",
+    error: null,
+  };
 
   let filePaths = await getFilePathsFromGlobPattern(include, exclude);
 
   if (filePaths?.length > 0) {
+    retObj.totalFiles = filePaths.length;
+
     const isStopOnError = false;
     const startIndex = 0;
     const state: IImportFilesState = {
@@ -136,24 +142,23 @@ const readSingleJSONFileFromPaths = async (
       state,
       async (data) => {
         if (!data.error && data.content) {
-          filePath = data.filePath;
-          content = data.content;
+          retObj.filePath = data.filePath;
+          retObj.fileIndex = data.fileIndex;
+          retObj.content = data.content;
 
           state.isPaused = true; // stop reading after one file
         }
       }
     );
   } else {
-    error = `No file found for the given path: ${include.join(", ")}`;
+    retObj.error = `No file found for the given path: ${include.join(", ")}`;
   }
 
-  return { filePath, content, error };
+  return retObj;
 };
 
-const readJSONArrayFileFromPath = async (
-  filePath: string
-): Promise<string[]> => {
-  let fileContents: string[] = [];
+const readJSONArrayFileFromPath = async (filePath: string) => {
+  let fileContents: any[] = [];
 
   try {
     let content = "";
@@ -210,6 +215,33 @@ const loadItemsFromArray = async (
   }
 };
 
+const readSingleValueFromJSONArrayFile = async (filePath: string) => {
+  const retObj: IFileReaderData = {
+    totalFiles: 0,
+    filePath: "",
+    fileIndex: 0,
+    content: "",
+    error: null,
+  };
+
+  try {
+    let fileContents = await readJSONArrayFileFromPath(filePath);
+
+    if (fileContents?.length > 0) {
+      retObj.totalFiles = fileContents.length;
+      retObj.filePath = filePath;
+      retObj.fileIndex = 0;
+      retObj.content = fileContents[0];
+    } else {
+      retObj.error = `No item found in the file: ${filePath}`;
+    }
+  } catch (err) {
+    retObj.error = err;
+  }
+
+  return retObj;
+};
+
 export {
   getFilePathsFromGlobPattern,
   getJSONGlobForFolderPath,
@@ -217,6 +249,7 @@ export {
   readSingleJSONFileFromPaths,
   readJSONArrayFileFromPath,
   loadItemsFromArray,
+  readSingleValueFromJSONArrayFile,
 };
 
 export type { IFileReaderData };

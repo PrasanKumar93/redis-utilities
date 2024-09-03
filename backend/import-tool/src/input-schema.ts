@@ -37,7 +37,8 @@ export const testJSONFormatterFnSchema = z.object({
 });
 
 export const getSampleInputForJSONFormatterFnSchema = z.object({
-  serverFolderPath: z.string(),
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
 //--- types ---

@@ -8,6 +8,12 @@ const CONSTANTS = {
   },
 };
 
+const UPLOAD_TYPES_FOR_IMPORT = {
+  JSON_FOLDER: "jsonFolder",
+  JSON_ARRAY_FILE: "jsonArrayFile",
+  CSV_FILE: "csvFile",
+};
+
 const DISABLE_JS_DATA = {
   NAMES_GLOBAL: ["window", "document", "global", "process"],
   NAMES_DANGEROUS: ["eval"],
@@ -56,6 +62,11 @@ type DisableJsFlagsType = {
   [key in keyof typeof DISABLE_JS_FLAGS]: boolean;
 };
 
-export { CONSTANTS, DISABLE_JS_DATA, DISABLE_JS_FLAGS };
+export {
+  CONSTANTS,
+  DISABLE_JS_DATA,
+  DISABLE_JS_FLAGS,
+  UPLOAD_TYPES_FOR_IMPORT,
+};
 
 export type { DisableJsFlagsType };
