@@ -21,12 +21,13 @@ enum IMPORT_PAGE_TABS {
 }
 
 const IMPORT_PAGE_THEMES = [
+  "theme-redis",
   "theme-blue",
   "theme-blue-gray",
   "theme-teal",
   "theme-orange",
-  "theme-gray",
   "theme-brown",
+  "theme-gray",
 ];
 
 export {

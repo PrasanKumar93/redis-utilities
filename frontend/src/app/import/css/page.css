@@ -57,8 +57,9 @@
         align-items: center;
         justify-content: center;
         padding: var(--space-8);
-        background: linear-gradient(90deg, var(--primary-6), var(--primary-10));
-        color: var(--primary-clr-8);
+        /* background: linear-gradient(90deg, var(--primary-8), var(--primary-10)); */
+        background: var(--primary-10);
+        color: var(--primary-clr-10);
         box-shadow: 0 0 8px #000;
         font-size: var(--font-size-24);
         letter-spacing: 2px;
@@ -192,10 +193,10 @@
                     fieldset {
                         margin: 0;
                         border-radius: 5px;
-                        border-color: var(--primary-6);
+                        border-color: var(--primary-8);
 
                         legend {
-                            color: var(--primary-6);
+                            color: var(--primary-8);
                             padding: 0 var(--space-4);
                             font-size: var(--font-size-16);
                         }
@@ -288,8 +289,8 @@
                         padding: var(--space-12);
                         height: 40px;
                         width: 40px;
-                        background: var(--primary-6);
-                        color: var(--primary-clr-6);
+                        background: var(--primary-8);
+                        color: var(--primary-clr-8);
                         border-radius: 50%;
                         cursor: pointer;
                         position: relative;
@@ -395,7 +396,7 @@
 
                         .tab-title {
                             padding: var(--space-8);
-                            border: 2px solid var(--primary-6);
+                            border: 2px solid var(--primary-8);
                             border-bottom: none;
                             border-bottom: none;
                             border-radius: 5px 5px 0 0;
@@ -403,8 +404,8 @@
                         }
 
                         .tab-title-active {
-                            background-color: var(--primary-6);
-                            color: var(--primary-clr-6);
+                            background-color: var(--primary-8);
+                            color: var(--primary-clr-8);
                         }
                     }
 
@@ -413,7 +414,7 @@
                         padding: var(--space-4);
                         background: var(--primary-2);
                         color: var(--primary-clr-2);
-                        border: 2px solid var(--primary-6);
+                        border: 2px solid var(--primary-8);
                         border-radius: 0 5px 5px 5px;
 
                         overflow: auto;
@@ -422,8 +423,8 @@
 
                         .tab-container-status {
                             padding: var(--space-4);
-                            background-color: var(--primary-5);
-                            color: var(--primary-clr-5);
+                            background-color: var(--primary-7);
+                            color: var(--primary-clr-7);
                         }
 
                         details {

@@ -117,7 +117,7 @@
     --primary-9: #EF6C00;
     --primary-clr-9: #000000;
     --primary-10: #E65100;
-    --primary-clr-10: #000000;
+    --primary-clr-10: #ffffff;
 
     --secondary-1: #6D4C41;
     --secondary-clr-1: #ffffff;
@@ -190,4 +190,44 @@
     --gradient-clr-2: #F27121;
     --gradient-clr: #ffffff;
 
+}
+
+.pg001-body.theme-redis {
+
+    --primary-1: #c6cdff;
+    --primary-clr-1: #000000;
+
+    --primary-2: #b2b9f5;
+    --primary-clr-2: #000000;
+
+    --primary-3: #9da4dc;
+    --primary-clr-3: #000000;
+
+    --primary-4: #8990c4;
+    --primary-clr-4: #000000;
+
+    --primary-5: #747bac;
+    --primary-clr-5: #ffffff;
+
+    --primary-6: #5f6793;
+    --primary-clr-6: #ffffff;
+
+    --primary-7: #4b537b;
+    --primary-clr-7: #ffffff;
+
+    --primary-8: #373e63;
+    --primary-clr-8: #ffffff;
+
+    --primary-9: #232a4b;
+    --primary-clr-9: #ffffff;
+
+    --primary-10: #0f1633;
+    --primary-clr-10: #ffffff;
+
+    --secondary-1: #ff6f61;
+    --secondary-clr-1: #ffffff;
+
+    --gradient-clr-1: #ff00cc;
+    --gradient-clr-2: #333399;
+    --gradient-clr: #ffffff;
 }
