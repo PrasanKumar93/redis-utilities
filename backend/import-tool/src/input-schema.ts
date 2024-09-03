@@ -28,6 +28,9 @@ export const importDataToRedisSchema = z.object({
 export const resumeImportDataToRedisSchema = z.object({
   socketId: z.string(),
   isStopOnError: z.boolean().optional(),
+
+  uploadType: z.string().optional(),
+  uploadPath: z.string(),
 });
 
 export const testJSONFormatterFnSchema = z.object({

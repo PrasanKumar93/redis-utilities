@@ -1,17 +1,20 @@
-# resumeImportFilesToRedis
+# resumeImportDataToRedis
 
 ## Request
 
 ```json
-POST http://localhost:3001/api/resumeImportFilesToRedis
+POST http://localhost:3001/api/resumeImportDataToRedis
 {
 "socketId":"1",
-"isStopOnError":true
+"isStopOnError":true,
+"uploadType":"jsonFolder",
+"uploadPath":"/Users/user1/Documents/data/product-data",
 }
 ```
 
 Note:
 
+- [sample-upload-types](./sample-upload-types.md)
 - `socketId` : To resume the import process of connected socket client.
 
 - Optional
