@@ -3,13 +3,14 @@
 import type { ImportFileError } from "../types";
 import React, { useEffect, useState } from "react";
 
-import './css/typography.css';
-import './css/variables.css';
+import '../common/css/typography.css';
+import '../common/css/variables.css';
+import '../common/css/theme.css';
+
 import './css/page.css';
-import './css/theme.css';
 
 import CodeMirrorEditor from '../components/CodeMirrorEditor';
-
+import Loader from '../components/Loader';
 
 import {
     testRedisConnection,
@@ -18,14 +19,16 @@ import {
     testJSONFormatterFn,
     getSampleInputForJSONFormatterFn,
 } from "../utils/services";
-import { infoToast } from "../utils/toast-util";
+import { errorToast, infoToast } from "../utils/toast-util";
 import { encryptData } from "../utils/crypto-util";
 
 import {
     IMPORT_ANIMATE_CSS,
     IMPORT_STATUS,
     IMPORT_PAGE_TABS,
-    IMPORT_PAGE_THEMES
+    IMPORT_PAGE_THEMES,
+    UPLOAD_TYPES_OPTIONS,
+    UPLOAD_TYPES_FOR_IMPORT,
 } from "../constants";
 import { config } from "../config";
 
@@ -76,6 +79,8 @@ const Page = () => {
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
     const [themeName, setThemeName] = useState(IMPORT_PAGE_THEMES[0]);
+    const [isShowLoader, setIsShowLoader] = useState(false);
+    const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_TYPES_OPTIONS[0]);
 
     const {
         socketId,
@@ -107,6 +112,7 @@ const Page = () => {
 
         if (testRedisUrl) {
             setRedisConUrl("");
+            setIsShowLoader(true);
 
             const encryptedRedisUrl = await encryptData(testRedisUrl);
             const result = await testRedisConnection({
@@ -117,18 +123,45 @@ const Page = () => {
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
             }
+            setIsShowLoader(false);
 
         }
     }
 
-    const evtClickEnterFolderPath = async () => {
+    const validateUploadPath = () => {
+        let isValid = false;
 
         if (uploadPath) {
+            if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+                isValid = !!(uploadPath.match(/\.json$/)?.length);
+            }
+            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+                isValid = !!(uploadPath.match(/\.csv$/)?.length);
+            }
+            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
+                // should not end with any file extension
+                isValid = !(uploadPath.match(/\.\w+$/)?.length);
+            }
+
+        }
+
+        return isValid;
+    }
+
+    const evtClickEnterFolderPath = async () => {
+
+        const isValid = validateUploadPath();
+        if (!isValid) {
+            errorToast("Invalid upload path!");
+        }
+        else {
             removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
             addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
 
+            setIsShowLoader(true);
+
             const result = await getSampleInputForJSONFormatterFn({
-                uploadType: "",
+                uploadType: uploadTypeOption.value,
                 uploadPath: uploadPath
             });
             if (result?.data?.content) {
@@ -139,6 +172,8 @@ const Page = () => {
             else if (result?.error) {
                 setFormatterFnInput({});
             }
+            setIsShowLoader(false);
+
         }
 
     }
@@ -150,7 +185,7 @@ const Page = () => {
 
         const result = await importDataToRedis({
             redisConUrlEncrypted: encryptedRedisUrl,
-            uploadType: "",
+            uploadType: uploadTypeOption.value,
             uploadPath,
             keyPrefix,
             idField,
@@ -171,7 +206,7 @@ const Page = () => {
         const result = await resumeImportDataToRedis({
             socketId,
             isStopOnError,
-            uploadType: "",
+            uploadType: uploadTypeOption.value,
             uploadPath: uploadPath
         });
 
@@ -263,6 +298,13 @@ const Page = () => {
         }
     }
 
+    const handleUploadTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedValue = e.target.value;
+        const selectedOption = UPLOAD_TYPES_OPTIONS.find(option => option.value === selectedValue);
+        if (selectedOption) {
+            setUploadTypeOption(selectedOption);
+        }
+    };
 
     return (
         <div className={"pg001-body roboto-regular "
@@ -273,9 +315,17 @@ const Page = () => {
             id="pg001-body">
 
             <div className="pg001-outer-container">
-                <div className="heading roboto-black">
-                    <i className="fas fa-file-import heading-icon"></i> <span>Import Tool</span>
-                    <div className="theme-toggle fas fa-adjust" onClick={evtClickToggleTheme} title="Change Theme"></div>
+                <div className="header roboto-black">
+                    <div className="header-top">
+                        <div className="header-logo-container">
+                            <img src="/logo-small.png" alt="Logo" />
+                        </div>
+                        <div className="heading">
+                            <i className="fas fa-file-import heading-icon"></i> <span>Import Tool</span>
+                        </div>
+                        <div className="theme-toggle fas fa-adjust" onClick={evtClickToggleTheme} title="Change Theme"></div>
+                    </div>
+                    <Loader isShow={isShowLoader} />
                 </div>
                 <div className="con-url-outer-container">
                     <div className="con-url-container">
@@ -302,12 +352,23 @@ const Page = () => {
                 </div>
                 <div className="folder-path-outer-container">
                     <div className="folder-path-container fade-in-out-to-top">
-                        <div className="folder-path-lbl roboto-medium pg001-single-line-label">Enter server folder path* : </div>
+                        <div className="folder-path-select-ctr">
+                            <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
+                                Upload Type :
+                            </span>
+                            <select value={uploadTypeOption.value} onChange={handleUploadTypeChange} className="pg001-select" >
+                                {UPLOAD_TYPES_OPTIONS.map((option) => (
+                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                ))}
+                            </select>
+                        </div>
 
                         <div className="folder-path-textbox-ctr">
-
+                            <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
+                                Upload Path :
+                            </span>
                             <input type="text" className="folder-path-textbox pg001-textbox"
-                                placeholder="/Users/tom/Documents/product-data"
+                                placeholder={uploadTypeOption.placeholder}
                                 id="folder-path-textbox"
                                 value={uploadPath}
                                 onChange={(e) => setUploadPath(e.target.value)}
@@ -330,7 +391,7 @@ const Page = () => {
                 <div className="import-process-outer-container">
                     <div id="final-folder-path-container" className="final-folder-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
-                        <div className="roboto-medium">Server Folder Path : </div>
+                        <div className="roboto-medium">Upload Path : </div>
                         <div id="final-folder-path" className="final-folder-path">{uploadPath}</div>
                     </div>
                     <div className="import-process-container">
@@ -351,6 +412,7 @@ const Page = () => {
                                                     value={keyPrefix}
                                                     onChange={(e) => setKeyPrefix(e.target.value)}
                                                     tabIndex={3}
+                                                    disabled={!!displayStatus}
                                                 />
                                             </div>
                                             <div>
@@ -360,6 +422,8 @@ const Page = () => {
                                                     value={idField}
                                                     onChange={(e) => setIdField(e.target.value)}
                                                     tabIndex={4}
+                                                    disabled={!!displayStatus}
+
                                                 />
                                             </div>
                                             <div className="options-col">

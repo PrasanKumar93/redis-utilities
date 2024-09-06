@@ -1,4 +1,4 @@
-.pg001-body.theme-blue {
+.theme-blue {
 
     --primary-1: #E8EAF6;
     --primary-clr-1: #000000;
@@ -32,7 +32,7 @@
     --fn-info-clr: #000000;
 }
 
-.pg001-body.theme-blue-gray {
+.theme-blue-gray {
 
     --primary-1: #ECEFF1;
     --primary-clr-1: #000000;
@@ -64,7 +64,7 @@
 
 }
 
-.pg001-body.theme-teal {
+.theme-teal {
 
     --primary-1: #E0F2F1;
     --primary-clr-1: #000000;
@@ -96,7 +96,7 @@
 
 }
 
-.pg001-body.theme-orange {
+.theme-orange {
 
     --primary-1: #FFF3E0;
     --primary-clr-1: #000000;
@@ -128,7 +128,7 @@
 
 }
 
-.pg001-body.theme-gray {
+.theme-gray {
 
     --primary-1: #FAFAFA;
     --primary-clr-1: #000000;
@@ -160,7 +160,7 @@
 
 }
 
-.pg001-body.theme-brown {
+.theme-brown {
 
     --primary-1: #EFEBE9;
     --primary-clr-1: #000000;
@@ -192,7 +192,7 @@
 
 }
 
-.pg001-body.theme-redis {
+.theme-redis {
 
     --primary-1: #c6cdff;
     --primary-clr-1: #000000;

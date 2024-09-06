@@ -30,9 +30,35 @@ const IMPORT_PAGE_THEMES = [
   "theme-gray",
 ];
 
+const UPLOAD_TYPES_FOR_IMPORT = {
+  JSON_FOLDER: "jsonFolder",
+  JSON_ARRAY_FILE: "jsonArrayFile",
+  CSV_FILE: "csvFile",
+};
+
+const UPLOAD_TYPES_OPTIONS = [
+  {
+    value: UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER,
+    label: "JSON Folder",
+    placeholder: "/Users/tom/Documents/product-data",
+  },
+  {
+    value: UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE,
+    label: "JSON Array File",
+    placeholder: "/Users/tom/Documents/product-data/products.json",
+  },
+  // {
+  //   value: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
+  //   label: "CSV File",
+  //   placeholder: "/Users/tom/Documents/product-data/products.csv",
+  // },
+];
+
 export {
   IMPORT_ANIMATE_CSS,
   IMPORT_STATUS,
   IMPORT_PAGE_TABS,
   IMPORT_PAGE_THEMES,
+  UPLOAD_TYPES_OPTIONS,
+  UPLOAD_TYPES_FOR_IMPORT,
 };

@@ -24,6 +24,14 @@
     outline: none;
 }
 
+.pg001-select {
+    padding: var(--space-8);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-right: var(--space-8);
+    outline: none;
+}
+
 .pg001-textbox::placeholder {
     color: lightgrey;
     /* opacity: 0.8; */
@@ -52,29 +60,47 @@
     color: var(--primary-2-clr);
     transition: all .5s;
 
-    .heading {
+    .header {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: var(--space-8);
-        /* background: linear-gradient(90deg, var(--primary-8), var(--primary-10)); */
-        background: var(--primary-10);
+        flex-direction: column;
+        background: linear-gradient(90deg, var(--primary-1) 5%, var(--primary-7) 12%, var(--primary-10));
         color: var(--primary-clr-10);
-        box-shadow: 0 0 8px #000;
+        box-shadow: 5px 0 8px var(--black);
         font-size: var(--font-size-24);
-        letter-spacing: 2px;
-        transition: all .5s;
-        position: relative;
 
-        .heading-icon {
-            margin-right: var(--space-8);
-        }
+        .header-top {
+            display: flex;
+            height: 44px;
+            padding: var(--space-4) var(--space-8) 0 var(--space-8);
 
-        .theme-toggle {
-            font-size: var(--font-size-16);
-            position: absolute;
-            right: 8px;
-            cursor: pointer;
+            .header-logo-container {
+                width: 100px;
+
+                img {
+                    height: 100%;
+                    padding: var(--space-4);
+                }
+            }
+
+            .heading {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-grow: 1;
+
+                .heading-icon {
+                    margin-right: var(--space-8);
+                }
+            }
+
+            .theme-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                width: 100px;
+                font-size: var(--font-size-16);
+                cursor: pointer;
+            }
         }
     }
 
@@ -127,7 +153,12 @@
             width: 40%;
             animation: fade-in-out-to-top .5s .5s forwards;
 
-            .folder-path-lbl {
+            .folder-path-select-ctr {
+                margin-bottom: var(--space-8);
+                font-size: var(--font-size-14);
+            }
+
+            .pg001-upload-lbl {
                 margin: var(--space-4);
                 font-size: var(--font-size-14);
             }

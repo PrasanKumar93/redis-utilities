@@ -1,4 +1,4 @@
-.pg001-body {
+body {
     /* common variables */
 
     --space-2: 2px;
@@ -21,4 +21,6 @@
     --black: #000000;
 
     --border: var(--primary-10);
+
+    --comp-loader-height: 4px;
 }
