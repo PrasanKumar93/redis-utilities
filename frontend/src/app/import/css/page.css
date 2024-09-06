@@ -93,13 +93,23 @@
                 }
             }
 
-            .theme-toggle {
+            .header-right {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: flex-end;
                 width: 100px;
+            }
+
+            .theme-toggle {
                 font-size: var(--font-size-16);
                 cursor: pointer;
+            }
+
+            .git-tag {
+                margin-top: var(--space-4);
+                font-size: var(--font-size-12);
+                opacity: 0.5;
             }
         }
     }
@@ -141,19 +151,19 @@
         }
     }
 
-    .folder-path-outer-container {
+    .upload-path-outer-container {
         display: none;
 
         flex-grow: 1;
         justify-content: center;
         align-items: center;
 
-        .folder-path-container {
+        .upload-path-container {
 
             width: 40%;
             animation: fade-in-out-to-top .5s .5s forwards;
 
-            .folder-path-select-ctr {
+            .upload-path-select-ctr {
                 margin-bottom: var(--space-8);
                 font-size: var(--font-size-14);
             }
@@ -163,16 +173,16 @@
                 font-size: var(--font-size-14);
             }
 
-            .folder-path-textbox-ctr {
+            .upload-path-textbox-ctr {
                 display: flex;
                 align-items: center;
             }
 
-            .folder-path-textbox {
+            .upload-path-textbox {
                 min-width: 100%;
             }
 
-            .folder-path-submit-icon {
+            .upload-path-submit-icon {
                 color: var(--primary-10);
                 font-size: var(--font-size-24);
                 cursor: pointer;
@@ -188,7 +198,7 @@
         flex-grow: 1;
         padding: var(--space-8);
 
-        .final-folder-path-container {
+        .final-upload-path-container {
             display: flex;
             align-items: center;
             font-size: var(--font-size-14);
@@ -198,7 +208,7 @@
                 margin-right: var(--space-4);
             }
 
-            .final-folder-path {
+            .final-upload-path {
                 padding-left: var(--space-4);
             }
         }
@@ -499,7 +509,7 @@
     }
 }
 
-.pg001-body.choose-folder-path,
+.pg001-body.choose-upload-path,
 .pg001-body.show-import-process-ctr {
     /* overflow: hidden; */
 
@@ -522,9 +532,9 @@
     }
 }
 
-.pg001-body.choose-folder-path {
+.pg001-body.choose-upload-path {
     .pg001-outer-container {
-        .folder-path-outer-container {
+        .upload-path-outer-container {
             display: flex;
         }
     }

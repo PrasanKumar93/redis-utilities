@@ -1,5 +1,5 @@
 const IMPORT_ANIMATE_CSS = {
-  CHOOSE_FOLDER_PATH: "choose-folder-path",
+  CHOOSE_UPLOAD_PATH: "choose-upload-path",
   SHOW_IMPORT_PROCESS_CTR: "show-import-process-ctr",
   IMPORT_START: "import-start",
   IMPORT_PAUSE: "import-pause",

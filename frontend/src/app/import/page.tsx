@@ -62,6 +62,8 @@ const defaultFunctionString = `function customJSONFormatter(jsonObj){
  return jsonObj; // mandatory return 
 }`;
 
+const gitTag = "v0.1.0";
+
 const Page = () => {
 
     const [testRedisUrl, setTestRedisUrl] = useState(config.DEFAULT_REDIS_URL);
@@ -121,7 +123,7 @@ const Page = () => {
             if (result?.data) {
                 setRedisConUrl(testRedisUrl);
 
-                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
+                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
             }
             setIsShowLoader(false);
 
@@ -148,14 +150,14 @@ const Page = () => {
         return isValid;
     }
 
-    const evtClickEnterFolderPath = async () => {
+    const evtClickEnterUploadPath = async () => {
 
         const isValid = validateUploadPath();
         if (!isValid) {
             errorToast("Invalid upload path!");
         }
         else {
-            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_FOLDER_PATH);
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
             addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
 
             setIsShowLoader(true);
@@ -323,7 +325,11 @@ const Page = () => {
                         <div className="heading">
                             <i className="fas fa-file-import heading-icon"></i> <span>Import Tool</span>
                         </div>
-                        <div className="theme-toggle fas fa-adjust" onClick={evtClickToggleTheme} title="Change Theme"></div>
+                        <div className="header-right">
+                            <div className="theme-toggle fas fa-adjust" onClick={evtClickToggleTheme} title="Change Theme">
+                            </div>
+                            <div className="git-tag">{gitTag}</div>
+                        </div>
                     </div>
                     <Loader isShow={isShowLoader} />
                 </div>
@@ -350,12 +356,14 @@ const Page = () => {
                         <div className="fas fa-check-circle con-url-submit-icon done"></div>
                     </div>
                 </div>
-                <div className="folder-path-outer-container">
-                    <div className="folder-path-container fade-in-out-to-top">
-                        <div className="folder-path-select-ctr">
+                <div className="upload-path-outer-container">
+                    <div className="upload-path-container fade-in-out-to-top">
+                        <div className="upload-path-select-ctr">
+
                             <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
                                 Upload Type :
                             </span>
+
                             <select value={uploadTypeOption.value} onChange={handleUploadTypeChange} className="pg001-select" >
                                 {UPLOAD_TYPES_OPTIONS.map((option) => (
                                     <option key={option.value} value={option.value}>{option.label}</option>
@@ -363,36 +371,36 @@ const Page = () => {
                             </select>
                         </div>
 
-                        <div className="folder-path-textbox-ctr">
+                        <div className="upload-path-textbox-ctr">
                             <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
                                 Upload Path :
                             </span>
-                            <input type="text" className="folder-path-textbox pg001-textbox"
+                            <input type="text" className="upload-path-textbox pg001-textbox"
                                 placeholder={uploadTypeOption.placeholder}
-                                id="folder-path-textbox"
+                                id="upload-path-textbox"
                                 value={uploadPath}
                                 onChange={(e) => setUploadPath(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key.toLowerCase() === 'enter') {
-                                        evtClickEnterFolderPath();
+                                        evtClickEnterUploadPath();
                                     }
                                 }}
                                 tabIndex={2}
                             />
 
-                            <div className="fas fa-arrow-circle-right folder-path-submit-icon"
+                            <div className="fas fa-arrow-circle-right upload-path-submit-icon"
                                 title="Next"
-                                onClick={evtClickEnterFolderPath}></div>
+                                onClick={evtClickEnterUploadPath}></div>
                         </div>
 
 
                     </div>
                 </div>
                 <div className="import-process-outer-container">
-                    <div id="final-folder-path-container" className="final-folder-path-container fade-in-out-to-top">
+                    <div id="final-upload-path-container" className="final-upload-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
                         <div className="roboto-medium">Upload Path : </div>
-                        <div id="final-folder-path" className="final-folder-path">{uploadPath}</div>
+                        <div id="final-upload-path" className="final-upload-path">{uploadPath}</div>
                     </div>
                     <div className="import-process-container">
 
