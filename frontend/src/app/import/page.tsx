@@ -468,7 +468,7 @@ const Page = () => {
                                             <div className="import-formatter-func-field">
 
                                                 <CodeMirrorEditor
-                                                    initialValue={formatterFn}
+                                                    initialValue={defaultFunctionString}
                                                     className="import-formatter-func-textarea"
                                                     onBlur={validateFormatterFn}
                                                     tabIndex={6}
