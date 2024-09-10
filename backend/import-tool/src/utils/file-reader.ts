@@ -8,6 +8,7 @@ import Papa from "papaparse";
 
 import { LoggerCls } from "./logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
+import { ImportStatus } from "../state.js";
 
 interface IFileReaderData {
   filePath: string;
@@ -125,10 +126,10 @@ const readJsonFilesFromPaths = async (
         fileIndex,
       });
 
-      if (error && isStopOnError) {
+      if (importState?.currentStatus == ImportStatus.ERROR_STOPPED) {
         LoggerCls.error("Stopped on error");
         break;
-      } else if (importState?.isPaused) {
+      } else if (importState?.currentStatus == ImportStatus.PAUSED) {
         LoggerCls.info("Paused on user request");
         break;
       }
@@ -184,11 +185,10 @@ const loopJsonArrayFileContents = async (
         fileIndex,
       });
 
-      // if (error && isStopOnError) {
-      //   LoggerCls.error("Stopped on error");
-      //   break;
-      // } else
-      if (importState?.isPaused) {
+      if (importState?.currentStatus == ImportStatus.ERROR_STOPPED) {
+        LoggerCls.error("Stopped on error");
+        break;
+      } else if (importState?.currentStatus == ImportStatus.PAUSED) {
         LoggerCls.info("Paused on user request");
         break;
       }

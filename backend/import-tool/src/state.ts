@@ -18,7 +18,6 @@ interface IImportCommonState {
   stats?: IImportStats;
   input?: z.infer<typeof InputSchemas.importDataToRedisSchema>;
   currentStatus?: ImportStatus;
-  isPaused?: boolean;
   importErrors?: any[];
   fileIndex?: number;
 }

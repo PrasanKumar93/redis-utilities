@@ -5,7 +5,7 @@ import cors from "cors";
 import "dotenv/config";
 
 import { router } from "./routes.js";
-import { socketState } from "./state.js";
+import { ImportStatus, socketState } from "./state.js";
 import { LoggerCls } from "./utils/logger.js";
 
 //------ Constants
@@ -36,7 +36,8 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("pauseImportFilesToRedis", (message) => {
     LoggerCls.info("socket onPauseImportFilesToRedis " + message);
-    socketState[socket.id].isPaused = true;
+    const importState = socketState[socket.id];
+    importState.currentStatus = ImportStatus.PAUSED;
   });
 
   socket.on("disconnect", () => {

@@ -535,7 +535,7 @@ const Page = () => {
                                     <div className={"tab-title roboto-bold "
                                         + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "tab-title-active" : "")}
                                         onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS)}>
-                                        Errors ({displayErrors.length})
+                                        ErrorLogs ({displayErrors.length})
                                     </div>
                                 </div>
                                 <div className={"tab-container "

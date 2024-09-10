@@ -71,22 +71,26 @@ const processFileData = async (
   redisWrapper: RedisWrapper,
   input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
-  if (data?.content) {
-    let key = getFileKey(
-      data.filePath,
-      input.idField,
-      data.content,
-      input.keyPrefix,
-      data.fileIndex
-    );
+  try {
+    if (data?.content) {
+      let key = getFileKey(
+        data.filePath,
+        input.idField,
+        data.content,
+        input.keyPrefix,
+        data.fileIndex
+      );
 
-    const isKeyExists = await redisWrapper.client?.exists(key);
-    await redisWrapper.client?.json.set(key, ".", data.content);
-    if (isKeyExists) {
-      LoggerCls.info(`Updated key: ${key}`);
-    } else {
-      LoggerCls.log(`Added key: ${key}`);
+      const isKeyExists = await redisWrapper.client?.exists(key);
+      await redisWrapper.client?.json.set(key, ".", data.content);
+      if (isKeyExists) {
+        LoggerCls.info(`Updated key: ${key}`);
+      } else {
+        LoggerCls.log(`Added key: ${key}`);
+      }
     }
+  } catch (err) {
+    data.error = err;
   }
 };
 
@@ -97,14 +101,18 @@ const formatJSONContent = async (
   if (importState.input?.jsFunctionString && data?.content) {
     const jsFunctionString = importState.input.jsFunctionString;
 
-    const modifiedContent = await runJSFunction(
-      jsFunctionString,
-      data.content,
-      true,
-      null
-    );
-    if (modifiedContent) {
-      data.content = modifiedContent;
+    try {
+      const modifiedContent = await runJSFunction(
+        jsFunctionString,
+        data.content,
+        true,
+        null
+      );
+      if (modifiedContent) {
+        data.content = modifiedContent;
+      }
+    } catch (err) {
+      data.error = err;
     }
   }
 };
@@ -155,8 +163,6 @@ const readEachFileCallback = async (
 
   if (data?.error && input.isStopOnError) {
     importState.currentStatus = ImportStatus.ERROR_STOPPED;
-  } else if (importState.isPaused) {
-    importState.currentStatus = ImportStatus.PAUSED;
   }
 };
 
@@ -209,7 +215,6 @@ const getInitialImportState = (
   importState.importErrors = [];
   importState.fileIndex = 0;
 
-  importState.isPaused = false;
   importState.currentStatus = ImportStatus.IN_PROGRESS;
 
   return importState;
@@ -238,7 +243,6 @@ const getResumeImportState = (
         fileIndex++;
       }
 
-      importResState.isPaused = false;
       importResState.currentStatus = ImportStatus.IN_PROGRESS;
     }
   }
