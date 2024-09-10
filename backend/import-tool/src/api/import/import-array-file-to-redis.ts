@@ -14,10 +14,14 @@ import { getInputRedisConUrl } from "../common-api.js";
 import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
 import { validateJS } from "../../utils/validate-js.js";
-import { DISABLE_JS_FLAGS } from "../../utils/constants.js";
+import {
+  DISABLE_JS_FLAGS,
+  UPLOAD_TYPES_FOR_IMPORT,
+} from "../../utils/constants.js";
 import {
   readRawJSONFile,
   loopJsonArrayFileContents,
+  readRawCSVFile,
 } from "../../utils/file-reader.js";
 
 const importArrayFileToRedis = async (
@@ -51,7 +55,11 @@ const importArrayFileToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  importState.fileContents = await readRawJSONFile(input.uploadPath, true);
+  if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+    importState.fileContents = await readRawJSONFile(input.uploadPath, true);
+  } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+    importState.fileContents = await readRawCSVFile(input.uploadPath);
+  }
 
   let startIndex = 0;
   await loopJsonArrayFileContents(

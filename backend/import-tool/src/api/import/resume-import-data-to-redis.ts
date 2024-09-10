@@ -20,7 +20,8 @@ const resumeImportDataToRedis = async (
   if (resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
     retObj = await resumeImportJSONFilesToRedis(resumeInput);
   } else if (
-    resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
+    resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE ||
+    resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
   ) {
     retObj = await resumeImportArrayFileToRedis(resumeInput);
   }

@@ -3,8 +3,11 @@ import type { IImportFilesState, IImportArrayFileState } from "../state.js";
 import fs from "fs-extra";
 import fg from "fast-glob";
 import zlib from "node:zlib";
+import _ from "lodash";
+import Papa from "papaparse";
 
 import { LoggerCls } from "./logger.js";
+import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
 
 interface IFileReaderData {
   filePath: string;
@@ -193,7 +196,10 @@ const loopJsonArrayFileContents = async (
   }
 };
 
-const readSampleDataFromJSONArrayFile = async (filePath: string) => {
+const readSampleDataFromArrayFile = async (
+  filePath: string,
+  uploadType: string
+) => {
   const retObj: IFileReaderData = {
     totalFiles: 0,
     filePath: "",
@@ -201,7 +207,13 @@ const readSampleDataFromJSONArrayFile = async (filePath: string) => {
     content: "",
   };
 
-  let fileContents: any[] = await readRawJSONFile(filePath, true);
+  let fileContents: any[] = [];
+
+  if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+    fileContents = await readRawJSONFile(filePath, true);
+  } else if (uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+    fileContents = await readRawCSVFile(filePath);
+  }
 
   if (fileContents?.length > 0) {
     retObj.totalFiles = fileContents.length;
@@ -215,14 +227,57 @@ const readSampleDataFromJSONArrayFile = async (filePath: string) => {
   return retObj;
 };
 
+const readRawCSVFile = async (filePath: string) => {
+  const results: any[] = [];
+
+  if (filePath) {
+    try {
+      const fileContent = fs.readFileSync(filePath, "utf8");
+
+      Papa.parse(fileContent, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: (parsedData) => {
+          if (parsedData?.meta?.fields && parsedData.data?.length) {
+            const colNames = parsedData.meta.fields;
+            const rows = parsedData.data;
+            const casedColNames = colNames.map((colName) =>
+              _.camelCase(colName)
+            );
+
+            rows.forEach((row: any) => {
+              const formattedData: any = {};
+              casedColNames.forEach((casedColName, index) => {
+                formattedData[casedColName] = row[colNames[index]];
+              });
+              results.push(formattedData);
+            });
+          }
+        },
+        error: (err: any) => {
+          LoggerCls.error(`Error parsing CSV file: ${filePath}`, err);
+          throw err;
+        },
+      });
+    } catch (err) {
+      LoggerCls.error(`Error reading/ parsing CSV file: ${filePath}`, err);
+      throw err;
+    }
+  }
+
+  return results;
+};
+
 export {
   getFilePathsFromGlobPattern,
   getJsonGlobForFolderPath,
   readJsonFilesFromPaths,
   readSampleJsonFileFromPaths,
   loopJsonArrayFileContents,
-  readSampleDataFromJSONArrayFile,
+  readSampleDataFromArrayFile,
   readRawJSONFile,
+  readRawCSVFile,
 };
 
 export type { IFileReaderData };

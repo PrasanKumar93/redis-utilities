@@ -18,7 +18,10 @@ const importDataToRedis = async (
 
   if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
     retObj = await importJSONFilesToRedis(input);
-  } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+  } else if (
+    input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE ||
+    input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
+  ) {
     retObj = await importArrayFileToRedis(input);
   }
 

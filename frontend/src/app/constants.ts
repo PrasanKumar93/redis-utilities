@@ -47,11 +47,11 @@ const UPLOAD_TYPES_OPTIONS = [
     label: "JSON Array File",
     placeholder: "/Users/tom/Documents/product-data/products.json",
   },
-  // {
-  //   value: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
-  //   label: "CSV File",
-  //   placeholder: "/Users/tom/Documents/product-data/products.csv",
-  // },
+  {
+    value: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
+    label: "CSV File",
+    placeholder: "/Users/tom/Documents/product-data/products.csv",
+  },
 ];
 
 export {

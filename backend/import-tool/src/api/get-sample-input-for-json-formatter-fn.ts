@@ -5,7 +5,7 @@ import {
   getJsonGlobForFolderPath,
   IFileReaderData,
   readSampleJsonFileFromPaths,
-  readSampleDataFromJSONArrayFile,
+  readSampleDataFromArrayFile,
 } from "../utils/file-reader.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../utils/constants.js";
 import { getDefaultUploadType } from "./common-api.js";
@@ -23,8 +23,14 @@ const getSampleInputForJSONFormatterFn = async (
   if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
     const jsonGlobArr = getJsonGlobForFolderPath(input.uploadPath);
     retObj = await readSampleJsonFileFromPaths(jsonGlobArr, []);
-  } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
-    retObj = await readSampleDataFromJSONArrayFile(input.uploadPath);
+  } else if (
+    input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE ||
+    input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
+  ) {
+    retObj = await readSampleDataFromArrayFile(
+      input.uploadPath,
+      input.uploadType
+    );
   }
 
   return retObj;
