@@ -295,8 +295,10 @@ const Page = () => {
             }, 10);
         }
         else {
-            setFormatterFn(defaultFunctionString);
+            setFormatterFn("");
+            setFormatterFnOutput(formatterFnInput);
             setIsValidFormatterFn(true);
+            setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
         }
     }
 
@@ -468,10 +470,11 @@ const Page = () => {
                                             <div className="import-formatter-func-field">
 
                                                 <CodeMirrorEditor
-                                                    initialValue={defaultFunctionString}
+                                                    initialValue={formatterFn}
                                                     className="import-formatter-func-textarea"
                                                     onBlur={validateFormatterFn}
                                                     tabIndex={6}
+                                                    disabled={!!displayStatus}
                                                 />
                                             </div>
                                         </div>

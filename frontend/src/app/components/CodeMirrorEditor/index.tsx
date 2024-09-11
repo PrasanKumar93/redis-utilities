@@ -68,7 +68,8 @@ const CodeMirrorEditor = React.forwardRef<EditorView | null, CodeMirrorEditorPro
                 editorViewRef.current?.destroy();
                 editorViewRef.current = null;
             };
-        }, [initialValue, ref, disabled]);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [ref, disabled]);
 
         return <div ref={editorContainerRef}
             className={`code-mirror-container ${className}`}
