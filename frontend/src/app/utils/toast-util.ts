@@ -10,6 +10,7 @@ const toastOptions: ToastOptions = {
   draggable: true,
   progress: undefined,
   theme: "colored", // light, dark, colored
+  className: "",
   transition: Bounce,
 };
 

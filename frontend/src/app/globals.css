@@ -58,6 +58,10 @@ a {
   text-decoration: none;
 }
 
+.custom-error-toast {
+  width: 400px;
+}
+
 /* Remove dark theme media query */
 /*
 @media (prefers-color-scheme: dark) {

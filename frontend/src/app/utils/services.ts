@@ -4,6 +4,10 @@ import { postRequest } from "./axios-util";
 
 import { errorToast } from "./toast-util";
 
+const CSS_CLASSES = {
+  CUSTOM_ERROR_TOAST: "custom-error-toast",
+};
+
 //#region API input schema
 const zodEncryptedData = z.object({
   encryptedData: z.string(),
@@ -54,6 +58,12 @@ const consoleLogError = (axiosError: any) => {
   }
   return error;
 };
+
+const errorAPIAlert = (apiName: string) => {
+  errorToast(`Error in /${apiName} API, Check console for more info !`, {
+    className: CSS_CLASSES.CUSTOM_ERROR_TOAST,
+  });
+};
 // #endregion
 
 //#region API calls
@@ -67,7 +77,7 @@ const testRedisConnection = async (
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /testRedisConnection API");
+    errorAPIAlert("testRedisConnection");
   }
 };
 
@@ -80,7 +90,7 @@ const importDataToRedis = async (
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /importDataToRedis API");
+    errorAPIAlert("importDataToRedis");
   }
 };
 
@@ -93,7 +103,7 @@ const resumeImportDataToRedis = async (
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /resumeImportDataToRedis API");
+    errorAPIAlert("resumeImportDataToRedis");
   }
 };
 
@@ -113,7 +123,7 @@ const testJSONFormatterFn = async (
     if (error?.userMessage) {
       errorToast(error.userMessage);
     } else {
-      errorToast("Error in /testJSONFormatterFn API");
+      errorAPIAlert("testJSONFormatterFn");
     }
     testResult.error = error?.message || error; // message, stack
   }
@@ -134,7 +144,7 @@ const getSampleInputForJSONFormatterFn = async (
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorToast("Error in /getSampleInputForJSONFormatterFn API");
+    errorAPIAlert("getSampleInputForJSONFormatterFn");
   }
 };
 
