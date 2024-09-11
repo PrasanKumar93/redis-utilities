@@ -157,8 +157,6 @@ const Page = () => {
             errorToast("Invalid upload path!");
         }
         else {
-            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
-            addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
 
             setIsShowLoader(true);
 
@@ -170,6 +168,9 @@ const Page = () => {
                 console.log("sample file path :", result.data?.filePath);
                 console.log("sample file data :", result.data.content);
                 setFormatterFnInput(result.data.content);
+
+                removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
+                addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.SHOW_IMPORT_PROCESS_CTR);
             }
             else if (result?.error) {
                 setFormatterFnInput({});
