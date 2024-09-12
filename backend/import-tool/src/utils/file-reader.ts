@@ -84,6 +84,7 @@ const readRawJSONFile = async (
       }
       content = JSON.parse(content);
     } catch (err) {
+      err = LoggerCls.getPureError(err);
       LoggerCls.error(`Error reading/ parsing JSON file:  ${filePath}`, err);
       throw err;
     }
@@ -99,7 +100,6 @@ const readRawJSONFile = async (
 
 const readJsonFilesFromPaths = async (
   filePaths: string[],
-  isStopOnError: boolean = false,
   startIndex: number = 0,
   importState: IImportFilesState | null = null,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
@@ -256,6 +256,7 @@ const readRawCSVFile = async (filePath: string) => {
           }
         },
         error: (err: any) => {
+          err = LoggerCls.getPureError(err);
           LoggerCls.error(`Error parsing CSV file: ${filePath}`, err);
           throw err;
         },

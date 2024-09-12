@@ -148,6 +148,7 @@
 
             .con-url-submit-icon.done {
                 display: none;
+                cursor: crosshair;
             }
         }
     }
@@ -408,6 +409,11 @@
                     .error-count-container {
                         display: none;
                         border: 2px solid var(--error-clr);
+
+                        .import-error-count {
+                            text-decoration: underline;
+                            cursor: pointer;
+                        }
                     }
 
                     .success-count-container::after {
@@ -470,7 +476,7 @@
                         border-radius: 0 5px 5px 5px;
 
                         overflow: auto;
-                        max-height: calc(100vh - 170px);
+                        height: calc(100vh - 180px);
                         max-width: 100%;
 
                         .tab-container-status {

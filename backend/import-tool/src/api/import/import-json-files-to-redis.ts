@@ -60,7 +60,6 @@ const importJSONFilesToRedis = async (
   let startIndex = 0;
   await readJsonFilesFromPaths(
     importState.filePaths,
-    input.isStopOnError,
     startIndex,
     importState,
     async (data) => {

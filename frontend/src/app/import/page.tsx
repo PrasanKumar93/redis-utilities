@@ -72,7 +72,7 @@ const Page = () => {
     const [uploadPath, setUploadPath] = useState('');
     const [keyPrefix, setKeyPrefix] = useState('');
     const [idField, setIdField] = useState('');
-    const [isStopOnError, setIsStopOnError] = useState(false);
+    const [isStopOnError, setIsStopOnError] = useState(true);
 
     const [formatterFn, setFormatterFn] = useState(defaultFunctionString);
     const [formatterFnInput, setFormatterFnInput] = useState<any>({});
@@ -246,16 +246,6 @@ const Page = () => {
         pauseImportFilesToRedis();
     }
 
-    // const evtClickCancel = () => {
-
-    //     const result = confirm("Do you want to cancel the import?");
-
-    //     if (result) {
-    //         alert("Import Cancelled - dummy alert");
-    //     }
-
-    // }
-
     const evtClickToggleTheme = () => {
 
         let themeIndex = IMPORT_PAGE_THEMES.indexOf(themeName);
@@ -288,12 +278,7 @@ const Page = () => {
                 setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
             }
 
-            setTimeout(() => {
-                const tabContainer = document.querySelector(".tab-container:not(.hide-tab-container)");
-                if (tabContainer) {
-                    tabContainer.scrollTop = tabContainer.scrollHeight;
-                }
-            }, 10);
+            scrollTabContainer();
         }
         else {
             setFormatterFn("");
@@ -310,6 +295,17 @@ const Page = () => {
             setUploadTypeOption(selectedOption);
         }
     };
+
+    const scrollTabContainer = () => {
+
+        setTimeout(() => {
+            const tabContainer = document.querySelector(".tab-container:not(.hide-tab-container)");
+            if (tabContainer) {
+                tabContainer.scrollTop = tabContainer.scrollHeight;
+            }
+        }, 10);
+
+    }
 
     return (
         <div className={"pg001-body roboto-regular "
@@ -356,7 +352,7 @@ const Page = () => {
                         <div className="fas fa-arrow-circle-right con-url-submit-icon enter"
                             title="Next"
                             onClick={evtClickEnterConUrl}></div>
-                        <div className="fas fa-check-circle con-url-submit-icon done"></div>
+                        <div className="fas fa-check-circle con-url-submit-icon done" title="Connection successful"></div>
                     </div>
                 </div>
                 <div className="upload-path-outer-container">
@@ -402,7 +398,7 @@ const Page = () => {
                 <div className="import-process-outer-container">
                     <div id="final-upload-path-container" className="final-upload-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
-                        <div className="roboto-medium">Upload Path : </div>
+                        <div className="pg001-single-line-label roboto-medium">Upload Path : </div>
                         <div id="final-upload-path" className="final-upload-path">{uploadPath}</div>
                     </div>
                     <div className="import-process-container">
@@ -443,6 +439,7 @@ const Page = () => {
                                                     checked={isStopOnError}
                                                     onChange={(e) => setIsStopOnError(e.target.checked)}
                                                     tabIndex={5}
+                                                    disabled={displayStatus == IMPORT_STATUS.IN_PROGRESS}
                                                 />
                                                 <label htmlFor="import-check-stop-on-error" className="roboto-medium stop-on-error-lbl">Stop on error</label>
                                             </div>
@@ -521,7 +518,10 @@ const Page = () => {
                                 </div>
                                 <div className="count-container error-count-container fade-in-out-to-top">
                                     <div className="error-count-icon fas fa-times"></div>
-                                    <div className="import-error-count"> {displayStats.failed} failed</div>
+                                    <div className="import-error-count" title="View Error" onClick={() => {
+                                        setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
+                                        scrollTabContainer();
+                                    }}> {displayStats.failed} failed</div>
                                 </div>
                             </div>
                         </div>

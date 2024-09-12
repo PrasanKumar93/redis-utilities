@@ -41,7 +41,6 @@ const resumeImportJSONFilesToRedis = async (
 
     await readJsonFilesFromPaths(
       importState.filePaths,
-      input.isStopOnError,
       fileIndex,
       importState,
       async (data) => {
