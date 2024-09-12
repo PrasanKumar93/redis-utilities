@@ -69,3 +69,46 @@
     font-weight: 900;
     font-style: italic;
 }
+
+/*----------*/
+
+/* Default root font size */
+html {
+    font-size: 16px;
+    /* This makes 1rem = 16px */
+}
+
+
+/* Media Query for tablets */
+@media (min-width: 640px) {
+    html {
+        font-size: 17px;
+    }
+}
+
+/* Media Query for desktop */
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+/* Media Query for large desktop */
+@media (min-width: 1024px) {
+    html {
+        font-size: 17px;
+    }
+}
+
+/* Media Query for extra large screens */
+/* @media (min-width: 1280px) {
+    html {
+        font-size: 20px;
+    }
+} */
+
+@media (min-width: 1536px) {
+    html {
+        font-size: 22px;
+    }
+}

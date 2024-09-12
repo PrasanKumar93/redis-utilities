@@ -444,12 +444,12 @@ const Page = () => {
                                                     onChange={(e) => setIsStopOnError(e.target.checked)}
                                                     tabIndex={5}
                                                 />
-                                                <label htmlFor="import-check-stop-on-error" className="roboto-medium">Stop on error</label>
+                                                <label htmlFor="import-check-stop-on-error" className="roboto-medium stop-on-error-lbl">Stop on error</label>
                                             </div>
                                         </div>
                                         <div className="import-formatter-func-section">
-                                            <div className="roboto-medium import-formatter-func-title-container">
-                                                <div>Formatter function</div>
+                                            <div className="import-formatter-func-title-container">
+                                                <div className="import-option-title roboto-medium" >Formatter function</div>
 
                                                 <div className="import-formatter-func-icon-container">
                                                     <div className="fas fa-info-circle import-formatter-func-icon"></div>
@@ -530,13 +530,13 @@ const Page = () => {
                             <div className="tabs-outer-container fade-in-out-to-left">
                                 <div className="tab-headings">
 
-                                    <div className={"tab-title roboto-bold "
+                                    <div className={"tab-title roboto-medium "
                                         + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "tab-title-active" : "")}
                                         onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)}>
                                         Info
                                     </div>
 
-                                    <div className={"tab-title roboto-bold "
+                                    <div className={"tab-title roboto-medium "
                                         + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "tab-title-active" : "")}
                                         onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS)}>
                                         ErrorLogs ({displayErrors.length})

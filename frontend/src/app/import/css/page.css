@@ -22,6 +22,7 @@
     border-radius: 16px;
     margin-right: var(--space-8);
     outline: none;
+    font-size: var(--font-size-12);
 }
 
 .pg001-select {
@@ -210,6 +211,7 @@
 
             .final-upload-path {
                 padding-left: var(--space-4);
+                font-size: var(--font-size-12);
             }
         }
 
@@ -230,6 +232,7 @@
                     z-index: 1;
                     /* To show info icon hover element on top */
                     animation: fade-in-out-to-top .5s .75s forwards;
+                    margin-top: 8px;
 
                     fieldset {
                         margin: 0;
@@ -243,20 +246,27 @@
                         }
 
                         .options {
-                            margin-top: var(--space-2);
+                            margin-top: var(--space-4);
+
+                            .import-option-title {
+                                margin-bottom: var(--space-2);
+                                font-size: var(--font-size-14);
+                                color: var(--primary-8);
+                            }
 
                             .options-row {
                                 display: flex;
                                 align-items: center;
                                 justify-content: space-between;
 
-                                .import-option-title {
-                                    margin-bottom: var(--space-2);
-                                }
-
                                 .options-col {
                                     display: flex;
                                     align-items: center;
+                                }
+
+                                .stop-on-error-lbl {
+                                    font-size: var(--font-size-14);
+                                    color: var(--primary-8);
                                 }
                             }
 
@@ -442,6 +452,7 @@
                             border-bottom: none;
                             border-radius: 5px 5px 0 0;
                             cursor: pointer;
+                            font-size: var(--font-size-14);
                         }
 
                         .tab-title-active {

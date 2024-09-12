@@ -7,11 +7,21 @@ body {
     --space-12: 12px;
     --space-16: 16px;
 
-    --font-size-12: 12px;
-    --font-size-14: 14px;
-    --font-size-16: 16px;
-    --font-size-18: 18px;
-    --font-size-24: 24px;
+    /*base font size is defined in typography.css file */
+    --font-size-12: 0.75rem;
+    --font-size-14: 0.875rem;
+    --font-size-16: 1rem;
+    --font-size-18: 1.125rem;
+    --font-size-20: 1.25rem;
+    --font-size-24: 1.5rem;
+    --font-size-30: 1.875rem;
+    --font-size-36: 2.25rem;
+    --font-size-48: 3rem;
+    --font-size-60: 3.75rem;
+    --font-size-72: 4.5rem;
+    --font-size-96: 6rem;
+    --font-size-128: 8rem;
+
 
     --success-clr: #30b330;
     --error-clr: #e74c3c;
