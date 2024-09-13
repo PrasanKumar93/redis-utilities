@@ -36,6 +36,8 @@ const DISABLE_JS_DATA = {
     "ForOfStatement",
   ],
 
+  CONSTRUCT_ASYNC: ["AwaitExpression", "ImportExpression"],
+
   CALL_EXPRESSION_ARRAY_LOOPS: [
     "forEach",
     "map",
@@ -56,6 +58,7 @@ const DISABLE_JS_FLAGS = {
   NESTED_FUNCTIONS: true,
   LOOPS: true,
   ARRAY_LOOPS: true,
+  ASYNC: true,
 };
 
 type DisableJsFlagsType = {

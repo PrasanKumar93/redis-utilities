@@ -20,6 +20,7 @@ const getCheckNamesAndConstructs = (df: DisableJsFlagsType) => {
 
   const CHECK_CONSTRUCTS = [
     ...(df.LOOPS ? DISABLE_JS_DATA.CONSTRUCT_LOOPS : []),
+    ...(df.ASYNC ? DISABLE_JS_DATA.CONSTRUCT_ASYNC : []),
   ];
 
   return { CHECK_NAMES, CHECK_CONSTRUCTS };
@@ -87,6 +88,9 @@ const validateJS = (
       DoWhileStatement: addDisallowedConstruct,
       ForInStatement: addDisallowedConstruct,
       ForOfStatement: addDisallowedConstruct,
+
+      AwaitExpression: addDisallowedConstruct,
+      ImportExpression: addDisallowedConstruct,
 
       FunctionDeclaration: incrementFunctionCount,
       FunctionExpression: incrementFunctionCount,
