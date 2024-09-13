@@ -77,7 +77,7 @@ const Page = () => {
     const [formatterFn, setFormatterFn] = useState(defaultFunctionString);
     const [formatterFnInput, setFormatterFnInput] = useState<any>({});
     const [formatterFnOutput, setFormatterFnOutput] = useState<any>(null);
-    const [isValidFormatterFn, setIsValidFormatterFn] = useState(true);
+    const [isValidFormatterFn, setIsValidFormatterFn] = useState(false);
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
     const [themeName, setThemeName] = useState(IMPORT_PAGE_THEMES[0]);
@@ -221,22 +221,21 @@ const Page = () => {
         }
     }
     const evtClickPlay = async () => {
-        if (isValidFormatterFn) {
 
-            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
+        if (!displayStatus) { // first time
+            const isValid = await validateFormatterFn(formatterFn);
 
-            if (!displayStatus) { // first time
+            if (isValid) {
+                removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_START);
 
                 await startImportFiles();
-
-            } else if (displayStatus != IMPORT_STATUS.IN_PROGRESS) {
-                await resumeImportFiles();
             }
 
-        }
-        else {
-            infoToast("Please correct the formatter function before starting the import");
+        } else if (displayStatus != IMPORT_STATUS.IN_PROGRESS) {
+            removeFromSet(setBodyClasses, IMPORT_ANIMATE_CSS.IMPORT_PAUSE);
+
+            await resumeImportFiles();
         }
 
     }
@@ -254,38 +253,46 @@ const Page = () => {
     }
 
     const validateFormatterFn = async (code: string) => {
+        let isValid = false;
 
-        if (code) {
-            setFormatterFn(code);
-
-            const testResult = await testJSONFormatterFn({
-                jsFunctionString: code,
-                paramsObj: formatterFnInput
-            });
-
-            if (testResult?.data) {
-                setIsValidFormatterFn(true);
-                setFormatterFnOutput(testResult?.data);
-                setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
-            }
-            else if (testResult?.error) {
-                setIsValidFormatterFn(false);
-                const displayError: ImportFileError = {
-                    message: "Error in formatter function ",
-                    error: testResult?.error
-                };
-                setDisplayErrors((prev) => [...prev, displayError]);
-                setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
-            }
-
-            scrollTabContainer();
+        if (!code) {
+            code = "";
         }
-        else {
-            setFormatterFn("");
-            setFormatterFnOutput(formatterFnInput);
-            setIsValidFormatterFn(true);
+
+        setFormatterFn(code);
+
+        const testResult = await testJSONFormatterFn({ // validate key & formatter function
+            idField: idField,
+            keyPrefix: keyPrefix,
+
+            jsFunctionString: code,
+            paramsObj: formatterFnInput
+        });
+
+        if (testResult?.data) {
+            isValid = true;
+            setFormatterFnOutput(testResult?.data);
             setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
         }
+        else if (testResult?.error) {
+            isValid = false;
+            const displayError: ImportFileError = {
+                message: "Error in Import Options ",
+                error: testResult?.error
+            };
+            setDisplayErrors((prev) => [...prev, displayError]);
+            setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
+        }
+        else if (code == "") {
+            isValid = true;
+            setFormatterFnOutput(formatterFnInput);
+            setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
+        }
+
+        setIsValidFormatterFn(isValid);
+        scrollTabContainer();
+
+        return isValid;
     }
 
     const handleUploadTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -423,7 +430,10 @@ const Page = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <div className="import-option-title roboto-medium"> ID field</div>
+                                                <div className="import-option-title roboto-medium">
+                                                    ID field
+                                                    <div className="fas fa-info-circle options-info-icon" title="ID field JSON property or path in the final formatted JSON output"></div>
+                                                </div>
                                                 <input type="text" className="pg001-textbox"
                                                     placeholder="productId"
                                                     value={idField}

@@ -12,7 +12,7 @@ const getInputRedisConUrl = (
   }
 
   if (!redisConUrl) {
-    throw new Error("Redis connection URL is missing !");
+    throw "Redis connection URL is missing !";
   }
   return redisConUrl;
 };

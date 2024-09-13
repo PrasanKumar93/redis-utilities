@@ -16,6 +16,7 @@ function userFunction(jsonObj){
  return jsonObj;
 }
 ",
+"idField":"",
 "paramsObj":{
     "meta": {
         "code": 200,
@@ -73,6 +74,7 @@ jsonObj = {
  return jsonObj;
 }
 ",
+"idField":"",
 "paramsObj":{
     "meta": {
         "code": 200,

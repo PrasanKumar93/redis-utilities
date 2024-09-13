@@ -68,7 +68,7 @@ async function encryptData(
   key = key || DEFAULT_ENCRYPTION_KEY || "";
 
   if (!key || !data) {
-    throw new Error("encryptData() : Mandatory parameters are missing!");
+    throw "encryptData() : Mandatory parameters are missing!";
   }
 
   const cryptoKey = await importKey(key);
@@ -104,7 +104,7 @@ async function decryptData(
   const { encryptedData, iv, authTag } = encryptedElm || {};
 
   if (!key || !encryptedData || !iv || !authTag) {
-    throw new Error("decryptData() : Mandatory parameters are missing!");
+    throw "decryptData() : Mandatory parameters are missing!";
   }
 
   const cryptoKey = await importKey(key);
@@ -129,7 +129,7 @@ async function decryptData(
 
 async function hashData(data: string): Promise<string> {
   if (!data) {
-    throw new Error("hashData() : Mandatory parameters are missing!");
+    throw "hashData() : Mandatory parameters are missing!";
   }
 
   const encoder = new TextEncoder();

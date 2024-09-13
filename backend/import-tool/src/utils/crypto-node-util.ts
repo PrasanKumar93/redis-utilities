@@ -21,7 +21,7 @@ function encryptData(data: string, key: string = ""): IEncryptedElm {
   key = key || DEFAULT_ENCRYPTION_KEY || "";
 
   if (!key || !data) {
-    throw new Error("encryptData() : Mandatory parameters are missing!");
+    throw "encryptData() : Mandatory parameters are missing!";
   }
 
   const iv = crypto.randomBytes(12);
@@ -47,7 +47,7 @@ function decryptData(encryptedElm: IEncryptedElm, key: string = ""): string {
   const { encryptedData, iv, authTag } = encryptedElm || {};
 
   if (!key || !encryptedData || !iv || !authTag) {
-    throw new Error("decryptData() : Mandatory parameters are missing!");
+    throw "decryptData() : Mandatory parameters are missing!";
   }
 
   const decipher = crypto.createDecipheriv(
@@ -65,7 +65,7 @@ function decryptData(encryptedElm: IEncryptedElm, key: string = ""): string {
 
 function hashData(data: string): string {
   if (!data) {
-    throw new Error("hashData() : Mandatory parameters are missing!");
+    throw "hashData() : Mandatory parameters are missing!";
   }
   return crypto
     .createHash(ALGORITHMS.SHA_256)

@@ -91,7 +91,7 @@ const readRawJSONFile = async (
 
     if (isJsonArrayFile) {
       if (!Array.isArray(content)) {
-        throw new Error("File content is not an array in " + filePath);
+        throw "File content is not an array in " + filePath;
       }
     }
   }
@@ -156,7 +156,7 @@ const readSampleJsonFileFromPaths = async (
     retObj.fileIndex = 0;
     retObj.content = await readRawJSONFile(filePaths[0], false);
   } else {
-    throw new Error(`No file found for the given path: ${include.join(", ")}`);
+    throw `No file found for the given path: ${include.join(", ")}`;
   }
 
   return retObj;
@@ -221,7 +221,7 @@ const readSampleDataFromArrayFile = async (
     retObj.fileIndex = 0;
     retObj.content = fileContents[0];
   } else {
-    throw new Error(`No item found in the file: ${filePath}`);
+    throw `No item found in the file: ${filePath}`;
   }
 
   return retObj;

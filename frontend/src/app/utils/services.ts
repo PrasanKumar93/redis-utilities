@@ -39,6 +39,9 @@ const resumeImportDataToRedisSchema = z.object({
 });
 
 export const testJSONFormatterFnSchema = z.object({
+  idField: z.string().optional(),
+  keyPrefix: z.string().optional(),
+
   jsFunctionString: z.string(),
   paramsObj: z.record(z.string(), z.any()),
 });

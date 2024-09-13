@@ -152,6 +152,7 @@ function runJSFunction(
 
       //  LoggerCls.info("User function result : ", result);
     } catch (error) {
+      error = LoggerCls.getPureError(error);
       LoggerCls.error("Error executing user function:", error);
       throw error;
     }

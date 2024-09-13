@@ -14,18 +14,32 @@ import { RedisWrapper } from "../../utils/redis.js";
 import { LoggerCls } from "../../utils/logger.js";
 import { runJSFunction } from "../../utils/validate-js.js";
 
-const getFileKey = (
-  filePath: string,
-  idField: string = "",
-  content: any,
-  keyPrefix: string = "",
-  index: number = 0
-) => {
+interface IGetFileKey {
+  filePath?: string;
+  idField?: string;
+  content?: any;
+  keyPrefix?: string;
+  index?: number;
+}
+const getFileKey = (_obj: IGetFileKey) => {
   let key = "";
+
+  const { filePath, idField, content, keyPrefix, index } = _obj;
+
   if (idField && content) {
     // JSON id field as key
     //key = content[idField];
     key = _.get(content, idField); // to support nested id with dot
+
+    if (typeof key === "number") {
+      key = key + "";
+    }
+
+    if (!key) {
+      throw `idField: ${idField} not found in JSON content`;
+    } else if (typeof key !== "string") {
+      throw `idField: ${idField} value must be string`;
+    }
   } else if (filePath) {
     // filename as key
     if (filePath.endsWith(".json.gz")) {
@@ -35,11 +49,12 @@ const getFileKey = (
     } else {
       key = path.basename(filePath);
     }
-  } else if (index >= 0) {
+  } else if (index) {
     key = (index + 1).toString();
   }
 
   key = keyPrefix ? keyPrefix + key : key;
+  key = key.trim();
 
   return key;
 };
@@ -73,13 +88,13 @@ const processFileData = async (
 ) => {
   try {
     if (data?.content) {
-      let key = getFileKey(
-        data.filePath,
-        input.idField,
-        data.content,
-        input.keyPrefix,
-        data.fileIndex
-      );
+      let key = getFileKey({
+        filePath: data.filePath,
+        idField: input.idField,
+        content: data.content,
+        keyPrefix: input.keyPrefix,
+        index: data.fileIndex,
+      });
 
       const isKeyExists = await redisWrapper.client?.exists(key);
       await redisWrapper.client?.json.set(key, ".", data.content);
@@ -90,6 +105,7 @@ const processFileData = async (
       }
     }
   } catch (err) {
+    err = LoggerCls.getPureError(err);
     data.error = err;
   }
 };
@@ -230,7 +246,7 @@ const getResumeImportState = (
     importResState = socketState[resumeInput.socketId];
 
     if (importResState.currentStatus == ImportStatus.IN_PROGRESS) {
-      throw new Error("Import is already in progress for this socketId");
+      throw "Import is already in progress for this socketId";
     }
 
     if (importResState.input) {
@@ -251,6 +267,7 @@ const getResumeImportState = (
 };
 
 export {
+  getFileKey,
   readEachFileCallback,
   emitSocketMessages,
   setImportTimeAndStatus,

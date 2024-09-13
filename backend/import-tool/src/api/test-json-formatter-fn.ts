@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { getFileKey } from "./import/common-import.js";
 import { DISABLE_JS_FLAGS } from "../utils/constants.js";
 import { runJSFunction } from "../utils/validate-js.js";
 
@@ -10,15 +11,28 @@ const testJSONFormatterFn = async (
 ) => {
   InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
 
-  let disableFlags = DISABLE_JS_FLAGS;
-  //disableFlags.NAMES_CONSOLE = false; // allow console.log
+  let functionResult: any = "";
 
-  const functionResult = await runJSFunction(
-    input.jsFunctionString,
-    input.paramsObj,
-    false,
-    disableFlags
-  );
+  if (input.idField) {
+    // throws error if idField is not present in paramsObj
+    getFileKey({
+      idField: input.idField,
+      content: input.paramsObj,
+      keyPrefix: input.keyPrefix,
+    });
+  }
+
+  if (input.jsFunctionString) {
+    let disableFlags = DISABLE_JS_FLAGS;
+    //disableFlags.NAMES_CONSOLE = false; // allow console.log
+
+    functionResult = await runJSFunction(
+      input.jsFunctionString,
+      input.paramsObj,
+      false,
+      disableFlags
+    );
+  }
 
   return functionResult;
 };
