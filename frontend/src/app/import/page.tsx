@@ -11,6 +11,8 @@ import './page.css';
 import PageHeader from '../components/PageHeader';
 import ImportOptions from './page-components/ImportOptions';
 import LogTabs from './page-components/LogTabs';
+import ImportStatsCount from './page-components/ImportStatsCount';
+import ImportActionButtons from './page-components/ImportActionButtons';
 
 import {
     testRedisConnection,
@@ -396,42 +398,18 @@ const Page = () => {
                                 infoIconFunctionString={infoIconFunctionString}
                                 formatterFn={formatterFn} validateFormatterFn={validateFormatterFn}
                             />
-                            <div className="action-container fade-in-out-to-top">
-                                {displayStatus != IMPORT_STATUS.IN_PROGRESS ? (
-                                    <div className="action-icons fas fa-play" title="Start/ Resume Import"
-                                        onClick={() => evtClickPlay()}
-                                        onKeyDown={(e) => {
-                                            if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
-                                                evtClickPlay();
-                                            }
-                                        }}
-                                        tabIndex={7} ></div>
-                                ) : (
-                                    <div className="action-icons fas fa-pause" title="Pause Import"
-                                        onClick={() => evtClickPause()}
-                                        onKeyDown={(e) => {
-                                            if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
-                                                evtClickPause();
-                                            }
-                                        }}
-                                        tabIndex={8}></div>
-                                )}
-                            </div>
-                            <div className="count-outer-container fade-in-out-to-top">
-                                <div className="count-container success-count-container">
-                                    <div className="success-count-icon fas fa-check"></div>
-                                    <div className="import-success-count">
-                                        {displayStats.processed} out of {displayStats.totalFiles}
-                                    </div>
-                                </div>
-                                <div className="count-container error-count-container fade-in-out-to-top">
-                                    <div className="error-count-icon fas fa-times"></div>
-                                    <div className="import-error-count" title="View Error" onClick={() => {
-                                        setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
-                                        scrollTabContainer();
-                                    }}> {displayStats.failed} failed</div>
-                                </div>
-                            </div>
+
+                            <ImportActionButtons
+                                displayStatus={displayStatus}
+                                evtClickPlay={evtClickPlay}
+                                evtClickPause={evtClickPause}
+                            />
+
+                            <ImportStatsCount
+                                displayStats={displayStats}
+                                setActiveTabIndex={setActiveTabIndex}
+                                scrollTabContainer={scrollTabContainer}
+                            />
                         </div>
 
                         <div className="import-process-right-container">
