@@ -7,10 +7,10 @@ import '../common/css/typography.css';
 import '../common/css/variables.css';
 import '../common/css/theme.css';
 
-import './css/page.css';
+import './page.css';
 
-import CodeMirrorEditor from '../components/CodeMirrorEditor';
-import PageHeader from '../components/PageHeader'
+import PageHeader from '../components/PageHeader';
+import ImportOptions from './page-components/ImportOptions';
 
 import {
     testRedisConnection,
@@ -386,84 +386,15 @@ const Page = () => {
                     <div className="import-process-container">
 
                         <div className="import-process-left-container">
-                            <div className="options-container  fade-in-out-to-top">
-                                <fieldset>
 
-                                    <legend className="roboto-bold-italic">Options</legend>
-                                    <div className="options">
-
-                                        <div className="options-row">
-                                            <div>
-                                                <div className="import-option-title roboto-medium"> Key prefix</div>
-
-                                                <input type="text" className="pg001-textbox"
-                                                    placeholder="products:"
-                                                    value={keyPrefix}
-                                                    onChange={(e) => setKeyPrefix(e.target.value)}
-                                                    tabIndex={3}
-                                                    disabled={!!displayStatus}
-                                                />
-                                            </div>
-                                            <div>
-                                                <div className="import-option-title roboto-medium">
-                                                    ID field
-                                                    <div className="fas fa-info-circle options-info-icon" title="ID field JSON property or path in the final formatted JSON output"></div>
-                                                </div>
-                                                <input type="text" className="pg001-textbox"
-                                                    placeholder="productId"
-                                                    value={idField}
-                                                    onChange={(e) => setIdField(e.target.value)}
-                                                    tabIndex={4}
-                                                    disabled={!!displayStatus}
-
-                                                />
-                                            </div>
-                                            <div className="options-col">
-                                                <input type="checkbox" className="pg001-checkbox"
-                                                    id="import-check-stop-on-error"
-                                                    checked={isStopOnError}
-                                                    onChange={(e) => setIsStopOnError(e.target.checked)}
-                                                    tabIndex={5}
-                                                    disabled={displayStatus == IMPORT_STATUS.IN_PROGRESS}
-                                                />
-                                                <label htmlFor="import-check-stop-on-error" className="roboto-medium stop-on-error-lbl">Stop on error</label>
-                                            </div>
-                                        </div>
-                                        <div className="import-formatter-func-section">
-                                            <div className="import-formatter-func-title-container">
-                                                <div className="import-option-title roboto-medium" >Formatter function</div>
-
-                                                <div className="import-formatter-func-icon-container">
-                                                    <div className="fas fa-info-circle import-formatter-func-icon"></div>
-                                                    <div className="import-formatter-func-info-container">
-                                                        <div className="pg001-triangle-arrow-top"></div>
-                                                        <div className="import-formatter-func-info-body">
-
-                                                            <CodeMirrorEditor
-                                                                initialValue={infoIconFunctionString}
-                                                                className="import-formatter-func-textarea"
-                                                                disabled={true}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-                                            <div className="import-formatter-func-field">
-
-                                                <CodeMirrorEditor
-                                                    initialValue={formatterFn}
-                                                    className="import-formatter-func-textarea"
-                                                    onBlur={validateFormatterFn}
-                                                    tabIndex={6}
-                                                    disabled={!!displayStatus}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
+                            <ImportOptions
+                                keyPrefix={keyPrefix} setKeyPrefix={setKeyPrefix}
+                                idField={idField} setIdField={setIdField}
+                                isStopOnError={isStopOnError} setIsStopOnError={setIsStopOnError}
+                                displayStatus={displayStatus}
+                                infoIconFunctionString={infoIconFunctionString}
+                                formatterFn={formatterFn} validateFormatterFn={validateFormatterFn}
+                            />
                             <div className="action-container fade-in-out-to-top">
                                 {displayStatus != IMPORT_STATUS.IN_PROGRESS ? (
                                     <div className="action-icons fas fa-play" title="Start/ Resume Import"
@@ -484,15 +415,6 @@ const Page = () => {
                                         }}
                                         tabIndex={8}></div>
                                 )}
-
-                                {/* <div className="action-icons fas fa-ban" title="Cancel Import"
-                                    onClick={evtClickCancel}
-                                    onKeyDown={(e) => {
-                                        if (e.key.toLowerCase() === 'enter' || e.key === ' ') {
-                                            evtClickCancel();
-                                        }
-                                    }}
-                                    tabIndex={9}></div> */}
                             </div>
                             <div className="count-outer-container fade-in-out-to-top">
                                 <div className="count-container success-count-container">

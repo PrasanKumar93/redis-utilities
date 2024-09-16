@@ -1,0 +1,103 @@
+  .import-options-container {
+      z-index: 1;
+      /* To show info icon hover element on top */
+      animation: fade-in-out-to-top .5s .75s forwards;
+      margin-top: 8px;
+
+      fieldset {
+          margin: 0;
+          border-radius: 5px;
+          border-color: var(--primary-8);
+
+          legend {
+              color: var(--primary-8);
+              padding: 0 var(--space-4);
+              font-size: var(--font-size-16);
+          }
+
+          .options {
+              margin-top: var(--space-4);
+
+              .import-option-title {
+                  margin-bottom: var(--space-2);
+                  font-size: var(--font-size-14);
+                  color: var(--primary-8);
+              }
+
+              .options-row {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+
+                  .options-col {
+                      display: flex;
+                      align-items: center;
+                  }
+
+                  .stop-on-error-lbl {
+                      font-size: var(--font-size-14);
+                      color: var(--primary-8);
+                  }
+
+                  .options-info-icon {
+                      font-size: var(--font-size-12);
+                      margin-left: var(--space-8);
+                      cursor: crosshair;
+                      position: relative;
+                      top: -4px;
+                  }
+              }
+
+              .import-formatter-func-section {
+                  margin-top: var(--space-8);
+
+                  .import-formatter-func-title-container {
+                      display: flex;
+
+                      .import-formatter-func-icon-container {
+                          margin-left: var(--space-8);
+                          position: relative;
+
+                          .import-formatter-func-icon {
+                              cursor: pointer;
+                          }
+
+                          .import-formatter-func-info-container {
+                              transform: scale(0);
+                              transform-origin: 6px 0;
+                              position: absolute;
+                              z-index: 2;
+                              transition: all .1s;
+
+                              .import-formatter-func-info-body {
+                                  width: 45vw;
+                                  padding: var(--space-8);
+                                  background: var(--fn-info-bg);
+                                  color: var(--fn-info-clr);
+                                  border-radius: 0 5px 5px 5px;
+                                  box-shadow: 0 0 10px var(--fn-info-bg);
+                              }
+                          }
+                      }
+
+                      .import-formatter-func-icon-container:hover {
+                          .import-formatter-func-info-container {
+                              transform: scale(1);
+                              transition: all .1s;
+                          }
+                      }
+                  }
+
+                  .import-formatter-func-field {
+                      margin-top: var(--space-2);
+                      max-width: 45vw;
+
+                      .import-formatter-func-textarea {
+                          height: 140px;
+                          padding: var(--space-4);
+                      }
+                  }
+              }
+          }
+      }
+  }
