@@ -9,10 +9,12 @@ import '../common/css/theme.css';
 import './page.css';
 
 import PageHeader from '../components/PageHeader';
+import RedisConnection from './page-components/RedisConnection';
+import UploadTypes from './page-components/UploadTypes';
 import ImportOptions from './page-components/ImportOptions';
-import LogTabs from './page-components/LogTabs';
-import ImportStatsCount from './page-components/ImportStatsCount';
 import ImportActionButtons from './page-components/ImportActionButtons';
+import ImportStatsCount from './page-components/ImportStatsCount';
+import LogTabs from './page-components/LogTabs';
 
 import {
     testRedisConnection,
@@ -288,14 +290,6 @@ const Page = () => {
         return isValid;
     }
 
-    const handleUploadTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedValue = e.target.value;
-        const selectedOption = UPLOAD_TYPES_OPTIONS.find(option => option.value === selectedValue);
-        if (selectedOption) {
-            setUploadTypeOption(selectedOption);
-        }
-    };
-
     const scrollTabContainer = () => {
 
         setTimeout(() => {
@@ -317,75 +311,25 @@ const Page = () => {
             <div className="pg001-outer-container">
                 <PageHeader isShowLoader={isShowLoader} headerIconCls="fas fa-file-import" headerLabel="Import Tool" pageVersion={gitTag} />
 
-                <div className="con-url-outer-container">
-                    <div className="con-url-container">
-                        <div className="con-url-lbl roboto-medium pg001-single-line-label">Connection URL : </div>
+                <RedisConnection
+                    testRedisUrl={testRedisUrl} setTestRedisUrl={setTestRedisUrl}
+                    evtClickEnterConUrl={evtClickEnterConUrl}
+                />
 
-                        <input type="text"
-                            placeholder="Enter Redis Connection URL"
-                            className="con-url-textbox pg001-textbox"
-                            value={testRedisUrl}
-                            onChange={(e) => setTestRedisUrl(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key.toLowerCase() === 'enter') {
-                                    evtClickEnterConUrl();
-                                }
-                            }}
-                            tabIndex={1}
-                        />
+                <UploadTypes
+                    uploadTypeOption={uploadTypeOption} setUploadTypeOption={setUploadTypeOption}
+                    uploadPath={uploadPath} setUploadPath={setUploadPath}
+                    evtClickEnterUploadPath={evtClickEnterUploadPath}
+                />
 
-                        <div className="fas fa-arrow-circle-right con-url-submit-icon enter"
-                            title="Next"
-                            onClick={evtClickEnterConUrl}></div>
-                        <div className="fas fa-check-circle con-url-submit-icon done" title="Connection successful"></div>
-                    </div>
-                </div>
-                <div className="upload-path-outer-container">
-                    <div className="upload-path-container fade-in-out-to-top">
-                        <div className="upload-path-select-ctr">
-
-                            <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
-                                Upload Type :
-                            </span>
-
-                            <select value={uploadTypeOption.value} onChange={handleUploadTypeChange} className="pg001-select" >
-                                {UPLOAD_TYPES_OPTIONS.map((option) => (
-                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="upload-path-textbox-ctr">
-                            <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
-                                Upload Path :
-                            </span>
-                            <input type="text" className="upload-path-textbox pg001-textbox"
-                                placeholder={uploadTypeOption.placeholder}
-                                id="upload-path-textbox"
-                                value={uploadPath}
-                                onChange={(e) => setUploadPath(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key.toLowerCase() === 'enter') {
-                                        evtClickEnterUploadPath();
-                                    }
-                                }}
-                                tabIndex={2}
-                            />
-
-                            <div className="fas fa-arrow-circle-right upload-path-submit-icon"
-                                title="Next"
-                                onClick={evtClickEnterUploadPath}></div>
-                        </div>
-
-
-                    </div>
-                </div>
                 <div className="import-process-outer-container">
+
                     <div id="final-upload-path-container" className="final-upload-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
                         <div className="pg001-single-line-label roboto-medium">Upload Path : </div>
                         <div id="final-upload-path" className="final-upload-path">{uploadPath}</div>
                     </div>
+
                     <div className="import-process-container">
 
                         <div className="import-process-left-container">

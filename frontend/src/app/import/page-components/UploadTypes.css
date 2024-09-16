@@ -1,0 +1,39 @@
+  .import-upload-type-container {
+      display: none;
+
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+
+      .upload-path-container {
+
+          width: 40%;
+          animation: fade-in-out-to-top .5s .5s forwards;
+
+          .upload-path-select-ctr {
+              margin-bottom: var(--space-8);
+              font-size: var(--font-size-14);
+          }
+
+          .pg001-upload-lbl {
+              margin: var(--space-4);
+              font-size: var(--font-size-14);
+          }
+
+          .upload-path-textbox-ctr {
+              display: flex;
+              align-items: center;
+          }
+
+          .upload-path-textbox {
+              min-width: 100%;
+          }
+
+          .upload-path-submit-icon {
+              color: var(--primary-10);
+              font-size: var(--font-size-24);
+              cursor: pointer;
+              transition: all 0.5s;
+          }
+      }
+  }

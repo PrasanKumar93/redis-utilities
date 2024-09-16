@@ -65,84 +65,6 @@
     color: var(--primary-2-clr);
     transition: all .5s;
 
-    .con-url-outer-container {
-        flex-grow: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: var(--space-8);
-        transition: all .5s;
-
-        .con-url-container {
-            display: flex;
-            align-items: center;
-
-            width: 40%;
-
-            .con-url-lbl {
-                display: flex;
-                margin-right: var(--space-4);
-                font-size: var(--font-size-14);
-            }
-
-            .con-url-textbox {
-                width: 100%;
-            }
-
-            .con-url-submit-icon {
-                color: var(--primary-10);
-                font-size: var(--font-size-24);
-                cursor: pointer;
-                transition: all 0.5s;
-            }
-
-            .con-url-submit-icon.done {
-                display: none;
-                cursor: crosshair;
-            }
-        }
-    }
-
-    .upload-path-outer-container {
-        display: none;
-
-        flex-grow: 1;
-        justify-content: center;
-        align-items: center;
-
-        .upload-path-container {
-
-            width: 40%;
-            animation: fade-in-out-to-top .5s .5s forwards;
-
-            .upload-path-select-ctr {
-                margin-bottom: var(--space-8);
-                font-size: var(--font-size-14);
-            }
-
-            .pg001-upload-lbl {
-                margin: var(--space-4);
-                font-size: var(--font-size-14);
-            }
-
-            .upload-path-textbox-ctr {
-                display: flex;
-                align-items: center;
-            }
-
-            .upload-path-textbox {
-                min-width: 100%;
-            }
-
-            .upload-path-submit-icon {
-                color: var(--primary-10);
-                font-size: var(--font-size-24);
-                cursor: pointer;
-                transition: all 0.5s;
-            }
-        }
-    }
-
     .import-process-outer-container {
         display: none;
 
@@ -196,7 +118,7 @@
 .pg001-body.show-import-process-ctr {
     /* overflow: hidden; */
 
-    .con-url-outer-container {
+    .import-redis-con-container {
         flex-grow: 0;
 
         .con-url-textbox {
@@ -217,7 +139,7 @@
 
 .pg001-body.choose-upload-path {
     .pg001-outer-container {
-        .upload-path-outer-container {
+        .import-upload-type-container {
             display: flex;
         }
     }
