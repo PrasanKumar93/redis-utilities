@@ -24,7 +24,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="/fontawesome-free-6.6.0-web/css/all.min.css" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className + " theme-redis"}>
         {children}
 
         <ToastContainer />

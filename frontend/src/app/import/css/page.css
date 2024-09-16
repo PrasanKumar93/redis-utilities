@@ -65,60 +65,6 @@
     color: var(--primary-2-clr);
     transition: all .5s;
 
-    .header {
-        display: flex;
-        flex-direction: column;
-        background: linear-gradient(90deg, var(--primary-1) 5%, var(--primary-7) 12%, var(--primary-10));
-        color: var(--primary-clr-10);
-        box-shadow: 5px 0 8px var(--black);
-        font-size: var(--font-size-24);
-
-        .header-top {
-            display: flex;
-            height: 44px;
-            padding: var(--space-4) var(--space-8) 0 var(--space-8);
-
-            .header-logo-container {
-                width: 100px;
-
-                img {
-                    height: 100%;
-                    padding: var(--space-4);
-                }
-            }
-
-            .heading {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-grow: 1;
-
-                .heading-icon {
-                    margin-right: var(--space-8);
-                }
-            }
-
-            .header-right {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-end;
-                width: 100px;
-            }
-
-            .theme-toggle {
-                font-size: var(--font-size-16);
-                cursor: pointer;
-            }
-
-            .git-tag {
-                margin-top: var(--space-4);
-                font-size: var(--font-size-12);
-                opacity: 0.5;
-            }
-        }
-    }
-
     .con-url-outer-container {
         flex-grow: 1;
         display: flex;

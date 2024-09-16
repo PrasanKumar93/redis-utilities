@@ -10,7 +10,7 @@ import '../common/css/theme.css';
 import './css/page.css';
 
 import CodeMirrorEditor from '../components/CodeMirrorEditor';
-import Loader from '../components/Loader';
+import PageHeader from '../components/PageHeader'
 
 import {
     testRedisConnection,
@@ -26,7 +26,6 @@ import {
     IMPORT_ANIMATE_CSS,
     IMPORT_STATUS,
     IMPORT_PAGE_TABS,
-    IMPORT_PAGE_THEMES,
     UPLOAD_TYPES_OPTIONS,
     UPLOAD_TYPES_FOR_IMPORT,
 } from "../constants";
@@ -62,8 +61,6 @@ const defaultFunctionString = `function customJSONFormatter(jsonObj){
  return jsonObj; // mandatory return 
 }`;
 
-const gitTag = "v0.1.0";
-
 const Page = () => {
 
     const [testRedisUrl, setTestRedisUrl] = useState(config.DEFAULT_REDIS_URL);
@@ -80,9 +77,10 @@ const Page = () => {
     const [isValidFormatterFn, setIsValidFormatterFn] = useState(false);
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
-    const [themeName, setThemeName] = useState(IMPORT_PAGE_THEMES[0]);
     const [isShowLoader, setIsShowLoader] = useState(false);
     const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_TYPES_OPTIONS[0]);
+
+    const gitTag = config.GIT_TAG;
 
     const {
         socketId,
@@ -245,13 +243,6 @@ const Page = () => {
         pauseImportFilesToRedis();
     }
 
-    const evtClickToggleTheme = () => {
-
-        let themeIndex = IMPORT_PAGE_THEMES.indexOf(themeName);
-        themeIndex = (themeIndex + 1) >= IMPORT_PAGE_THEMES.length ? 0 : (themeIndex + 1);
-        setThemeName(IMPORT_PAGE_THEMES[themeIndex]);
-    }
-
     const validateFormatterFn = async (code: string) => {
         let isValid = false;
 
@@ -317,28 +308,12 @@ const Page = () => {
     return (
         <div className={"pg001-body roboto-regular "
             + (displayErrors.length ? "import-error " : "")
-            + (themeName + " ")
             + Array.from(bodyClasses).join(" ")
         }
             id="pg001-body">
 
             <div className="pg001-outer-container">
-                <div className="header roboto-black">
-                    <div className="header-top">
-                        <div className="header-logo-container">
-                            <img src="/logo-small.png" alt="Logo" />
-                        </div>
-                        <div className="heading">
-                            <i className="fas fa-file-import heading-icon"></i> <span>Import Tool</span>
-                        </div>
-                        <div className="header-right">
-                            <div className="theme-toggle fas fa-adjust" onClick={evtClickToggleTheme} title="Change Theme">
-                            </div>
-                            <div className="git-tag">{gitTag}</div>
-                        </div>
-                    </div>
-                    <Loader isShow={isShowLoader} />
-                </div>
+                <PageHeader isShowLoader={isShowLoader} headerIconCls="fas fa-file-import" headerLabel="Import Tool" pageVersion={gitTag} />
                 <div className="con-url-outer-container">
                     <div className="con-url-container">
                         <div className="con-url-lbl roboto-medium pg001-single-line-label">Connection URL : </div>
