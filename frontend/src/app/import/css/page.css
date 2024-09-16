@@ -25,6 +25,10 @@
     font-size: var(--font-size-12);
 }
 
+.pg001-textbox:disabled::placeholder {
+    color: transparent;
+}
+
 .pg001-select {
     padding: var(--space-8);
     border: 1px solid var(--border);

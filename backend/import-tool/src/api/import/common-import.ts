@@ -24,7 +24,11 @@ interface IGetFileKey {
 const getFileKey = (_obj: IGetFileKey) => {
   let key = "";
 
-  const { filePath, idField, content, keyPrefix, index } = _obj;
+  let { filePath, idField, content, keyPrefix, index } = _obj;
+
+  if (!index) {
+    index = 0;
+  }
 
   if (idField && content) {
     // JSON id field as key
@@ -49,7 +53,7 @@ const getFileKey = (_obj: IGetFileKey) => {
     } else {
       key = path.basename(filePath);
     }
-  } else if (index) {
+  } else if (index >= 0) {
     key = (index + 1).toString();
   }
 
