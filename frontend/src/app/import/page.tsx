@@ -6,11 +6,11 @@ import React, { useEffect, useState } from "react";
 import '../common/css/typography.css';
 import '../common/css/variables.css';
 import '../common/css/theme.css';
-
 import './page.css';
 
 import PageHeader from '../components/PageHeader';
 import ImportOptions from './page-components/ImportOptions';
+import LogTabs from './page-components/LogTabs';
 
 import {
     testRedisConnection,
@@ -314,6 +314,7 @@ const Page = () => {
 
             <div className="pg001-outer-container">
                 <PageHeader isShowLoader={isShowLoader} headerIconCls="fas fa-file-import" headerLabel="Import Tool" pageVersion={gitTag} />
+
                 <div className="con-url-outer-container">
                     <div className="con-url-container">
                         <div className="con-url-lbl roboto-medium pg001-single-line-label">Connection URL : </div>
@@ -434,83 +435,13 @@ const Page = () => {
                         </div>
 
                         <div className="import-process-right-container">
-                            <div className="tabs-outer-container fade-in-out-to-left">
-                                <div className="tab-headings">
-
-                                    <div className={"tab-title roboto-medium "
-                                        + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "tab-title-active" : "")}
-                                        onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)}>
-                                        Info
-                                    </div>
-
-                                    <div className={"tab-title roboto-medium "
-                                        + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "tab-title-active" : "")}
-                                        onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS)}>
-                                        ErrorLogs ({displayErrors.length})
-                                    </div>
-                                </div>
-                                <div className={"tab-container "
-                                    + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "hide-tab-container" : "")}>
-
-                                    <div className="tab-container-status roboto-bold-italic">
-                                        Status : {displayStatus || "Not started"}
-                                    </div>
-                                    {formatterFnInput &&
-                                        <>
-                                            <hr />
-                                            <details>
-                                                <summary className="summary-tag roboto-medium-italic">
-                                                    Formatter function input (jsonObj) is file content :
-                                                </summary>
-
-                                                <pre>
-                                                    <code>
-                                                        {JSON.stringify(formatterFnInput, null, 4)}
-                                                    </code>
-                                                </pre>
-                                            </details>
-                                        </>
-                                    }
-                                    {formatterFnOutput &&
-                                        <>
-                                            <hr />
-
-                                            <details>
-                                                <summary className="summary-tag roboto-medium-italic">
-                                                    Formatter function output to be stored in Redis :
-                                                </summary>
-                                                <pre>
-                                                    <code>
-                                                        {JSON.stringify(formatterFnOutput, null, 4)}
-                                                    </code>
-                                                </pre>
-                                            </details>
-                                        </>
-                                    }
-
-                                </div>
-                                <div className={"tab-container "
-                                    + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "hide-tab-container" : "")}>
-
-                                    {displayErrors.map((error, index) => (
-                                        <div key={index} className="error-log">
-                                            <div className="error-log-path">
-                                                {index + 1})
-                                                {error.filePath ? 'FilePath : ' + error.filePath : ''}
-                                                {error.message ? ' Message : ' + error.message : ''}
-                                            </div>
-                                            <div className="error-log-msg">
-                                                {/* Error : */}
-                                                <pre>
-                                                    <code>
-                                                        {JSON.stringify(error.error, null, 4)}
-                                                    </code>
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <LogTabs
+                                activeTabIndex={activeTabIndex} setActiveTabIndex={setActiveTabIndex}
+                                displayErrors={displayErrors}
+                                displayStatus={displayStatus}
+                                formatterFnInput={formatterFnInput}
+                                formatterFnOutput={formatterFnOutput}
+                            />
                         </div>
                     </div>
                 </div>
