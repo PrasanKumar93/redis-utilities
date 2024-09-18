@@ -2,6 +2,7 @@ import './UploadTypes.css';
 
 import { UPLOAD_DROPDOWN_OPTIONS, UPLOAD_CATEGORY } from "@/app/constants";
 import FileUpload from "@/app/components/FileUpload";
+import { useEffect, useState } from 'react';
 
 interface UploadTypesProps {
     uploadTypeOption: any;
@@ -11,6 +12,7 @@ interface UploadTypesProps {
     evtClickEnterUploadPath: () => Promise<void>;
 
     fileUploadApiUrl?: string;
+    socketId?: string;
 }
 
 const UploadTypes = ({
@@ -21,29 +23,37 @@ const UploadTypes = ({
     evtClickEnterUploadPath,
 
     fileUploadApiUrl,
+    socketId,
 
 }: UploadTypesProps) => {
 
     //#region for browser upload
+    const [fileUploadServerPath, setFileUploadServerPath] = useState<string>('');
 
     const evtFilePreUpload = (formData: FormData) => {
         if (formData) {
-            formData.append('uploadType', uploadTypeOption.value);
+            formData.append('uploadType', uploadTypeOption.uploadType);
+            if (socketId) {
+                formData.append('socketId', socketId);
+            }
         }
         return formData;
     }
 
     const evtFilePostUpload = (result: any) => {
 
-        if (result?.data) {
-            console.log(result.data);
-            const serverUploadPath = result.data?.serverUploadPath;
-            if (serverUploadPath) {
-                setUploadPath(serverUploadPath);
-                evtClickEnterUploadPath();
-            }
+        if (result.data?.serverUploadPath) {
+            const uploadedPath = result.data?.serverUploadPath;
+            setFileUploadServerPath(uploadedPath);
+            setUploadPath(uploadedPath);
         }
     }
+
+    useEffect(() => {
+        if (fileUploadServerPath) {
+            evtClickEnterUploadPath();
+        }
+    }, [fileUploadServerPath]);
     //#endregion
 
     const handleUploadTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

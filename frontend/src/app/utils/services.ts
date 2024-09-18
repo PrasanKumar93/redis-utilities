@@ -48,6 +48,16 @@ const getSampleInputForJSONFormatterFnSchema = z.object({
 
 //#endregion
 
+const API_PATHS = {
+  testRedisConnection: "/testRedisConnection",
+  importDataToRedis: "/importDataToRedis",
+  resumeImportDataToRedis: "/resumeImportDataToRedis",
+  testJSONFormatterFn: "/testJSONFormatterFn",
+  getSampleInputForJSONFormatterFn: "/getSampleInputForJSONFormatterFn",
+
+  uploadFileForImportDataToRedis: "/uploadFileForImportDataToRedis", //used directly in app/import/page.tsx
+};
+
 //#region API calls
 const testRedisConnection = async (
   input: z.infer<typeof testRedisConnectionSchema>
@@ -55,11 +65,11 @@ const testRedisConnection = async (
   try {
     testRedisConnectionSchema.parse(input); // validate input
 
-    const response = await postRequest("/testRedisConnection", input);
+    const response = await postRequest(API_PATHS.testRedisConnection, input);
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorAPIAlert("testRedisConnection");
+    errorAPIAlert(API_PATHS.testRedisConnection);
   }
 };
 
@@ -68,11 +78,11 @@ const importDataToRedis = async (
 ) => {
   try {
     importDataToRedisSchema.parse(input); // validate input
-    const response = await postRequest("/importDataToRedis", input);
+    const response = await postRequest(API_PATHS.importDataToRedis, input);
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorAPIAlert("importDataToRedis");
+    errorAPIAlert(API_PATHS.importDataToRedis);
   }
 };
 
@@ -81,11 +91,14 @@ const resumeImportDataToRedis = async (
 ) => {
   try {
     resumeImportDataToRedisSchema.parse(input); // validate input
-    const response = await postRequest("/resumeImportDataToRedis", input);
+    const response = await postRequest(
+      API_PATHS.resumeImportDataToRedis,
+      input
+    );
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorAPIAlert("resumeImportDataToRedis");
+    errorAPIAlert(API_PATHS.resumeImportDataToRedis);
   }
 };
 
@@ -98,14 +111,14 @@ const testJSONFormatterFn = async (
   };
   try {
     testJSONFormatterFnSchema.parse(input); // validate input
-    const response = await postRequest("/testJSONFormatterFn", input);
+    const response = await postRequest(API_PATHS.testJSONFormatterFn, input);
     testResult.data = response?.data?.data;
   } catch (axisError: any) {
     const error = consoleLogError(axisError);
     if (error?.userMessage) {
       errorToast(error.userMessage);
     } else {
-      errorAPIAlert("testJSONFormatterFn");
+      errorAPIAlert(API_PATHS.testJSONFormatterFn);
     }
     testResult.error = error?.message || error; // message, stack
   }
@@ -120,19 +133,20 @@ const getSampleInputForJSONFormatterFn = async (
     getSampleInputForJSONFormatterFnSchema.parse(input); // validate input
 
     const response = await postRequest(
-      "/getSampleInputForJSONFormatterFn",
+      API_PATHS.getSampleInputForJSONFormatterFn,
       input
     );
     return response?.data;
   } catch (axiosError: any) {
     consoleLogError(axiosError);
-    errorAPIAlert("getSampleInputForJSONFormatterFn");
+    errorAPIAlert(API_PATHS.getSampleInputForJSONFormatterFn);
   }
 };
 
 //#endregion
 
 export {
+  API_PATHS,
   testRedisConnection,
   importDataToRedis,
   resumeImportDataToRedis,

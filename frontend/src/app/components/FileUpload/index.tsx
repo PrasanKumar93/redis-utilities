@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './index.css';
 
 import { consoleLogError, errorAPIAlert, fileUploadRequest } from '@/app/utils/axios-util';
+import { infoToast } from '@/app/utils/toast-util';
 
 
 interface FileUploadProps {
@@ -34,11 +35,12 @@ const FileUpload = ({
     const handleUpload = async () => {
         if (selectedFile) {
             let formData = new FormData();
-            formData.append('file', selectedFile);
 
             if (preFileUploadCallback) {
                 formData = preFileUploadCallback(formData);
             }
+            formData.append('file', selectedFile);
+
 
             let responseData: any = null;
 
@@ -58,6 +60,9 @@ const FileUpload = ({
             if (postFileUploadCallback) {
                 postFileUploadCallback(responseData);
             }
+        }
+        else {
+            infoToast('Please select a file to upload');
         }
     };
 

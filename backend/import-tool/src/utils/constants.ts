@@ -1,11 +1,9 @@
-const CONSTANTS = {
-  HTTP_STATUS_CODES: {
-    OK: 200,
-    BAD_REQUEST: 400,
-    NOT_FOUND: 404,
-    METHOD_NOT_ALLOWED: 405,
-    INTERNAL_SERVER_ERROR: 500,
-  },
+const HTTP_STATUS_CODES = {
+  OK: 200,
+  BAD_REQUEST: 400,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  INTERNAL_SERVER_ERROR: 500,
 };
 
 const UPLOAD_TYPES_FOR_IMPORT = {
@@ -65,11 +63,14 @@ type DisableJsFlagsType = {
   [key in keyof typeof DISABLE_JS_FLAGS]: boolean;
 };
 
+const DEFAULT_IMPORT_UPLOAD_DIR = "../import-uploads";
+
 export {
-  CONSTANTS,
+  HTTP_STATUS_CODES,
   DISABLE_JS_DATA,
   DISABLE_JS_FLAGS,
   UPLOAD_TYPES_FOR_IMPORT,
+  DEFAULT_IMPORT_UPLOAD_DIR,
 };
 
 export type { DisableJsFlagsType };

@@ -22,6 +22,7 @@ import {
     resumeImportDataToRedis,
     testJSONFormatterFn,
     getSampleInputForJSONFormatterFn,
+    API_PATHS,
 } from "../utils/services";
 import { errorToast, infoToast } from "../utils/toast-util";
 import { encryptData } from "../utils/crypto-util";
@@ -136,17 +137,13 @@ const Page = () => {
         let isValid = false;
 
         if (uploadPath) {
-            if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
-                || uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE_BROWSER_UPLOAD
-            ) {
+            if (uploadTypeOption.uploadType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
                 isValid = !!(uploadPath.match(/\.json$/)?.length);
             }
-            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
-                || uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE_BROWSER_UPLOAD
-            ) {
+            else if (uploadTypeOption.uploadType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
                 isValid = !!(uploadPath.match(/\.csv$/)?.length);
             }
-            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
+            else if (uploadTypeOption.uploadType === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
                 // should not end with any file extension
                 isValid = !(uploadPath.match(/\.\w+$/)?.length);
             }
@@ -167,7 +164,7 @@ const Page = () => {
             setIsShowLoader(true);
 
             const result = await getSampleInputForJSONFormatterFn({
-                uploadType: uploadTypeOption.value,
+                uploadType: uploadTypeOption.uploadType,
                 uploadPath: uploadPath
             });
             if (result?.data?.content) {
@@ -194,7 +191,7 @@ const Page = () => {
 
         const result = await importDataToRedis({
             redisConUrlEncrypted: encryptedRedisUrl,
-            uploadType: uploadTypeOption.value,
+            uploadType: uploadTypeOption.uploadType,
             uploadPath,
             keyPrefix,
             idField,
@@ -215,7 +212,7 @@ const Page = () => {
         const result = await resumeImportDataToRedis({
             socketId,
             isStopOnError,
-            uploadType: uploadTypeOption.value,
+            uploadType: uploadTypeOption.uploadType,
             uploadPath: uploadPath
         });
 
@@ -324,6 +321,9 @@ const Page = () => {
                     uploadTypeOption={uploadTypeOption} setUploadTypeOption={setUploadTypeOption}
                     uploadPath={uploadPath} setUploadPath={setUploadPath}
                     evtClickEnterUploadPath={evtClickEnterUploadPath}
+
+                    fileUploadApiUrl={API_PATHS.uploadFileForImportDataToRedis}
+                    socketId={socketId}
                 />
 
                 <div className="import-process-outer-container">
