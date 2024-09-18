@@ -1,12 +1,7 @@
 import { z } from "zod";
 
-import { postRequest } from "./axios-util";
-
+import { postRequest, consoleLogError, errorAPIAlert } from "./axios-util";
 import { errorToast } from "./toast-util";
-
-const CSS_CLASSES = {
-  CUSTOM_ERROR_TOAST: "custom-error-toast",
-};
 
 //#region API input schema
 const zodEncryptedData = z.object({
@@ -52,22 +47,6 @@ const getSampleInputForJSONFormatterFnSchema = z.object({
 });
 
 //#endregion
-
-// #region helper functions
-const consoleLogError = (axiosError: any) => {
-  const error = axiosError?.response?.data?.error || axiosError;
-  if (error) {
-    console.error(error);
-  }
-  return error;
-};
-
-const errorAPIAlert = (apiName: string) => {
-  errorToast(`Error in /${apiName} API, Check console for more info !`, {
-    className: CSS_CLASSES.CUSTOM_ERROR_TOAST,
-  });
-};
-// #endregion
 
 //#region API calls
 const testRedisConnection = async (

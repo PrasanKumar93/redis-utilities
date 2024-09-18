@@ -30,7 +30,7 @@ import {
     IMPORT_ANIMATE_CSS,
     IMPORT_STATUS,
     IMPORT_PAGE_TABS,
-    UPLOAD_TYPES_OPTIONS,
+    UPLOAD_DROPDOWN_OPTIONS,
     UPLOAD_TYPES_FOR_IMPORT,
 } from "../constants";
 import { config } from "../config";
@@ -82,7 +82,7 @@ const Page = () => {
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
     const [isShowLoader, setIsShowLoader] = useState(false);
-    const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_TYPES_OPTIONS[0]);
+    const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_DROPDOWN_OPTIONS[0]);
 
     const gitTag = config.GIT_TAG;
 
@@ -136,10 +136,14 @@ const Page = () => {
         let isValid = false;
 
         if (uploadPath) {
-            if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+            if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
+                || uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE_BROWSER_UPLOAD
+            ) {
                 isValid = !!(uploadPath.match(/\.json$/)?.length);
             }
-            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+            else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
+                || uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE_BROWSER_UPLOAD
+            ) {
                 isValid = !!(uploadPath.match(/\.csv$/)?.length);
             }
             else if (uploadTypeOption.value === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {

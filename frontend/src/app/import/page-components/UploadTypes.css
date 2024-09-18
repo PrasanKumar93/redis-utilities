@@ -20,7 +20,7 @@
               font-size: var(--font-size-14);
           }
 
-          .upload-path-textbox-ctr {
+          .upload-textbox-ctr {
               display: flex;
               align-items: center;
           }
@@ -29,7 +29,7 @@
               min-width: 100%;
           }
 
-          .upload-path-submit-icon {
+          .upload-submit-icon {
               color: var(--primary-10);
               font-size: var(--font-size-24);
               cursor: pointer;

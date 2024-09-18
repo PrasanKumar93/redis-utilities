@@ -34,23 +34,44 @@ const UPLOAD_TYPES_FOR_IMPORT = {
   JSON_FOLDER: "jsonFolder",
   JSON_ARRAY_FILE: "jsonArrayFile",
   CSV_FILE: "csvFile",
+  JSON_ARRAY_FILE_BROWSER_UPLOAD: "jsonArrayFileBrowserUpload",
+  CSV_FILE_BROWSER_UPLOAD: "csvFileBrowserUpload",
+};
+const UPLOAD_CATEGORY = {
+  SERVER_PATH: "SERVER_PATH",
+  BROWSER_UPLOAD: "BROWSER_UPLOAD",
 };
 
-const UPLOAD_TYPES_OPTIONS = [
+const UPLOAD_DROPDOWN_OPTIONS = [
   {
     value: UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER,
-    label: "JSON Folder",
+    label: "JSON Folder (Server Path)",
     placeholder: "/Users/tom/Documents/product-data",
+    category: UPLOAD_CATEGORY.SERVER_PATH,
   },
   {
     value: UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE,
-    label: "JSON Array File",
+    label: "JSON Array File (Server Path)",
     placeholder: "/Users/tom/Documents/product-data/products.json",
+    category: UPLOAD_CATEGORY.SERVER_PATH,
   },
   {
     value: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
-    label: "CSV File",
+    label: "CSV File (Server Path)",
     placeholder: "/Users/tom/Documents/product-data/products.csv",
+    category: UPLOAD_CATEGORY.SERVER_PATH,
+  },
+  {
+    value: UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE_BROWSER_UPLOAD,
+    label: "JSON Array File (Browser Upload)",
+    placeholder: "products.json",
+    category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
+  },
+  {
+    value: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE_BROWSER_UPLOAD,
+    label: "CSV File (Browser Upload)",
+    placeholder: "products.csv",
+    category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
   },
 ];
 
@@ -59,6 +80,7 @@ export {
   IMPORT_STATUS,
   IMPORT_PAGE_TABS,
   IMPORT_PAGE_THEMES,
-  UPLOAD_TYPES_OPTIONS,
+  UPLOAD_DROPDOWN_OPTIONS,
   UPLOAD_TYPES_FOR_IMPORT,
+  UPLOAD_CATEGORY,
 };
