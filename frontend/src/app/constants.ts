@@ -68,6 +68,7 @@ const UPLOAD_DROPDOWN_OPTIONS = [
     placeholder: "products.json",
     category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
     uploadType: UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE,
+    allowExtension: ".json",
   },
   {
     value: "5",
@@ -75,6 +76,7 @@ const UPLOAD_DROPDOWN_OPTIONS = [
     placeholder: "products.csv",
     category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
     uploadType: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
+    allowExtension: ".csv",
   },
 ];
 

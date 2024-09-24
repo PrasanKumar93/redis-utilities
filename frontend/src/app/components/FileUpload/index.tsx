@@ -32,6 +32,17 @@ const FileUpload = ({
         }
     };
 
+    const animateFileUploadProgress = (progress: number) => {
+        let elm = document.getElementById("comp-file-upload-progress");
+        if (elm) {
+            if (progress < 0 || progress > 100) {
+                progress = 0;
+            }
+            elm.style.setProperty('--progress-value', progress.toString());
+            setFileUploadProgress(progress)
+        }
+    }
+
     const handleUpload = async () => {
         if (selectedFile) {
             let formData = new FormData();
@@ -41,15 +52,16 @@ const FileUpload = ({
             }
             formData.append('file', selectedFile);
 
-
-            let responseData: any = null;
-
             if (fileUploadApiUrl) {
                 try {
                     const response = await fileUploadRequest(fileUploadApiUrl, formData, null, (progress: number) => {
-                        setFileUploadProgress(progress);
+                        animateFileUploadProgress(Number(progress));
                     });
-                    responseData = response?.data;
+                    const responseData = response?.data;
+
+                    if (postFileUploadCallback) {
+                        postFileUploadCallback(responseData);
+                    }
                 }
                 catch (axiosError: any) {
                     const error = consoleLogError(axiosError);
@@ -58,12 +70,11 @@ const FileUpload = ({
                     } else {
                         errorAPIAlert(fileUploadApiUrl);
                     }
+                    animateFileUploadProgress(0);
                 }
             }
 
-            if (postFileUploadCallback) {
-                postFileUploadCallback(responseData);
-            }
+
         }
         else {
             infoToast('Please select a file to upload');
@@ -76,11 +87,18 @@ const FileUpload = ({
                 onChange={handleFileChange}
                 {...(allowFileExtensions ? { accept: allowFileExtensions } : {})}
                 tabIndex={tabIndex} />
-            <div className="fas fa-upload upload-submit-icon"
-                title="Upload file to server"
-                onClick={handleUpload}
-            ></div>
-            {Number(fileUploadProgress) > 0 && <div>Upload Progress: {fileUploadProgress}%</div>}
+
+            <div className={fileUploadProgress > 0 ? "progress-bar progress-bar-active" : "progress-bar"} id="comp-file-upload-progress">
+
+
+                {fileUploadProgress > 0 && <div>{fileUploadProgress}%</div>}
+
+                {fileUploadProgress == 0 && <div className="fas fa-upload upload-submit-icon"
+                    title="Upload file to server"
+                    onClick={handleUpload}
+                ></div>}
+            </div>
+
         </div>
     );
 };

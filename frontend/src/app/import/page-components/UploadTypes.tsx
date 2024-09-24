@@ -87,7 +87,7 @@ const UploadTypes = ({
 
                         <FileUpload
                             fileUploadApiUrl={fileUploadApiUrl}
-                            allowFileExtensions=".zip,.json,.csv"
+                            allowFileExtensions={uploadTypeOption.allowExtension}
                             preFileUploadCallback={evtFilePreUpload}
                             postFileUploadCallback={evtFilePostUpload}
                             tabIndex={2}
