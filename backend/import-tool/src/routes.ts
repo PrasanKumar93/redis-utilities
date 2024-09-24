@@ -112,7 +112,20 @@ router.post(
 router.post(
   "/uploadFileForImportDataToRedis",
   async (req: Request, res: Response) => {
-    return uploadFileForImportDataToRedis(req, res);
+    const result: any = {
+      data: null,
+      error: null,
+    };
+    try {
+      result.data = await uploadFileForImportDataToRedis(req);
+    } catch (err) {
+      err = LoggerCls.getPureError(err);
+      LoggerCls.error("/uploadFileForImportDataToRedis API failed !", err);
+      result.error = err;
+      res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+
+    res.send(result);
   }
 );
 

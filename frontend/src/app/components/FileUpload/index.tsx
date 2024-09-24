@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './index.css';
 
 import { consoleLogError, errorAPIAlert, fileUploadRequest } from '@/app/utils/axios-util';
-import { infoToast } from '@/app/utils/toast-util';
+import { errorToast, infoToast } from '@/app/utils/toast-util';
 
 
 interface FileUploadProps {
@@ -52,8 +52,12 @@ const FileUpload = ({
                     responseData = response?.data;
                 }
                 catch (axiosError: any) {
-                    consoleLogError(axiosError);
-                    errorAPIAlert(fileUploadApiUrl);
+                    const error = consoleLogError(axiosError);
+                    if (error?.userMessage) {
+                        errorToast(error.userMessage);
+                    } else {
+                        errorAPIAlert(fileUploadApiUrl);
+                    }
                 }
             }
 

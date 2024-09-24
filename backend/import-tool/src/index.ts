@@ -3,14 +3,24 @@ import { Server, Socket } from "socket.io";
 import http from "http";
 import cors from "cors";
 import "dotenv/config";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { router } from "./routes.js";
 import { ImportStatus, socketState } from "./state.js";
 import { LoggerCls } from "./utils/logger.js";
+import {
+  setRootUploadDir,
+  deleteSocketUploadDir,
+} from "./api/import/upload-file-for-import-data-to-redis.js";
 
 //------ Constants
 const PORT = process.env.API_PORT || 3001;
 const API_PREFIX = "/api";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+setRootUploadDir(__dirname);
 //------
 
 const app = express();
@@ -43,6 +53,7 @@ io.on("connection", (socket: Socket) => {
   socket.on("disconnect", () => {
     LoggerCls.info("Client disconnected " + socket.id);
     delete socketState[socket.id];
+    deleteSocketUploadDir(socket.id);
   });
 
   // socket.emit("importStats", { processed: 0, failed: 0, totalFiles: 0 });

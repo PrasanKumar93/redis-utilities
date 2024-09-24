@@ -31,6 +31,8 @@ interface IImportArrayFileState extends IImportCommonState {
 }
 
 const socketState: {
+  IMPORT_UPLOAD_DIR?: any;
+
   [socketId: string]: IImportFilesState | IImportArrayFileState;
 } = {};
 

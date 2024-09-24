@@ -42,7 +42,7 @@ const UploadTypes = ({
 
     const evtFilePostUpload = (result: any) => {
 
-        if (result.data?.serverUploadPath) {
+        if (result?.data?.serverUploadPath) {
             const uploadedPath = result.data?.serverUploadPath;
             setFileUploadServerPath(uploadedPath);
             setUploadPath(uploadedPath);

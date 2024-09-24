@@ -63,14 +63,11 @@ type DisableJsFlagsType = {
   [key in keyof typeof DISABLE_JS_FLAGS]: boolean;
 };
 
-const DEFAULT_IMPORT_UPLOAD_DIR = "../import-uploads";
-
 export {
   HTTP_STATUS_CODES,
   DISABLE_JS_DATA,
   DISABLE_JS_FLAGS,
   UPLOAD_TYPES_FOR_IMPORT,
-  DEFAULT_IMPORT_UPLOAD_DIR,
 };
 
 export type { DisableJsFlagsType };
