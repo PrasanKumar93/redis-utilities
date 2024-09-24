@@ -3,8 +3,10 @@ import type { IImportFilesState, IImportArrayFileState } from "../state.js";
 import fs from "fs-extra";
 import fg from "fast-glob";
 import zlib from "node:zlib";
+import path from "node:path";
 import _ from "lodash";
 import Papa from "papaparse";
+import yauzl from "yauzl";
 
 import { LoggerCls } from "./logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
@@ -17,6 +19,10 @@ interface IFileReaderData {
   content: any;
   totalFiles: number;
   error?: any;
+}
+interface IUnzipFile {
+  userMessage: string;
+  unzippedPath: string;
 }
 
 const getJsonGlobForFolderPath = (folderPath: string) => {
@@ -270,6 +276,73 @@ const readRawCSVFile = async (filePath: string) => {
   return results;
 };
 
+const unzipFile = async (zipFilePath: string, destDir: string) => {
+  const retObj: IUnzipFile = {
+    userMessage: "",
+    unzippedPath: "",
+  };
+
+  let promObj: Promise<IUnzipFile> = new Promise((resolve, reject) => {
+    yauzl.open(zipFilePath, { lazyEntries: true }, (errOpenZip, zipFile) => {
+      const handleZipError = (err: Error, isCloseFile = true) => {
+        reject(err);
+        if (isCloseFile) {
+          zipFile.close();
+        }
+      };
+
+      if (errOpenZip) {
+        handleZipError(errOpenZip, false);
+      } else {
+        zipFile.readEntry(); // read the first entry
+
+        zipFile.on("entry", (entry) => {
+          const filePath = path.join(destDir, entry.fileName);
+
+          if (/\/$/.test(entry.fileName)) {
+            // if entry.fileName is Directory
+            fs.mkdirSync(filePath, { recursive: true });
+            zipFile.readEntry(); // read the next entry
+          } else {
+            // if entry.fileName is File
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+            // Extract file
+            zipFile.openReadStream(entry, (errOpenFile, readStream) => {
+              LoggerCls.info("Extracting file: " + filePath);
+
+              if (errOpenFile) {
+                handleZipError(errOpenFile);
+              } else {
+                const writeStream = fs.createWriteStream(filePath);
+                readStream.pipe(writeStream);
+
+                readStream.on("error", handleZipError);
+                writeStream.on("error", handleZipError);
+
+                readStream.on("end", function () {
+                  zipFile.readEntry(); // read the next entry
+                });
+              }
+            });
+          }
+        });
+
+        zipFile.on("end", () => {
+          retObj.userMessage = "Unzipping completed at : " + destDir;
+          LoggerCls.info(retObj.userMessage);
+          retObj.unzippedPath = destDir;
+          resolve(retObj);
+        });
+
+        zipFile.on("error", handleZipError);
+      }
+    });
+  });
+
+  return promObj;
+};
+
 export {
   getFilePathsFromGlobPattern,
   getJsonGlobForFolderPath,
@@ -279,6 +352,7 @@ export {
   readSampleDataFromArrayFile,
   readRawJSONFile,
   readRawCSVFile,
+  unzipFile,
 };
 
 export type { IFileReaderData };

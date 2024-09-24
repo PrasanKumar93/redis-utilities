@@ -1,50 +1,50 @@
 import { Request } from "express";
-import {
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  rmdirSync,
-  unlinkSync,
-} from "node:fs";
-import { join } from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 import Busboy from "busboy";
 
 import { socketState } from "../../state.js";
 import { LoggerCls } from "../../utils/logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../../utils/constants.js";
+import { unzipFile } from "../../utils/file-reader.js";
 
 const setRootUploadDir = (rootDir: string) => {
-  socketState.IMPORT_UPLOAD_DIR = join(rootDir, "import-uploads");
+  socketState.IMPORT_UPLOAD_DIR = path.join(rootDir, "import-uploads");
 };
 
 const getSocketUploadDir = (socketId: string) => {
   let folderPath = "";
   if (socketId) {
-    folderPath = join(socketState.IMPORT_UPLOAD_DIR, socketId);
+    folderPath = path.join(socketState.IMPORT_UPLOAD_DIR, socketId);
   }
   return folderPath;
 };
+
 const deleteSocketUploadDir = (socketId: string) => {
-  let folderPath = getSocketUploadDir(socketId);
+  const folderPath = getSocketUploadDir(socketId);
 
-  if (folderPath && existsSync(folderPath)) {
-    try {
-      const files = readdirSync(folderPath);
+  const deleteFolderRecursive = (folderPath: string) => {
+    if (folderPath && fs.existsSync(folderPath)) {
+      const files = fs.readdirSync(folderPath);
+
       for (const file of files) {
-        const filePath = join(folderPath, file);
-        unlinkSync(filePath);
+        const curPath = path.join(folderPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) {
+          deleteFolderRecursive(curPath);
+        } else {
+          fs.unlinkSync(curPath);
+        }
       }
-      rmdirSync(folderPath);
-
-      LoggerCls.info("Deleted uploadDir of socket: " + socketId);
-    } catch (err) {
-      err = LoggerCls.getPureError(err);
-      LoggerCls.error(
-        `Error occurred while deleting socket uploadDir: ${folderPath}`,
-        err
-      );
+      fs.rmdirSync(folderPath);
     }
+  };
+
+  try {
+    deleteFolderRecursive(folderPath);
+    LoggerCls.info("Deleted uploadDir of socket: " + socketId);
+  } catch (err) {
+    err = LoggerCls.getPureError(err);
+    LoggerCls.error("Error deleting uploadDir of socket: " + socketId, err);
   }
 };
 
@@ -89,12 +89,6 @@ const uploadFileForImportDataToRedis = async (req: Request) => {
     });
 
     busboy.on("file", (name, file, info) => {
-      //TODO: validateFileExtension in UI and stop upload if invalid
-      //TODO: validate file size
-
-      //TODO json zip folder extract while validating
-      //TODO: validate uploadType and file path (test from browser)
-
       try {
         const { filename, encoding, mimeType } = info;
         validateFileExtension(uploadType, filename);
@@ -104,11 +98,11 @@ const uploadFileForImportDataToRedis = async (req: Request) => {
         );
         if (socketId) {
           const uploadDir = getSocketUploadDir(socketId);
-          if (!existsSync(uploadDir)) {
-            mkdirSync(uploadDir, { recursive: true });
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
           }
-          serverUploadPath = join(uploadDir, filename);
-          file.pipe(createWriteStream(serverUploadPath));
+          serverUploadPath = path.join(uploadDir, filename);
+          file.pipe(fs.createWriteStream(serverUploadPath));
         } else {
           throw "Invalid socketId for file upload.";
         }
@@ -121,11 +115,23 @@ const uploadFileForImportDataToRedis = async (req: Request) => {
       }
     });
 
-    busboy.on("close", () => {
-      result.data = {
-        serverUploadPath: serverUploadPath,
-        message: "File uploaded successfully !",
-      };
+    busboy.on("close", async () => {
+      if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
+        const zipFilePath = serverUploadPath;
+        const destDir = zipFilePath.replace(".zip", "");
+        const { unzippedPath } = await unzipFile(zipFilePath, destDir);
+
+        result.data = {
+          serverUploadPath: unzippedPath,
+          message: "File uploaded & unzipped successfully !",
+        };
+      } else {
+        result.data = {
+          serverUploadPath: serverUploadPath,
+          message: "File uploaded successfully !",
+        };
+      }
+
       req.unpipe(busboy);
       resolve(result.data);
     });

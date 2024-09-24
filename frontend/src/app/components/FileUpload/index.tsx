@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import './index.css';
 
+import Loader from '../Loader';
+
 import { consoleLogError, errorAPIAlert, fileUploadRequest } from '@/app/utils/axios-util';
 import { errorToast, infoToast } from '@/app/utils/toast-util';
 
@@ -25,6 +27,7 @@ const FileUpload = ({
 }: FileUploadProps) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileUploadProgress, setFileUploadProgress] = useState<number>(0);
+    const [isShowApiLoader, setIsShowApiLoader] = useState<boolean>(false);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event?.target?.files && event.target.files.length > 0) {
@@ -40,6 +43,11 @@ const FileUpload = ({
             }
             elm.style.setProperty('--progress-value', progress.toString());
             setFileUploadProgress(progress)
+
+            if (progress == 100) {
+                // Upload completed, but file processing or response is still pending
+                setIsShowApiLoader(true);
+            }
         }
     }
 
@@ -54,9 +62,16 @@ const FileUpload = ({
 
             if (fileUploadApiUrl) {
                 try {
-                    const response = await fileUploadRequest(fileUploadApiUrl, formData, null, (progress: number) => {
-                        animateFileUploadProgress(Number(progress));
-                    });
+                    //setIsShowApiLoader(true);
+                    const response = await fileUploadRequest(
+                        fileUploadApiUrl,
+                        formData,
+                        null,
+                        (progress: number) => {
+                            animateFileUploadProgress(Number(progress));
+                        });
+                    setIsShowApiLoader(false);
+
                     const responseData = response?.data;
 
                     if (postFileUploadCallback) {
@@ -64,6 +79,7 @@ const FileUpload = ({
                     }
                 }
                 catch (axiosError: any) {
+                    setIsShowApiLoader(false);
                     const error = consoleLogError(axiosError);
                     if (error?.userMessage) {
                         errorToast(error.userMessage);
@@ -82,23 +98,25 @@ const FileUpload = ({
     };
 
     return (
-        <div className='comp-file-upload'>
-            <input type="file" className='upload-file-elm'
-                onChange={handleFileChange}
-                {...(allowFileExtensions ? { accept: allowFileExtensions } : {})}
-                tabIndex={tabIndex} />
+        <div className='comp-file-upload-ctr'>
+            <div className='comp-file-upload'>
+                <input type="file" className='upload-file-elm'
+                    onChange={handleFileChange}
+                    {...(allowFileExtensions ? { accept: allowFileExtensions } : {})}
+                    tabIndex={tabIndex} />
 
-            <div className={fileUploadProgress > 0 ? "progress-bar progress-bar-active" : "progress-bar"} id="comp-file-upload-progress">
+                <div className={fileUploadProgress > 0 ? "progress-bar progress-bar-active" : "progress-bar"} id="comp-file-upload-progress">
 
 
-                {fileUploadProgress > 0 && <div>{fileUploadProgress}%</div>}
+                    {fileUploadProgress > 0 && <div>{fileUploadProgress}%</div>}
 
-                {fileUploadProgress == 0 && <div className="fas fa-upload upload-submit-icon"
-                    title="Upload file to server"
-                    onClick={handleUpload}
-                ></div>}
+                    {fileUploadProgress == 0 && <div className="fas fa-upload upload-submit-icon"
+                        title="Upload file to server"
+                        onClick={handleUpload}
+                    ></div>}
+                </div>
             </div>
-
+            <Loader isShow={isShowApiLoader} />
         </div>
     );
 };

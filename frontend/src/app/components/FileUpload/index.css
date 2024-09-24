@@ -5,57 +5,63 @@
 }
 
 
-
-.comp-file-upload {
-    display: flex;
-    align-items: center;
+.comp-file-upload-ctr {
     flex-grow: 1;
-    height: 36px;
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
 
-    .upload-file-elm {
-        flex-grow: 1;
-        max-width: 300px;
-    }
-
-    .upload-file-elm::file-selector-button {
-        height: 32px;
-        padding: 0 var(--space-16);
-        background: linear-gradient(0deg, var(--primary-6), var(--primary-8));
-        color: var(--primary-clr-7);
-        border: 1px solid var(--primary-10);
-        border-radius: 16px;
-        outline: none;
-        cursor: pointer;
-        transition: all .5s;
-    }
-
-    .upload-file-elm::file-selector-button:hover {
-        background: linear-gradient(0deg, var(--primary-8), var(--primary-6));
-    }
-
-    .upload-file-elm::file-selector-button:active {
-        background: var(--primary-9);
-        color: var(--primary-clr-9);
-    }
-
-    .upload-submit-icon {
-        color: var(--primary-10);
-        font-size: var(--font-size-16);
-        cursor: pointer;
-    }
-
-    .progress-bar {
+    .comp-file-upload {
         display: flex;
-        justify-content: center;
         align-items: center;
-        width: 36px;
+        flex-grow: 1;
         height: 36px;
-        border-radius: 50%;
-    }
+        margin-bottom: 10px;
 
-    .progress-bar-active {
-        background:
-            radial-gradient(closest-side, var(--white) 79%, transparent 80% 100%),
-            conic-gradient(var(--gradient-clr-1), var(--gradient-clr-2), var(--gradient-clr-1) calc(var(--progress-value) * 1%), var(--primary-1) 0);
+        .upload-file-elm {
+            flex-grow: 1;
+        }
+
+        .upload-file-elm::file-selector-button {
+            height: 32px;
+            padding: 0 var(--space-16);
+            background: linear-gradient(0deg, var(--primary-6), var(--primary-8));
+            color: var(--primary-clr-7);
+            border: 1px solid var(--primary-10);
+            border-radius: 16px;
+            outline: none;
+            cursor: pointer;
+            transition: all .5s;
+        }
+
+        .upload-file-elm::file-selector-button:hover {
+            background: linear-gradient(0deg, var(--primary-8), var(--primary-6));
+        }
+
+        .upload-file-elm::file-selector-button:active {
+            background: var(--primary-9);
+            color: var(--primary-clr-9);
+        }
+
+        .upload-submit-icon {
+            color: var(--primary-10);
+            font-size: var(--font-size-16);
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .progress-bar-active {
+            background:
+                radial-gradient(closest-side, var(--white) 79%, transparent 80% 100%),
+                conic-gradient(var(--gradient-clr-1), var(--gradient-clr-2), var(--gradient-clr-1) calc(var(--progress-value) * 1%), var(--primary-1) 0);
+        }
     }
 }

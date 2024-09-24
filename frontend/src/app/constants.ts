@@ -64,7 +64,7 @@ const UPLOAD_DROPDOWN_OPTIONS = [
   },
   {
     value: "4",
-    label: "JSON Array File (Browser Upload)",
+    label: "JSON Array File Upload",
     placeholder: "products.json",
     category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
     uploadType: UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE,
@@ -72,11 +72,19 @@ const UPLOAD_DROPDOWN_OPTIONS = [
   },
   {
     value: "5",
-    label: "CSV File (Browser Upload)",
+    label: "CSV File Upload",
     placeholder: "products.csv",
     category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
     uploadType: UPLOAD_TYPES_FOR_IMPORT.CSV_FILE,
     allowExtension: ".csv",
+  },
+  {
+    value: "6",
+    label: "(Zipped) JSON Folder Upload",
+    placeholder: "products.zip",
+    category: UPLOAD_CATEGORY.BROWSER_UPLOAD,
+    uploadType: UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER,
+    allowExtension: ".zip",
   },
 ];
 
