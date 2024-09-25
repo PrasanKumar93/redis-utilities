@@ -1,0 +1,28 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+ARG PORT_ARG
+ARG NEXT_PUBLIC_API_BASE_URL_ARG
+ARG NEXT_PUBLIC_SOCKET_IO_URL_ARG
+ARG NEXT_PUBLIC_DEFAULT_REDIS_URL_ARG
+ARG NEXT_PUBLIC_ENCRYPTION_KEY_ARG
+
+# Set environment variables as next js static build requires them
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL_ARG}
+ENV NEXT_PUBLIC_SOCKET_IO_URL=${NEXT_PUBLIC_SOCKET_IO_URL_ARG}
+ENV NEXT_PUBLIC_DEFAULT_REDIS_URL=${NEXT_PUBLIC_DEFAULT_REDIS_URL_ARG}
+ENV NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY_ARG}
+
+RUN npm run build
+
+# CMD is runtime instruction, so use ENV variable rather than ARG variable
+ENV PORT=${PORT_ARG}
+CMD npm start -- -p $PORT

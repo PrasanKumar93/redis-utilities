@@ -9,18 +9,20 @@ services:
     env_file:
       - ./.env
 
-  # frontend:
-  #   container_name: frontend
-  #   build:
-  #     context: ./frontend/
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "${FRONTEND_PORT}:3000"
-  #   args:
-  #     BUILD_BASE_PATH: cdn
-  #   env_file:
-  #     - ./frontend/.env
-  #   stdin_open: true # -i input flag
-  #   tty: true # -t terminal flag
-  #   depends_on:
-  #     - import-tool-service
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+      args:
+        PORT_ARG: ${NEXT_APP_PORT}
+        NEXT_PUBLIC_API_BASE_URL_ARG: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_SOCKET_IO_URL_ARG: ${NEXT_PUBLIC_SOCKET_IO_URL}
+        NEXT_PUBLIC_DEFAULT_REDIS_URL_ARG: ${NEXT_PUBLIC_DEFAULT_REDIS_URL}
+        NEXT_PUBLIC_ENCRYPTION_KEY_ARG: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+    ports:
+      - "${NEXT_APP_PORT}:${NEXT_APP_PORT}"
+    stdin_open: true # -i input flag
+    tty: true # -t terminal flag
+    depends_on:
+      - import-tool-service
