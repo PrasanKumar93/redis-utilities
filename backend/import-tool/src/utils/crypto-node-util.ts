@@ -15,7 +15,8 @@ const ALGORITHMS = {
 
 //"openssl rand -base64 32" command in terminal to generate a key
 const DEFAULT_ENCRYPTION_KEY =
-  process.env.ENCRYPTION_KEY || "BPM3TsjUXJ2bJq8Lfze8HcE2ya19xGD/1zBVGGD95i8=";
+  process.env.IMPORT_TOOL_ENCRYPTION_KEY ||
+  "BPM3TsjUXJ2bJq8Lfze8HcE2ya19xGD/1zBVGGD95i8=";
 
 function encryptData(data: string, key: string = ""): IEncryptedElm {
   key = key || DEFAULT_ENCRYPTION_KEY || "";
