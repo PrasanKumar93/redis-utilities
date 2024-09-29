@@ -45,7 +45,7 @@
 
         .upload-submit-icon {
             color: var(--primary-10);
-            font-size: var(--font-size-16);
+            font-size: var(--font-size-20);
             cursor: pointer;
         }
 

@@ -303,7 +303,7 @@ const Page = () => {
     }
 
     return (
-        <div className={"pg001-body roboto-regular "
+        <div className={"pg001-body font-regular "
             + (displayErrors.length ? "import-error " : "")
             + Array.from(bodyClasses).join(" ")
         }
@@ -330,7 +330,7 @@ const Page = () => {
 
                     <div id="final-upload-path-container" className="final-upload-path-container fade-in-out-to-top">
                         <div className="far fa-folder folder-icon"></div>
-                        <div className="pg001-single-line-label roboto-medium">Upload Path : </div>
+                        <div className="pg001-single-line-label font-medium">Upload Path : </div>
                         <div id="final-upload-path" className="final-upload-path">{uploadPath}</div>
                     </div>
 

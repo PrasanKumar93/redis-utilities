@@ -26,13 +26,13 @@ const LogTabs = ({
         <div className="import-log-tabs-container fade-in-out-to-left">
             <div className="tab-headings">
 
-                <div className={"tab-title roboto-medium "
+                <div className={"tab-title font-medium "
                     + (activeTabIndex == IMPORT_PAGE_TABS.LOGS ? "tab-title-active" : "")}
                     onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)}>
                     Info
                 </div>
 
-                <div className={"tab-title roboto-medium "
+                <div className={"tab-title font-medium "
                     + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "tab-title-active" : "")}
                     onClick={() => setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS)}>
                     ErrorLogs ({displayErrors.length})
@@ -41,14 +41,14 @@ const LogTabs = ({
             <div className={"tab-container "
                 + (activeTabIndex == IMPORT_PAGE_TABS.ERRORS ? "hide-tab-container" : "")}>
 
-                <div className="tab-container-status roboto-bold-italic">
+                <div className="tab-container-status font-bold">
                     Status : {displayStatus || "Not started"}
                 </div>
                 {formatterFnInput &&
                     <>
                         <hr />
                         <details>
-                            <summary className="summary-tag roboto-medium-italic">
+                            <summary className="summary-tag font-medium">
                                 Formatter function input (jsonObj) is file content :
                             </summary>
 
@@ -65,7 +65,7 @@ const LogTabs = ({
                         <hr />
 
                         <details>
-                            <summary className="summary-tag roboto-medium-italic">
+                            <summary className="summary-tag font-medium">
                                 Formatter function output to be stored in Redis :
                             </summary>
                             <pre>

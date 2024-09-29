@@ -21,7 +21,12 @@ const ImportStatsCount = ({
             <div className="count-container success-count-container">
                 <div className="success-count-icon fas fa-check"></div>
                 <div className="import-success-count">
-                    {displayStats.processed} out of {displayStats.totalFiles}
+                    <div className="import-success-count-prefix">
+                        {displayStats.processed}
+                    </div>
+                    <div>
+                        out of {displayStats.totalFiles}
+                    </div>
                 </div>
             </div>
             <div className="count-container error-count-container fade-in-out-to-top">

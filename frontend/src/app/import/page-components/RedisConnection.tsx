@@ -15,7 +15,7 @@ const RedisConnection = ({
     return (
         <div className="import-redis-con-container">
             <div className="con-url-container">
-                <div className="con-url-lbl roboto-medium pg001-single-line-label">Connection URL : </div>
+                <div className="con-url-lbl font-medium pg001-single-line-label">Connection URL : </div>
 
                 <input type="text"
                     placeholder="Enter Redis Connection URL"

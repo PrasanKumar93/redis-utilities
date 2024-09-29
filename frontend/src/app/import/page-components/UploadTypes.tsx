@@ -69,7 +69,7 @@ const UploadTypes = ({
             <div className="upload-path-container fade-in-out-to-top">
                 <div className="upload-path-select-ctr">
 
-                    <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
+                    <span className="pg001-upload-lbl font-medium pg001-single-line-label">
                         Upload Type :
                     </span>
 
@@ -97,7 +97,7 @@ const UploadTypes = ({
 
                 {uploadTypeOption.category === UPLOAD_CATEGORY.SERVER_PATH && (
                     <div className="upload-textbox-ctr">
-                        <span className="pg001-upload-lbl roboto-medium pg001-single-line-label">
+                        <span className="pg001-upload-lbl font-medium pg001-single-line-label">
                             Upload Path :
                         </span>
                         <input type="text" className="upload-path-textbox pg001-textbox"

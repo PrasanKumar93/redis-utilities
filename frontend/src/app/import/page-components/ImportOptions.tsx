@@ -37,12 +37,12 @@ const ImportOptions = ({
         <div className="import-options-container  fade-in-out-to-top">
             <fieldset>
 
-                <legend className="roboto-bold-italic">Options</legend>
+                <legend className="font-bold">Options</legend>
                 <div className="options">
 
                     <div className="options-row">
                         <div>
-                            <div className="import-option-title roboto-medium"> Key prefix</div>
+                            <div className="import-option-title font-medium"> Key prefix</div>
 
                             <input type="text" className="pg001-textbox"
                                 placeholder="products:"
@@ -53,7 +53,7 @@ const ImportOptions = ({
                             />
                         </div>
                         <div>
-                            <div className="import-option-title roboto-medium">
+                            <div className="import-option-title font-medium">
                                 ID field
                                 <div className="fas fa-info-circle options-info-icon" title="ID field JSON property or path in the final formatted JSON output"></div>
                             </div>
@@ -74,12 +74,12 @@ const ImportOptions = ({
                                 tabIndex={5}
                                 disabled={displayStatus == IMPORT_STATUS.IN_PROGRESS}
                             />
-                            <label htmlFor="import-check-stop-on-error" className="roboto-medium stop-on-error-lbl">Stop on error</label>
+                            <label htmlFor="import-check-stop-on-error" className="font-medium stop-on-error-lbl">Stop on error</label>
                         </div>
                     </div>
                     <div className="import-formatter-func-section">
                         <div className="import-formatter-func-title-container">
-                            <div className="import-option-title roboto-medium" >Formatter function</div>
+                            <div className="import-option-title font-medium" >Formatter function</div>
 
                             <div className="import-formatter-func-icon-container">
                                 <div className="fas fa-info-circle import-formatter-func-icon"></div>

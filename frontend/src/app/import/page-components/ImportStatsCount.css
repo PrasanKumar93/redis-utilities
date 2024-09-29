@@ -22,6 +22,18 @@
               font-size: var(--font-size-24);
           }
 
+          .import-success-count {
+              flex-grow: 1;
+              display: flex;
+          }
+
+          .import-success-count-prefix {
+              margin-right: var(--space-4);
+              min-width: 60px;
+              display: flex;
+              justify-content: flex-end;
+          }
+
           .error-count-icon {
               margin-right: var(--space-8);
               color: var(--error-clr);

@@ -1,162 +1,128 @@
-/* Roboto Thin */
+/* Space Grotesk Variable Font */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Thin.ttf") format("truetype");
-    font-weight: 100;
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
+    font-weight: 100 900;
     font-style: normal;
 }
 
+/* static fonts are fallbacks for specific weights    */
+/* Space Grotesk Light */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-ThinItalic.ttf") format("truetype");
-    font-weight: 100;
-    font-style: italic;
-}
-
-/* Roboto Light */
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Light.ttf") format("truetype");
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/static/SpaceGrotesk-Light.ttf") format("truetype");
     font-weight: 300;
     font-style: normal;
 }
 
+/* Space Grotesk Regular */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-LightItalic.ttf") format("truetype");
-    font-weight: 300;
-    font-style: italic;
-}
-
-/* Roboto Regular */
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Regular.ttf") format("truetype");
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/static/SpaceGrotesk-Regular.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
 }
 
+/* Space Grotesk Medium */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Italic.ttf") format("truetype");
-    font-weight: 400;
-    font-style: italic;
-}
-
-/* Roboto Medium */
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Medium.ttf") format("truetype");
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/static/SpaceGrotesk-Medium.ttf") format("truetype");
     font-weight: 500;
     font-style: normal;
 }
 
+/* Space Grotesk SemiBold */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-MediumItalic.ttf") format("truetype");
-    font-weight: 500;
-    font-style: italic;
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/static/SpaceGrotesk-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
 }
 
-/* Roboto Bold */
+/* Space Grotesk Bold */
 @font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Bold.ttf") format("truetype");
+    font-family: "Space Grotesk";
+    src: url("/fonts/space-grotesk/static/SpaceGrotesk-Bold.ttf") format("truetype");
     font-weight: 700;
     font-style: normal;
 }
 
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-BoldItalic.ttf") format("truetype");
-    font-weight: 700;
-    font-style: italic;
-}
 
-/* Roboto Black */
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-Black.ttf") format("truetype");
-    font-weight: 900;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Roboto";
-    src: url("/fonts/roboto/Roboto-BlackItalic.ttf") format("truetype");
-    font-weight: 900;
-    font-style: italic;
-}
 
 /*--------*/
-.roboto-thin {
-    font-family: "Roboto", sans-serif;
+.font-thin {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 100;
-    font-style: normal;
 }
 
-.roboto-thin-italic {
-    font-family: "Roboto", sans-serif;
+.font-thin-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 100;
     font-style: italic;
 }
 
-.roboto-light {
-    font-family: "Roboto", sans-serif;
+.font-light {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 300;
-    font-style: normal;
 }
 
-.roboto-light-italic {
-    font-family: "Roboto", sans-serif;
+.font-light-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 300;
     font-style: italic;
 }
 
-.roboto-regular {
-    font-family: "Roboto", sans-serif;
+.font-regular {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 400;
-    font-style: normal;
 }
 
-.roboto-regular-italic {
-    font-family: "Roboto", sans-serif;
+.font-regular-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 400;
     font-style: italic;
 }
 
-.roboto-medium {
-    font-family: "Roboto", sans-serif;
+.font-medium {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 500;
-    font-style: normal;
 }
 
-.roboto-medium-italic {
-    font-family: "Roboto", sans-serif;
+.font-medium-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 500;
     font-style: italic;
 }
 
-.roboto-bold {
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-style: normal;
+.font-semibold {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
 }
 
-.roboto-bold-italic {
-    font-family: "Roboto", sans-serif;
+.font-semibold-italic {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.font-bold {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+}
+
+.font-bold-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 700;
     font-style: italic;
 }
 
-.roboto-black {
-    font-family: "Roboto", sans-serif;
+.font-black {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 900;
-    font-style: normal;
 }
 
-.roboto-black-italic {
-    font-family: "Roboto", sans-serif;
+.font-black-italic {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 900;
     font-style: italic;
 }

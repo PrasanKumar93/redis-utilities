@@ -41,7 +41,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ headerIconCls, headerLabel, pag
     }, [themeName])
 
     return (
-        <div className="comp-page-header roboto-black">
+        <div className="comp-page-header font-black">
             <div className="header-top">
                 <div className="header-logo-container">
                     <img src="/logo-small.png" alt="Logo" />
