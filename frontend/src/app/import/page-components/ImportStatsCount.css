@@ -34,6 +34,11 @@
               justify-content: flex-end;
           }
 
+          .numbers-font {
+              /* using default font to prevent flickering  */
+              font-family: sans-serif;
+          }
+
           .error-count-icon {
               margin-right: var(--space-8);
               color: var(--error-clr);

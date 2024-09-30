@@ -22,10 +22,10 @@ const ImportStatsCount = ({
                 <div className="success-count-icon fas fa-check"></div>
                 <div className="import-success-count">
                     <div className="import-success-count-prefix">
-                        {displayStats.processed}
+                        <span className="numbers-font">{displayStats.processed}</span>
                     </div>
                     <div>
-                        out of {displayStats.totalFiles}
+                        out of <span className="numbers-font">{displayStats.totalFiles}</span>
                     </div>
                 </div>
             </div>

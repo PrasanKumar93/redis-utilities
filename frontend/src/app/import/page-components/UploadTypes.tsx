@@ -18,7 +18,7 @@ interface UploadTypesProps {
 
 const getUploadTypes = (_isAllUploadTypes?: boolean) => {
     //default - browser upload types only
-    let retItems = UPLOAD_DROPDOWN_OPTIONS.filter(option => option.category == UPLOAD_CATEGORY.BROWSER_UPLOAD);
+    let retItems = UPLOAD_DROPDOWN_OPTIONS.filter(option => !option.category || option.category == UPLOAD_CATEGORY.BROWSER_UPLOAD);
     if (_isAllUploadTypes) {
         retItems = UPLOAD_DROPDOWN_OPTIONS;
     }

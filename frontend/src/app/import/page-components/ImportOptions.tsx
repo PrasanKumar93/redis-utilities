@@ -55,7 +55,7 @@ const ImportOptions = ({
                         <div>
                             <div className="import-option-title font-medium">
                                 ID field
-                                <div className="fas fa-info-circle options-info-icon" title="ID field JSON property or path in the final formatted JSON output"></div>
+                                <div className="fas fa-info-circle options-info-icon" title="ID field JSON property/ JSON path in the final formatted output"></div>
                             </div>
                             <input type="text" className="pg001-textbox"
                                 placeholder="productId"
