@@ -1,38 +1,65 @@
 # Redis Utilities
 
-Utilities to support common redis operations like import, export, etc.
+Utilities to support common redis operations.
 
 ## Import Tool For Redis
 
-## Setup
-
-At project root, run the following commands:
+### Start application
 
 ```sh
-# Install dependencies for frontend and backend
-npm install
-
-# Run the frontend and backend
-npm run backend
-npm run frontend
+# to start docker app
+docker compose up -d
 ```
 
-## (Optional) Backend environment variables
+- Open **"http://localhost:4000/"** in browser
 
-```env title="backend/import-tool/.env"
-API_PORT=3001
-ENCRYPTION_KEY=".......="
+### Other commands
+
+```sh
+# to stop docker app
+docker compose down
+
+# to stop & also delete volumes (mongodb & redis data)
+docker compose down -v
+
+# to rebuild all images & start
+docker compose  up -d --build
+
+# to rebuild image of specific service (after any code changes)
+docker-compose build --no-cache <service_name>
+# example
+docker-compose build --no-cache import-tool-service
+docker-compose build --no-cache frontend
 ```
 
-`openssl rand -base64 32` command in terminal to generate a new key
+## (Optional) environment variables
 
-## (Optional) Frontend environment variables
+Can modify the environment variables in the **.env** file.
 
-```env title="frontend/.env"
-NEXT_PUBLIC_ENCRYPTION_KEY=".......="
+```sh title="./.env"
+# Backend
+IMPORT_TOOL_API_PORT=3005
+IMPORT_TOOL_ENCRYPTION_KEY="4JxqtKVmjA/AV+UrRADgeRO0NKiOGHxAxEhs84BGWsQ="
+
+#-----------------------------------
+
+# Frontend
+NEXT_APP_PORT=4000
+
+# same as IMPORT_TOOL_ENCRYPTION_KEY
+NEXT_PUBLIC_ENCRYPTION_KEY="4JxqtKVmjA/AV+UrRADgeRO0NKiOGHxAxEhs84BGWsQ="
+
+# same port as Backend IMPORT_TOOL_API_PORT
+NEXT_PUBLIC_API_BASE_URL="http://localhost:3005/api"
+NEXT_PUBLIC_SOCKET_IO_URL="http://localhost:3005"
+
+# Default Redis URL , can change in application UI
+NEXT_PUBLIC_DEFAULT_REDIS_URL="redis://host.docker.internal:6379"
 ```
 
-NEXT_PUBLIC_ENCRYPTION_KEY same as ENCRYPTION_KEY in backend
+Note :
+
+- One way to generate an encryption key is by using the `openssl rand -base64 32` command in the terminal.
 
 ## API docs
 

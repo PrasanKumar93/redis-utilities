@@ -11,8 +11,18 @@ interface UploadTypesProps {
     setUploadPath: (value: string) => void;
     evtClickEnterUploadPath: () => Promise<void>;
 
+    isAllUploadTypes?: boolean;
     fileUploadApiUrl?: string;
     socketId?: string;
+}
+
+const getUploadTypes = (_isAllUploadTypes?: boolean) => {
+    //default - browser upload types only
+    let retItems = UPLOAD_DROPDOWN_OPTIONS.filter(option => option.category == UPLOAD_CATEGORY.BROWSER_UPLOAD);
+    if (_isAllUploadTypes) {
+        retItems = UPLOAD_DROPDOWN_OPTIONS;
+    }
+    return retItems;
 }
 
 const UploadTypes = ({
@@ -21,12 +31,14 @@ const UploadTypes = ({
     uploadPath,
     setUploadPath,
     evtClickEnterUploadPath,
+    isAllUploadTypes,
 
     fileUploadApiUrl,
     socketId,
 
 }: UploadTypesProps) => {
 
+    const [customDropdownOptions, setCustomDropdownOptions] = useState(getUploadTypes(isAllUploadTypes));
     //#region for browser upload
     const [fileUploadServerPath, setFileUploadServerPath] = useState<string>('');
 
@@ -56,9 +68,13 @@ const UploadTypes = ({
     }, [fileUploadServerPath]);
     //#endregion
 
+    useEffect(() => {
+        setCustomDropdownOptions(getUploadTypes(isAllUploadTypes));
+    }, [isAllUploadTypes]);
+
     const handleUploadTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = e.target.value;
-        const selectedOption = UPLOAD_DROPDOWN_OPTIONS.find(option => option.value === selectedValue);
+        const selectedOption = customDropdownOptions.find(option => option.value === selectedValue);
         if (selectedOption) {
             setUploadTypeOption(selectedOption);
         }
@@ -76,14 +92,14 @@ const UploadTypes = ({
                     <select value={uploadTypeOption.value}
                         onChange={handleUploadTypeChange}
                         className="pg001-select" >
-                        {UPLOAD_DROPDOWN_OPTIONS.map((option) => (
+                        {customDropdownOptions.map((option) => (
                             <option key={option.value} value={option.value}>{option.label}</option>
                         ))}
                     </select>
                 </div>
 
                 {uploadTypeOption.category === UPLOAD_CATEGORY.BROWSER_UPLOAD && (
-                    <div className="upload-textbox-ctr">
+                    <div className="upload-textbox-ctr fade-in-out-to-top">
 
                         <FileUpload
                             fileUploadApiUrl={fileUploadApiUrl}
@@ -96,7 +112,7 @@ const UploadTypes = ({
                 )}
 
                 {uploadTypeOption.category === UPLOAD_CATEGORY.SERVER_PATH && (
-                    <div className="upload-textbox-ctr">
+                    <div className="upload-textbox-ctr fade-in-out-to-top">
                         <span className="pg001-upload-lbl font-medium pg001-single-line-label">
                             Upload Path :
                         </span>

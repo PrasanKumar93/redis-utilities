@@ -3,9 +3,6 @@
 import type { ImportFileError } from "../types";
 import React, { useEffect, useState } from "react";
 
-import '../common/css/typography.css';
-import '../common/css/variables.css';
-import '../common/css/theme.css';
 import './page.css';
 
 import PageHeader from '../components/PageHeader';
@@ -84,6 +81,8 @@ const Page = () => {
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
     const [isShowLoader, setIsShowLoader] = useState(false);
     const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_DROPDOWN_OPTIONS[0]);
+    const [isAllUploadTypes, setIsAllUploadTypes] = useState(false);
+    const [isNonDocker, setIsNonDocker] = useState(false);
 
     const gitTag = config.GIT_TAG;
 
@@ -98,6 +97,10 @@ const Page = () => {
     } = useSocket();
 
     useEffect(() => {
+
+        if (typeof window !== 'undefined') {
+            setIsNonDocker(window.location.port === "3000");
+        }
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             evtClickPause();
@@ -127,6 +130,11 @@ const Page = () => {
                 setRedisConUrl(testRedisUrl);
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
+
+                if (isNonDocker) {
+                    //Showing all upload types for application running locally (Non docker)
+                    setIsAllUploadTypes(true);
+                }
             }
             setIsShowLoader(false);
 
@@ -322,6 +330,7 @@ const Page = () => {
                     uploadPath={uploadPath} setUploadPath={setUploadPath}
                     evtClickEnterUploadPath={evtClickEnterUploadPath}
 
+                    isAllUploadTypes={isAllUploadTypes}
                     fileUploadApiUrl={API_PATHS.uploadFileForImportDataToRedis}
                     socketId={socketId}
                 />

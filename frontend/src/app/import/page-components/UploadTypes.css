@@ -8,6 +8,7 @@
       .upload-path-container {
 
           width: 40%;
+          min-height: 120px;
           animation: fade-in-out-to-top .5s .5s forwards;
 
           .upload-path-select-ctr {
@@ -23,6 +24,8 @@
           .upload-textbox-ctr {
               display: flex;
               align-items: center;
+
+              animation: fade-in-out-to-top .5s .5s forwards;
           }
 
           .upload-path-textbox {

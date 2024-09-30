@@ -4,6 +4,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
 
+import './common/css/typography.css';
+import './common/css/variables.css';
+import './common/css/theme.css';
+
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,7 +28,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="/fontawesome-free-6.6.0-web/css/all.min.css" />
       </head>
-      <body className={inter.className + " theme-redis"}>
+      <body className={inter.className + " theme-redis font-regular"}>
         {children}
 
         <ToastContainer />

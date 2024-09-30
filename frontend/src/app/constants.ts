@@ -42,6 +42,13 @@ const UPLOAD_CATEGORY = {
 
 const UPLOAD_DROPDOWN_OPTIONS = [
   {
+    value: "",
+    label: "-- Select Upload Type --",
+    placeholder: "",
+    category: "",
+    uploadType: "",
+  },
+  {
     value: "1",
     label: "JSON Folder (Server Path)",
     placeholder: "/Users/tom/Documents/product-data",

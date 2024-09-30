@@ -22,8 +22,8 @@ export default function Home() {
           className={styles.card}
           rel="noopener noreferrer"
         >
-          <h2>
-            Import Tool <span>-&gt;</span>
+          <h2 className="font-bold" >
+            Import Tool
           </h2>
           <p>Import JSON documents in to Redis </p>
         </a>
@@ -33,8 +33,8 @@ export default function Home() {
           className={styles.card + " " + styles.disabled}
           rel="noopener noreferrer"
         >
-          <h2>
-            Export Tool <span>-&gt;</span>
+          <h2 className="font-bold" >
+            Export Tool
           </h2>
           <p>TBD</p>
         </a>
@@ -44,8 +44,8 @@ export default function Home() {
           className={styles.card + " " + styles.disabled}
           rel="noopener noreferrer"
         >
-          <h2>
-            Vector Tool <span>-&gt;</span>
+          <h2 className="font-bold" >
+            Vector Tool
           </h2>
           <p>TBD</p>
         </a>
@@ -55,8 +55,8 @@ export default function Home() {
           className={styles.card + " " + styles.disabled}
           rel="noopener noreferrer"
         >
-          <h2>
-            Tutorials <span>-&gt;</span>
+          <h2 className="font-bold" >
+            Tutorials
           </h2>
           <p>
             TBD (How to import, export, vector conversion etc.)
