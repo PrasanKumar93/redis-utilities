@@ -126,7 +126,7 @@ const Page = () => {
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
 
-                if (config.FROM_DOCKER === "Y") {
+                if (config.FROM_DOCKER === "N") {
                     //Showing all upload types for application running locally (Non docker)
                     setIsAllUploadTypes(true);
                 }

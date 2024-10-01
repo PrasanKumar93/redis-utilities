@@ -38,8 +38,8 @@ Can modify the environment variables in the **.env** file.
 
 ```sh title="./.env"
 # Common
-PORT_BACKEND=3005
-PORT_FRONTEND=4000
+PORT_BACKEND=3001
+PORT_FRONTEND=3000
 
 # Backend
 IMPORT_TOOL_ENCRYPTION_KEY="4JxqtKVmjA/AV+UrRADgeRO0NKiOGHxAxEhs84BGWsQ="

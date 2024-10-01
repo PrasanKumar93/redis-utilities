@@ -14,11 +14,12 @@ docker tag redis-utilities-local:latest prasanrajpurohit/redis-utilities:latest
 docker tag redis-utilities-local:latest prasanrajpurohit/redis-utilities:0.2.0
 
 # Test tagged image ----------------
-# Open http://localhost:3000/import after running below command
-docker run --rm --name redis-utilities -p 3000:3000 prasanrajpurohit/redis-utilities:latest
+docker run --rm --name redis-utilities -p 3000:3000 -p 3001:3001 prasanrajpurohit/redis-utilities:latest
+# Open http://localhost:3000/import after running above command, 3001 is backend port
 
-# Open http://localhost:4000/import after running below command
-docker run --rm --name redis-utilities -p 4000:4000 -p 3005:3005  --env-file ./.env prasanrajpurohit/redis-utilities:latest
+# can change ports & other env variables in .env file & test again
+docker run --rm --name redis-utilities -p 4000:4000 -p 3005:3005 --env-file ./.env prasanrajpurohit/redis-utilities:latest
+
 
 # Login to docker hub ----------------
 docker login
