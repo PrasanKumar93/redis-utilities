@@ -82,7 +82,6 @@ const Page = () => {
     const [isShowLoader, setIsShowLoader] = useState(false);
     const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_DROPDOWN_OPTIONS[0]);
     const [isAllUploadTypes, setIsAllUploadTypes] = useState(false);
-    const [isNonDocker, setIsNonDocker] = useState(false);
 
     const gitTag = config.GIT_TAG;
 
@@ -97,10 +96,6 @@ const Page = () => {
     } = useSocket();
 
     useEffect(() => {
-
-        if (typeof window !== 'undefined') {
-            setIsNonDocker(window.location.port === "3000");
-        }
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             evtClickPause();
@@ -131,7 +126,7 @@ const Page = () => {
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
 
-                if (isNonDocker) {
+                if (config.FROM_DOCKER === "Y") {
                     //Showing all upload types for application running locally (Non docker)
                     setIsAllUploadTypes(true);
                 }

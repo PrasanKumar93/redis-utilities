@@ -1,0 +1,17 @@
+services:
+  redis-utilities:
+    container_name: redis-utilities
+    build:
+      context: .
+      dockerfile: DockerfileHub
+      args:
+        NEXT_PUBLIC_ENCRYPTION_KEY_ARG: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+        NEXT_PUBLIC_PORT_BACKEND_ARG: ${PORT_BACKEND}
+    image: redis-utilities-local:latest # built image name
+    ports:
+      - "${PORT_FRONTEND}:${PORT_FRONTEND}"
+      - "${PORT_BACKEND}:${PORT_BACKEND}"
+    env_file:
+      - ./.env
+    stdin_open: true # -i input flag
+    tty: true # -t terminal flag

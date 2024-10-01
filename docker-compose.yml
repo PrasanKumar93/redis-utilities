@@ -5,7 +5,7 @@ services:
       context: ./backend/import-tool
       dockerfile: Dockerfile
     ports:
-      - "${IMPORT_TOOL_API_PORT}:${IMPORT_TOOL_API_PORT}"
+      - "${PORT_BACKEND}:${PORT_BACKEND}"
     env_file:
       - ./.env
 
@@ -15,13 +15,12 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        PORT_ARG: ${NEXT_APP_PORT}
-        NEXT_PUBLIC_API_BASE_URL_ARG: ${NEXT_PUBLIC_API_BASE_URL}
-        NEXT_PUBLIC_SOCKET_IO_URL_ARG: ${NEXT_PUBLIC_SOCKET_IO_URL}
-        NEXT_PUBLIC_DEFAULT_REDIS_URL_ARG: ${NEXT_PUBLIC_DEFAULT_REDIS_URL}
         NEXT_PUBLIC_ENCRYPTION_KEY_ARG: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+        NEXT_PUBLIC_PORT_BACKEND_ARG: ${PORT_BACKEND}
     ports:
-      - "${NEXT_APP_PORT}:${NEXT_APP_PORT}"
+      - "${PORT_FRONTEND}:${PORT_FRONTEND}"
+    env_file:
+      - ./.env
     stdin_open: true # -i input flag
     tty: true # -t terminal flag
     depends_on:

@@ -1,0 +1,35 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy the package.json for both frontend and backend
+COPY ./backend/import-tool/package*.json ./backend/import-tool/
+COPY ./frontend/package*.json ./frontend/
+
+# Install dependencies for both backend and frontend
+RUN cd ./backend/import-tool && npm install
+RUN cd ./frontend && npm install
+
+# Copy the rest of the backend and frontend code
+COPY ./backend/import-tool ./backend/import-tool
+COPY ./frontend ./frontend
+
+# Set frontend build arguments
+ARG NEXT_PUBLIC_ENCRYPTION_KEY_ARG
+ARG NEXT_PUBLIC_PORT_BACKEND_ARG
+
+# Set backend environment variables
+ENV IMPORT_TOOL_FROM_DOCKER="Y"
+
+# Set frontend environment variables as next js static build requires them
+ENV NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY_ARG}
+ENV NEXT_PUBLIC_PORT_BACKEND=${NEXT_PUBLIC_PORT_BACKEND_ARG}
+ENV NEXT_PUBLIC_FROM_DOCKER="Y"
+
+# Build the frontend
+RUN cd ./frontend && npm run build
+
+# Start both backend and frontend services concurrently
+# CMD is runtime instruction, so can use ENV variable rather than ARG variable
+CMD ["sh", "-c", "cd /app/backend/import-tool && npm start & PORT_FRONTEND=${PORT_FRONTEND:-3000} && cd /app/frontend && npm start -- -p $PORT_FRONTEND"]
+# :- operator ensures if PORT_FRONTEND env variable is not set, it will default to 3000.

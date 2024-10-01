@@ -37,24 +37,16 @@ docker-compose build --no-cache frontend
 Can modify the environment variables in the **.env** file.
 
 ```sh title="./.env"
+# Common
+PORT_BACKEND=3005
+PORT_FRONTEND=4000
+
 # Backend
-IMPORT_TOOL_API_PORT=3005
 IMPORT_TOOL_ENCRYPTION_KEY="4JxqtKVmjA/AV+UrRADgeRO0NKiOGHxAxEhs84BGWsQ="
 
-#-----------------------------------
-
 # Frontend
-NEXT_APP_PORT=4000
-
-# same as IMPORT_TOOL_ENCRYPTION_KEY
 NEXT_PUBLIC_ENCRYPTION_KEY="4JxqtKVmjA/AV+UrRADgeRO0NKiOGHxAxEhs84BGWsQ="
-
-# same port as Backend IMPORT_TOOL_API_PORT
-NEXT_PUBLIC_API_BASE_URL="http://localhost:3005/api"
-NEXT_PUBLIC_SOCKET_IO_URL="http://localhost:3005"
-
-# Default Redis URL , can change in application UI
-NEXT_PUBLIC_DEFAULT_REDIS_URL="redis://host.docker.internal:6379"
+# Note: Frontend encryption key is same as backend
 ```
 
 Note :

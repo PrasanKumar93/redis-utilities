@@ -15,7 +15,7 @@ import {
 } from "./api/import/upload-file-for-import-data-to-redis.js";
 
 //------ Constants
-const PORT = process.env.IMPORT_TOOL_API_PORT || 3001;
+const PORT = process.env.PORT_BACKEND || 3001;
 const API_PREFIX = "/api";
 
 const __filename = fileURLToPath(import.meta.url);
