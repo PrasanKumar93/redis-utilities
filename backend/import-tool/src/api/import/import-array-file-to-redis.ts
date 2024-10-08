@@ -25,7 +25,7 @@ import {
   readRawJSONFile,
   loopJsonArrayFileContents,
 } from "../../utils/file-reader.js";
-import { readCSVFileAsStream } from "../../utils/csv-reader.js";
+import { readFileAsStream } from "../../utils/file-stream-reader.js";
 import { LoggerCls } from "../../utils/logger.js";
 
 const importArrayFileToRedis = async (
@@ -76,8 +76,9 @@ const importArrayFileToRedis = async (
       }
     );
   } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
-    const msg = await readCSVFileAsStream(
+    const msg = await readFileAsStream(
       input.uploadPath,
+      input.uploadType,
       startIndex,
       importState,
       async (data) => {

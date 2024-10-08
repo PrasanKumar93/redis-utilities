@@ -15,7 +15,7 @@ import yauzl from "yauzl";
 import { LoggerCls } from "./logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
 import { ImportStatus } from "../state.js";
-import { readCSVFileAsStream } from "./csv-reader.js";
+import { readFileAsStream } from "./file-stream-reader.js";
 
 interface IFileReaderData {
   filePath: string;
@@ -231,8 +231,9 @@ const readSampleDataFromArrayFile = async (
     const importState: IImportStreamFileState = {
       currentStatus: ImportStatus.IN_PROGRESS,
     };
-    const msg = await readCSVFileAsStream(
+    const msg = await readFileAsStream(
       filePath,
+      uploadType,
       0,
       importState,
       async (data) => {

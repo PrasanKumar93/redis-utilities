@@ -18,7 +18,7 @@ import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
 import { loopJsonArrayFileContents } from "../../utils/file-reader.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../../utils/constants.js";
-import { readCSVFileAsStream } from "../../utils/csv-reader.js";
+import { readFileAsStream } from "../../utils/file-stream-reader.js";
 
 const resumeImportArrayFileToRedis = async (
   resumeInput: z.infer<typeof InputSchemas.resumeImportDataToRedisSchema>
@@ -61,9 +61,15 @@ const resumeImportArrayFileToRedis = async (
         }
       );
     } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
-      await readCSVFileAsStream("", fileIndex, importState, async (data) => {
-        await readEachFileCallback(data, redisWrapper, input, importState);
-      });
+      await readFileAsStream(
+        "",
+        input.uploadType,
+        fileIndex,
+        importState,
+        async (data) => {
+          await readEachFileCallback(data, redisWrapper, input, importState);
+        }
+      );
     }
 
     setImportTimeAndStatus(startTimeInMs, importState);
