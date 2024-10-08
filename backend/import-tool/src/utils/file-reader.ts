@@ -1,4 +1,8 @@
-import type { IImportFilesState, IImportArrayFileState } from "../state.js";
+import type {
+  IImportFilesState,
+  IImportArrayFileState,
+  IImportStreamFileState,
+} from "../state.js";
 
 import fs from "fs-extra";
 import fg from "fast-glob";
@@ -11,6 +15,7 @@ import yauzl from "yauzl";
 import { LoggerCls } from "./logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
 import { ImportStatus } from "../state.js";
+import { readCSVFileAsStream } from "./csv-reader.js";
 
 interface IFileReaderData {
   filePath: string;
@@ -170,7 +175,6 @@ const readSampleJsonFileFromPaths = async (
 
 const loopJsonArrayFileContents = async (
   fileContents: any[] = [],
-  isStopOnError: boolean = false,
   startIndex: number = 0,
   importState: IImportArrayFileState | null = null,
   recursiveCallback: (data: IFileReaderData) => Promise<void>
@@ -207,9 +211,9 @@ const readSampleDataFromArrayFile = async (
   uploadType: string
 ) => {
   const retObj: IFileReaderData = {
-    totalFiles: 0,
-    filePath: "",
+    filePath: filePath,
     fileIndex: 0,
+    totalFiles: -1,
     content: "",
   };
 
@@ -217,17 +221,30 @@ const readSampleDataFromArrayFile = async (
 
   if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
     fileContents = await readRawJSONFile(filePath, true);
+    if (fileContents?.length > 0) {
+      retObj.totalFiles = fileContents.length;
+      retObj.content = fileContents[0];
+    } else {
+      throw `No item found in the file: ${filePath}`;
+    }
   } else if (uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
-    fileContents = await readRawCSVFile(filePath);
-  }
+    const importState: IImportStreamFileState = {
+      currentStatus: ImportStatus.IN_PROGRESS,
+    };
+    const msg = await readCSVFileAsStream(
+      filePath,
+      0,
+      importState,
+      async (data) => {
+        retObj.content = data.content;
+        importState.currentStatus = ImportStatus.PAUSED;
+      }
+    );
+    LoggerCls.info(msg);
 
-  if (fileContents?.length > 0) {
-    retObj.totalFiles = fileContents.length;
-    retObj.filePath = filePath;
-    retObj.fileIndex = 0;
-    retObj.content = fileContents[0];
-  } else {
-    throw `No item found in the file: ${filePath}`;
+    if (!retObj.content) {
+      throw `No item found in the file: ${filePath}`;
+    }
   }
 
   return retObj;

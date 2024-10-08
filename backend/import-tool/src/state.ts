@@ -29,13 +29,25 @@ interface IImportFilesState extends IImportCommonState {
 interface IImportArrayFileState extends IImportCommonState {
   fileContents?: any[];
 }
+interface IImportStreamFileState extends IImportCommonState {
+  stream?: any;
+  isStreamEnded?: boolean;
+}
 
 const socketState: {
   IMPORT_UPLOAD_DIR?: any;
 
-  [socketId: string]: IImportFilesState | IImportArrayFileState;
+  [socketId: string]:
+    | IImportFilesState
+    | IImportArrayFileState
+    | IImportStreamFileState;
 } = {};
 
 export { socketState, ImportStatus };
 
-export type { IImportFilesState, IImportArrayFileState, IImportCommonState };
+export type {
+  IImportFilesState,
+  IImportArrayFileState,
+  IImportCommonState,
+  IImportStreamFileState,
+};

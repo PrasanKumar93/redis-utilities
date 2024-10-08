@@ -1,4 +1,7 @@
-import type { IImportArrayFileState } from "../../state.js";
+import type {
+  IImportArrayFileState,
+  IImportStreamFileState,
+} from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -21,8 +24,9 @@ import {
 import {
   readRawJSONFile,
   loopJsonArrayFileContents,
-  readRawCSVFile,
 } from "../../utils/file-reader.js";
+import { readCSVFileAsStream } from "../../utils/csv-reader.js";
+import { LoggerCls } from "../../utils/logger.js";
 
 const importArrayFileToRedis = async (
   input: z.infer<typeof InputSchemas.importDataToRedisSchema>
@@ -47,7 +51,7 @@ const importArrayFileToRedis = async (
   let startTimeInMs = 0;
 
   let importInitState = getInitialImportState(input);
-  let importState = importInitState as IImportArrayFileState;
+  let importState = importInitState as IImportStreamFileState;
 
   startTimeInMs = performance.now();
   emitSocketMessages({
@@ -55,22 +59,33 @@ const importArrayFileToRedis = async (
     currentStatus: importState.currentStatus,
   });
 
-  if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
-    importState.fileContents = await readRawJSONFile(input.uploadPath, true);
-  } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
-    importState.fileContents = await readRawCSVFile(input.uploadPath);
-  }
-
   let startIndex = 0;
-  await loopJsonArrayFileContents(
-    importState.fileContents,
-    input.isStopOnError,
-    startIndex,
-    importState,
-    async (data) => {
-      await readEachFileCallback(data, redisWrapper, input, importState);
-    }
-  );
+  if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+    const importStateArrayFile = importState as IImportArrayFileState;
+
+    importStateArrayFile.fileContents = await readRawJSONFile(
+      input.uploadPath,
+      true
+    );
+    await loopJsonArrayFileContents(
+      importStateArrayFile.fileContents,
+      startIndex,
+      importState,
+      async (data) => {
+        await readEachFileCallback(data, redisWrapper, input, importState);
+      }
+    );
+  } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+    const msg = await readCSVFileAsStream(
+      input.uploadPath,
+      startIndex,
+      importState,
+      async (data) => {
+        await readEachFileCallback(data, redisWrapper, input, importState);
+      }
+    );
+    LoggerCls.info(msg);
+  }
 
   setImportTimeAndStatus(startTimeInMs, importState);
   await redisWrapper.disconnect();

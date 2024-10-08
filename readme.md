@@ -1,6 +1,6 @@
 # Redis Utilities
 
-Utilities to support common redis operations.
+Utilities to support common Redis operations.
 
 ## Import Tool For Redis
 
@@ -11,7 +11,7 @@ Utilities to support common redis operations.
 docker compose up -d
 ```
 
-- Open **http://localhost:4000/import** in browser
+- Open **http://localhost:3000/import** in browser
 
 ### Other commands
 
@@ -60,3 +60,7 @@ Note :
 - [Resume Import Data to Redis](./docs/api/resume-import-data-to-redis.md)
 - [Test JSON Formatter Function](./docs/api/test-json-formatter-fn.md)
 - [Get Sample Input for JSON Formatter Function ](./docs/api/get-sample-input-for-json-formatter-fn.md)
+
+## Dockerhub
+
+`https://hub.docker.com/r/prasanrajpurohit/redis-utilities`

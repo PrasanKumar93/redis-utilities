@@ -167,7 +167,7 @@ const readEachFileCallback = async (
   data: IFileReaderData,
   redisWrapper: RedisWrapper,
   input: z.infer<typeof InputSchemas.importDataToRedisSchema>,
-  importState: IImportFilesState
+  importState: IImportCommonState
 ) => {
   await formatJSONContent(data, importState);
 
