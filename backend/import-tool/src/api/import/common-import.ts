@@ -69,7 +69,9 @@ const updateStatsAndErrors = (
   storeFileErrors?: any[]
 ) => {
   if (data && storeStats && storeFileErrors) {
-    storeStats.totalFiles = data.totalFiles;
+    if (data.totalFiles > 0) {
+      storeStats.totalFiles = data.totalFiles;
+    }
     if (data.error) {
       storeStats.failed++;
 

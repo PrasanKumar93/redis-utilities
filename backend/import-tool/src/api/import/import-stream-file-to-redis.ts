@@ -18,7 +18,10 @@ import {
   DISABLE_JS_FLAGS,
   UPLOAD_TYPES_FOR_IMPORT,
 } from "../../utils/constants.js";
-import { readFileAsStream } from "../../utils/file-stream-reader.js";
+import {
+  readFileAsStream,
+  getFileTotalEntriesCount,
+} from "../../utils/file-stream-reader.js";
 import { LoggerCls } from "../../utils/logger.js";
 
 const importStreamFileToRedis = async (
@@ -57,6 +60,17 @@ const importStreamFileToRedis = async (
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE ||
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
   ) {
+    getFileTotalEntriesCount(input.uploadPath, input.uploadType, (count) => {
+      if (importState.stats) {
+        importState.stats.totalFiles = count;
+
+        emitSocketMessages({
+          socketClient: importState.socketClient,
+          stats: importState.stats,
+        });
+      }
+    }); //async
+
     const msg = await readFileAsStream(
       input.uploadPath,
       input.uploadType,

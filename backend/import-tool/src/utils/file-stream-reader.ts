@@ -44,6 +44,41 @@ const getJsonFileStream = (filePath: string) => {
   return stream;
 };
 
+const getFileTotalEntriesCount = (
+  filePath: string,
+  fileType: string,
+  recursiveCallback?: (count: number) => void
+) => {
+  let promObj: Promise<number> = new Promise((resolve, reject) => {
+    let count = 0;
+    let stream: StreamType = null;
+
+    if (fileType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+      stream = getCsvFileStream(filePath);
+    } else if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+      //@ts-ignore
+      stream = getJsonFileStream(filePath);
+    }
+
+    if (stream) {
+      stream.on("data", () => {
+        count++;
+        if (recursiveCallback) {
+          recursiveCallback(count);
+        }
+      });
+      stream.on("end", () => {
+        resolve(count);
+      });
+      stream.on("error", (error) => {
+        reject(error);
+      });
+    }
+  });
+
+  return promObj;
+};
+
 const readFileAsStream = (
   filePath: string,
   fileType: string,
@@ -68,7 +103,7 @@ const readFileAsStream = (
       await recursiveCallback({
         filePath: "",
         content: row,
-        totalFiles: -1,
+        totalFiles: 0,
         error: null,
         fileIndex: rowIndex,
       });
@@ -161,7 +196,7 @@ const readSingleEntryFromStreamFile = async (
   const retObj: IFileReaderData = {
     filePath: filePath,
     fileIndex: 0,
-    totalFiles: -1,
+    totalFiles: 0,
     content: "",
   };
 
@@ -192,4 +227,8 @@ const readSingleEntryFromStreamFile = async (
   return retObj;
 };
 
-export { readFileAsStream, readSingleEntryFromStreamFile };
+export {
+  readFileAsStream,
+  readSingleEntryFromStreamFile,
+  getFileTotalEntriesCount,
+};
