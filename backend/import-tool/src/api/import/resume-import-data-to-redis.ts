@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { resumeImportJSONFilesToRedis } from "./resume-import-json-files-to-redis.js";
-import { resumeImportArrayFileToRedis } from "./resume-import-array-file-to-redis.js";
+import { resumeImportStreamFileToRedis } from "./resume-import-stream-file-to-redis.js";
 import { getDefaultUploadType } from "../common-api.js";
 import * as InputSchemas from "../../input-schema.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../../utils/constants.js";
@@ -23,7 +23,7 @@ const resumeImportDataToRedis = async (
     resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE ||
     resumeInput.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
   ) {
-    retObj = await resumeImportArrayFileToRedis(resumeInput);
+    retObj = await resumeImportStreamFileToRedis(resumeInput);
   }
 
   return retObj;

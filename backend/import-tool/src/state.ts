@@ -22,12 +22,8 @@ interface IImportCommonState {
   fileIndex?: number;
 }
 
-interface IImportFilesState extends IImportCommonState {
+interface IImportFolderFilesState extends IImportCommonState {
   filePaths?: string[];
-}
-
-interface IImportArrayFileState extends IImportCommonState {
-  fileContents?: any[];
 }
 interface IImportStreamFileState extends IImportCommonState {
   stream?: any;
@@ -37,17 +33,13 @@ interface IImportStreamFileState extends IImportCommonState {
 const socketState: {
   IMPORT_UPLOAD_DIR?: any;
 
-  [socketId: string]:
-    | IImportFilesState
-    | IImportArrayFileState
-    | IImportStreamFileState;
+  [socketId: string]: IImportFolderFilesState | IImportStreamFileState;
 } = {};
 
 export { socketState, ImportStatus };
 
 export type {
-  IImportFilesState,
-  IImportArrayFileState,
+  IImportFolderFilesState,
   IImportCommonState,
   IImportStreamFileState,
 };

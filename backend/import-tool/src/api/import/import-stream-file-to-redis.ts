@@ -1,7 +1,4 @@
-import type {
-  IImportArrayFileState,
-  IImportStreamFileState,
-} from "../../state.js";
+import type { IImportStreamFileState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -21,14 +18,10 @@ import {
   DISABLE_JS_FLAGS,
   UPLOAD_TYPES_FOR_IMPORT,
 } from "../../utils/constants.js";
-import {
-  readRawJSONFile,
-  loopJsonArrayFileContents,
-} from "../../utils/file-reader.js";
 import { readFileAsStream } from "../../utils/file-stream-reader.js";
 import { LoggerCls } from "../../utils/logger.js";
 
-const importArrayFileToRedis = async (
+const importStreamFileToRedis = async (
   input: z.infer<typeof InputSchemas.importDataToRedisSchema>
 ) => {
   // Validate input ----------------------
@@ -86,4 +79,4 @@ const importArrayFileToRedis = async (
   };
 };
 
-export { importArrayFileToRedis };
+export { importStreamFileToRedis };

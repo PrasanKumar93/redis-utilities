@@ -1,4 +1,4 @@
-import type { IImportFilesState } from "../../state.js";
+import type { IImportFolderFilesState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -21,7 +21,7 @@ const resumeImportJSONFilesToRedis = async (
   InputSchemas.resumeImportDataToRedisSchema.parse(resumeInput); // validate input
 
   let { importResState, fileIndex } = getResumeImportState(resumeInput);
-  let importState = importResState as IImportFilesState;
+  let importState = importResState as IImportFolderFilesState;
 
   if (importState?.filePaths?.length && fileIndex >= 0 && importState.input) {
     let input = importState.input;

@@ -1,7 +1,4 @@
-import type {
-  IImportArrayFileState,
-  IImportStreamFileState,
-} from "../../state.js";
+import type { IImportStreamFileState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -16,11 +13,10 @@ import { getInputRedisConUrl } from "../common-api.js";
 
 import * as InputSchemas from "../../input-schema.js";
 import { RedisWrapper } from "../../utils/redis.js";
-import { loopJsonArrayFileContents } from "../../utils/file-reader.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../../utils/constants.js";
 import { readFileAsStream } from "../../utils/file-stream-reader.js";
 
-const resumeImportArrayFileToRedis = async (
+const resumeImportStreamFileToRedis = async (
   resumeInput: z.infer<typeof InputSchemas.resumeImportDataToRedisSchema>
 ) => {
   InputSchemas.resumeImportDataToRedisSchema.parse(resumeInput); // validate input
@@ -69,4 +65,4 @@ const resumeImportArrayFileToRedis = async (
     currentStatus: importState.currentStatus,
   };
 };
-export { resumeImportArrayFileToRedis };
+export { resumeImportStreamFileToRedis };

@@ -1,4 +1,4 @@
-import type { IImportFilesState } from "../../state.js";
+import type { IImportFolderFilesState } from "../../state.js";
 
 import _ from "lodash";
 import { z } from "zod";
@@ -44,7 +44,7 @@ const importJSONFilesToRedis = async (
   let startTimeInMs = 0;
 
   let importInitState = getInitialImportState(input);
-  let importState = importInitState as IImportFilesState;
+  let importState = importInitState as IImportFolderFilesState;
   console.log("importState.socketClient", importState.socketClient);
 
   const jsonGlobArr = getJsonGlobForFolderPath(input.uploadPath);

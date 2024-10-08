@@ -1,6 +1,6 @@
 import type { IFileReaderData } from "../../utils/file-reader.js";
 import type { IImportStats } from "../../input-schema.js";
-import type { IImportFilesState, IImportCommonState } from "../../state.js";
+import type { IImportCommonState } from "../../state.js";
 
 import path from "node:path";
 import _ from "lodash";
@@ -116,7 +116,7 @@ const processFileData = async (
 
 const formatJSONContent = async (
   data: IFileReaderData,
-  importState: IImportFilesState
+  importState: IImportCommonState
 ) => {
   if (importState.input?.jsFunctionString && data?.content) {
     const jsFunctionString = importState.input.jsFunctionString;
@@ -188,7 +188,7 @@ const readEachFileCallback = async (
 
 const setImportTimeAndStatus = (
   startTimeInMs: number,
-  importState: IImportFilesState
+  importState: IImportCommonState
 ) => {
   if (importState?.stats) {
     const endTimeInMs = performance.now();

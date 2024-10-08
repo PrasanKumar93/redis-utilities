@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as InputSchemas from "../../input-schema.js";
 
 import { importJSONFilesToRedis } from "./import-json-files-to-redis.js";
-import { importArrayFileToRedis } from "./import-array-file-to-redis.js";
+import { importStreamFileToRedis } from "./import-stream-file-to-redis.js";
 import { getDefaultUploadType } from "../common-api.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "../../utils/constants.js";
 
@@ -22,7 +22,7 @@ const importDataToRedis = async (
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE ||
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE
   ) {
-    retObj = await importArrayFileToRedis(input);
+    retObj = await importStreamFileToRedis(input);
   }
 
   return retObj;

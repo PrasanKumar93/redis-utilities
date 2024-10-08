@@ -7,6 +7,7 @@ import _ from "lodash";
 import streamJsonPkg from "stream-json";
 import streamJsonArrayPkg from "stream-json/streamers/StreamArray.js";
 
+import { LoggerCls } from "./logger.js";
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
 import { ImportStatus } from "../state.js";
 
@@ -14,15 +15,16 @@ type StreamType = fs.ReadStream | csvParse.Parser | null;
 type ResolveCallback = (value: string | PromiseLike<string>) => void;
 type RejectCallback = (reason?: any) => void;
 
-const transformHeader = (header: string) => {
+const transformCsvHeaderRow = (header: string) => {
+  // Remove spaces and convert to camelCase
   return header ? _.camelCase(header.replace(/\s+/g, "")) : "";
 };
 
-const readCSVFileStream = (filePath: string) => {
+const getCsvFileStream = (filePath: string) => {
   const parser = csvParse.parse({
     // columns: true, // Convert rows to objects using the first row as header
     columns: (header) => {
-      const headers: string[] = header.map(transformHeader);
+      const headers: string[] = header.map(transformCsvHeaderRow);
       return headers;
     },
     skip_empty_lines: true, // Skip empty lines
@@ -33,7 +35,7 @@ const readCSVFileStream = (filePath: string) => {
   return stream;
 };
 
-const readJSONFileStream = (filePath: string) => {
+const getJsonFileStream = (filePath: string) => {
   const stream = fs
     .createReadStream(filePath)
     .pipe(streamJsonPkg.parser())
@@ -108,10 +110,10 @@ const readFileAsStream = (
     if (filePath) {
       // first time file reading
       if (fileType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
-        stream = readCSVFileStream(filePath);
+        stream = getCsvFileStream(filePath);
       } else if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
         //@ts-ignore
-        stream = readJSONFileStream(filePath);
+        stream = getJsonFileStream(filePath);
       }
 
       if (stream) {
@@ -152,4 +154,42 @@ const readFileAsStream = (
   return promObj;
 };
 
-export { readFileAsStream };
+const readSingleEntryFromStreamFile = async (
+  filePath: string,
+  uploadType: string
+) => {
+  const retObj: IFileReaderData = {
+    filePath: filePath,
+    fileIndex: 0,
+    totalFiles: -1,
+    content: "",
+  };
+
+  if (
+    uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE ||
+    uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
+  ) {
+    const importState: IImportStreamFileState = {
+      currentStatus: ImportStatus.IN_PROGRESS,
+    };
+    const msg = await readFileAsStream(
+      filePath,
+      uploadType,
+      0,
+      importState,
+      async (data) => {
+        retObj.content = data.content;
+        importState.currentStatus = ImportStatus.PAUSED;
+      }
+    );
+    LoggerCls.info(msg);
+
+    if (!retObj.content) {
+      throw `No item found in the file: ${filePath}`;
+    }
+  }
+
+  return retObj;
+};
+
+export { readFileAsStream, readSingleEntryFromStreamFile };
