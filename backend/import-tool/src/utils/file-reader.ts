@@ -217,17 +217,10 @@ const readSampleDataFromArrayFile = async (
     content: "",
   };
 
-  let fileContents: any[] = [];
-
-  if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
-    fileContents = await readRawJSONFile(filePath, true);
-    if (fileContents?.length > 0) {
-      retObj.totalFiles = fileContents.length;
-      retObj.content = fileContents[0];
-    } else {
-      throw `No item found in the file: ${filePath}`;
-    }
-  } else if (uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+  if (
+    uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE ||
+    uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
+  ) {
     const importState: IImportStreamFileState = {
       currentStatus: ImportStatus.IN_PROGRESS,
     };

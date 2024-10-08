@@ -2,13 +2,15 @@ import type { IFileReaderData } from "./file-reader.js";
 import type { IImportStreamFileState } from "../state.js";
 
 import fs from "fs";
-import { parse, Parser } from "csv-parse";
+import * as csvParse from "csv-parse";
 import _ from "lodash";
+import streamJsonPkg from "stream-json";
+import streamJsonArrayPkg from "stream-json/streamers/StreamArray.js";
 
 import { UPLOAD_TYPES_FOR_IMPORT } from "./constants.js";
 import { ImportStatus } from "../state.js";
 
-type StreamType = fs.ReadStream | Parser | null;
+type StreamType = fs.ReadStream | csvParse.Parser | null;
 type ResolveCallback = (value: string | PromiseLike<string>) => void;
 type RejectCallback = (reason?: any) => void;
 
@@ -17,7 +19,7 @@ const transformHeader = (header: string) => {
 };
 
 const readCSVFileStream = (filePath: string) => {
-  const parser = parse({
+  const parser = csvParse.parse({
     // columns: true, // Convert rows to objects using the first row as header
     columns: (header) => {
       const headers: string[] = header.map(transformHeader);
@@ -27,6 +29,15 @@ const readCSVFileStream = (filePath: string) => {
     cast: true, // Dynamically type values (e.g. "123" => 123)
   });
   const stream = fs.createReadStream(filePath).pipe(parser);
+
+  return stream;
+};
+
+const readJSONFileStream = (filePath: string) => {
+  const stream = fs
+    .createReadStream(filePath)
+    .pipe(streamJsonPkg.parser())
+    .pipe(streamJsonArrayPkg.streamArray());
 
   return stream;
 };
@@ -48,6 +59,9 @@ const readFileAsStream = (
     if (stream) {
       stream.pause(); // Pause the stream to process the current row
 
+      if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE && row.value) {
+        row = row.value; // row.key is the index of the row in the JSON array
+      }
       // Process the row
       await recursiveCallback({
         filePath: "",
@@ -90,11 +104,14 @@ const readFileAsStream = (
   //#endregion
 
   let promObj: Promise<string> = new Promise((resolve, reject) => {
-    let stream: fs.ReadStream | Parser | null = null;
+    let stream: StreamType = null;
     if (filePath) {
       // first time file reading
       if (fileType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
         stream = readCSVFileStream(filePath);
+      } else if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
+        //@ts-ignore
+        stream = readJSONFileStream(filePath);
       }
 
       if (stream) {

@@ -44,23 +44,10 @@ const resumeImportArrayFileToRedis = async (
       currentStatus: importState.currentStatus,
     });
 
-    if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
-      const importStateArrayFile = importState as IImportArrayFileState;
-
-      await loopJsonArrayFileContents(
-        importStateArrayFile.fileContents,
-        fileIndex,
-        importStateArrayFile,
-        async (data) => {
-          await readEachFileCallback(
-            data,
-            redisWrapper,
-            input,
-            importStateArrayFile
-          );
-        }
-      );
-    } else if (input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+    if (
+      input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE ||
+      input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
+    ) {
       await readFileAsStream(
         "",
         input.uploadType,
