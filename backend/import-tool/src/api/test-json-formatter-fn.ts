@@ -11,16 +11,8 @@ const testJSONFormatterFn = async (
 ) => {
   InputSchemas.testJSONFormatterFnSchema.parse(input); // validate input
 
+  let sampleKey = "";
   let functionResult: any = "";
-
-  if (input.idField) {
-    // throws error if idField is not present in paramsObj
-    getFileKey({
-      idField: input.idField,
-      content: input.paramsObj,
-      keyPrefix: input.keyPrefix,
-    });
-  }
 
   if (input.jsFunctionString) {
     let disableFlags = DISABLE_JS_FLAGS;
@@ -34,7 +26,18 @@ const testJSONFormatterFn = async (
     );
   }
 
-  return functionResult;
+  // throws error if idField is not present in paramsObj
+  sampleKey = getFileKey({
+    idField: input.idField,
+    content: functionResult || input.paramsObj,
+    keyPrefix: input.keyPrefix,
+    index: 0,
+  });
+
+  return {
+    functionResult,
+    sampleKey,
+  };
 };
 
 export { testJSONFormatterFn };

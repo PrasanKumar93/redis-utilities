@@ -3,6 +3,7 @@ import './ImportOptions.css';
 import CodeMirrorEditor from "@/app/components/CodeMirrorEditor";
 import {
     IMPORT_STATUS,
+    UPLOAD_TYPES_FOR_IMPORT,
 } from "@/app/constants";
 
 interface ImportOptionsProps {
@@ -13,6 +14,7 @@ interface ImportOptionsProps {
     isStopOnError: boolean;
     setIsStopOnError: (value: boolean) => void;
 
+    uploadType: string;
     displayStatus: string;
     infoIconFunctionString: string;
     formatterFn: string;
@@ -27,6 +29,7 @@ const ImportOptions = ({
     setIdField,
     isStopOnError,
     setIsStopOnError,
+    uploadType,
     displayStatus,
     infoIconFunctionString,
     formatterFn,
@@ -50,6 +53,7 @@ const ImportOptions = ({
                                 onChange={(e) => setKeyPrefix(e.target.value)}
                                 tabIndex={3}
                                 disabled={!!displayStatus}
+                                onBlur={() => { validateFormatterFn(formatterFn) }}
                             />
                         </div>
                         <div>
@@ -63,19 +67,25 @@ const ImportOptions = ({
                                 onChange={(e) => setIdField(e.target.value)}
                                 tabIndex={4}
                                 disabled={!!displayStatus}
+                                onBlur={() => { validateFormatterFn(formatterFn) }}
+                            />
+                        </div>
 
-                            />
-                        </div>
                         <div className="options-col">
-                            <input type="checkbox" className="pg001-checkbox"
-                                id="import-check-stop-on-error"
-                                checked={isStopOnError}
-                                onChange={(e) => setIsStopOnError(e.target.checked)}
-                                tabIndex={5}
-                                disabled={displayStatus == IMPORT_STATUS.IN_PROGRESS}
-                            />
-                            <label htmlFor="import-check-stop-on-error" className="font-medium stop-on-error-lbl">Stop on error</label>
+                            {uploadType === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER &&
+                                <>
+                                    <input type="checkbox" className="pg001-checkbox"
+                                        id="import-check-stop-on-error"
+                                        checked={isStopOnError}
+                                        onChange={(e) => setIsStopOnError(e.target.checked)}
+                                        tabIndex={5}
+                                        disabled={displayStatus == IMPORT_STATUS.IN_PROGRESS}
+                                    />
+                                    <label htmlFor="import-check-stop-on-error" className="font-medium stop-on-error-lbl">Stop on error</label>
+                                </>
+                            }
                         </div>
+
                     </div>
                     <div className="import-formatter-func-section">
                         <div className="import-formatter-func-title-container">

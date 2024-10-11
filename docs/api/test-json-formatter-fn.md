@@ -40,16 +40,19 @@ function userFunction(jsonObj){
 ```json
 {
   "data": {
-    "productDetails": {
-      "id": 1165,
-      "price": 2495,
-      "productDisplayName": "Nike Mean Team India Cricket Jersey",
-      "brandName": "NIKE",
-      "gender": "Men",
-      "baseColour": "Blue",
-      "year": "2013"
+    "functionResult": {
+      "productDetails": {
+        "id": 1165,
+        "price": 2495,
+        "productDisplayName": "Nike Mean Team India Cricket Jersey",
+        "brandName": "NIKE",
+        "gender": "Men",
+        "baseColour": "Blue",
+        "year": "2013"
+      },
+      "insertedAt": "2024-08-12T16:17:27.468Z"
     },
-    "insertedAt": "2024-08-12T16:17:27.468Z"
+    "sampleKey": "1"
   },
   "error": null
 }
@@ -98,10 +101,13 @@ jsonObj = {
 ```json
 {
   "data": {
-    "productId": 1165,
-    "productName": "Nike Mean Team India Cricket Jersey",
-    "price": 2495,
-    "insertedAt": "2024-08-12T16:18:28.616Z"
+    "functionResult": {
+      "productId": 1165,
+      "productName": "Nike Mean Team India Cricket Jersey",
+      "price": 2495,
+      "insertedAt": "2024-08-12T16:18:28.616Z"
+    },
+    "sampleKey": "1"
   },
   "error": null
 }

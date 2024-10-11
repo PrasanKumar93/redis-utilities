@@ -71,11 +71,12 @@ const Page = () => {
     const [uploadPath, setUploadPath] = useState('');
     const [keyPrefix, setKeyPrefix] = useState('');
     const [idField, setIdField] = useState('');
-    const [isStopOnError, setIsStopOnError] = useState(true);
+    const [isStopOnError, setIsStopOnError] = useState(false);
 
     const [formatterFn, setFormatterFn] = useState(defaultFunctionString);
     const [formatterFnInput, setFormatterFnInput] = useState<any>({});
     const [formatterFnOutput, setFormatterFnOutput] = useState<any>(null);
+    const [sampleKey, setSampleKey] = useState<string>("");
     const [isValidFormatterFn, setIsValidFormatterFn] = useState(false);
 
     const [activeTabIndex, setActiveTabIndex] = useState(IMPORT_PAGE_TABS.LOGS);
@@ -270,7 +271,13 @@ const Page = () => {
 
         if (testResult?.data) {
             isValid = true;
-            setFormatterFnOutput(testResult?.data);
+            if (testResult?.data.functionResult) {
+                setFormatterFnOutput(testResult?.data.functionResult);
+            }
+            else if (code == "") {
+                setFormatterFnOutput(formatterFnInput);
+            }
+            setSampleKey(testResult?.data.sampleKey);
             setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
         }
         else if (testResult?.error) {
@@ -281,11 +288,8 @@ const Page = () => {
             };
             setDisplayErrors((prev) => [...prev, displayError]);
             setActiveTabIndex(IMPORT_PAGE_TABS.ERRORS);
-        }
-        else if (code == "") {
-            isValid = true;
-            setFormatterFnOutput(formatterFnInput);
-            setActiveTabIndex(IMPORT_PAGE_TABS.LOGS)
+            setFormatterFnOutput(null);
+            setSampleKey("");
         }
 
         setIsValidFormatterFn(isValid);
@@ -346,6 +350,7 @@ const Page = () => {
                                 keyPrefix={keyPrefix} setKeyPrefix={setKeyPrefix}
                                 idField={idField} setIdField={setIdField}
                                 isStopOnError={isStopOnError} setIsStopOnError={setIsStopOnError}
+                                uploadType={uploadTypeOption.uploadType}
                                 displayStatus={displayStatus}
                                 infoIconFunctionString={infoIconFunctionString}
                                 formatterFn={formatterFn} validateFormatterFn={validateFormatterFn}
@@ -371,6 +376,7 @@ const Page = () => {
                                 displayStatus={displayStatus}
                                 formatterFnInput={formatterFnInput}
                                 formatterFnOutput={formatterFnOutput}
+                                sampleKey={sampleKey}
                             />
                         </div>
                     </div>

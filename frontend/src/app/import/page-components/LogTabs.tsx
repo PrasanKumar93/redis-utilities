@@ -11,6 +11,7 @@ interface LogTabsProps {
     displayStatus: string;
     formatterFnInput: any;
     formatterFnOutput: any;
+    sampleKey: string;
 }
 
 const LogTabs = ({
@@ -20,6 +21,7 @@ const LogTabs = ({
     displayStatus,
     formatterFnInput,
     formatterFnOutput,
+    sampleKey,
 }: LogTabsProps) => {
 
     return (
@@ -49,12 +51,27 @@ const LogTabs = ({
                         <hr />
                         <details>
                             <summary className="summary-tag font-medium">
-                                Formatter function input (jsonObj) is file content :
+                                Formatter function input  (sample file content as json object) :
                             </summary>
 
                             <pre>
                                 <code>
                                     {JSON.stringify(formatterFnInput, null, 4)}
+                                </code>
+                            </pre>
+                        </details>
+                    </>
+                }
+                {sampleKey &&
+                    <>
+                        <hr />
+                        <details>
+                            <summary className="summary-tag font-medium">
+                                Sample key to be stored in Redis :
+                            </summary>
+                            <pre>
+                                <code>
+                                    {sampleKey}
                                 </code>
                             </pre>
                         </details>
@@ -66,7 +83,7 @@ const LogTabs = ({
 
                         <details>
                             <summary className="summary-tag font-medium">
-                                Formatter function output to be stored in Redis :
+                                Formatter function output (sample value to be stored in Redis) :
                             </summary>
                             <pre>
                                 <code>

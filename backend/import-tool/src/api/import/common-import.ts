@@ -15,7 +15,6 @@ import { LoggerCls } from "../../utils/logger.js";
 import { runJSFunction } from "../../utils/validate-js.js";
 
 interface IGetFileKey {
-  filePath?: string;
   idField?: string;
   content?: any;
   keyPrefix?: string;
@@ -24,7 +23,7 @@ interface IGetFileKey {
 const getFileKey = (_obj: IGetFileKey) => {
   let key = "";
 
-  let { filePath, idField, content, keyPrefix, index } = _obj;
+  let { idField, content, keyPrefix, index } = _obj;
 
   if (!index) {
     index = 0;
@@ -43,15 +42,6 @@ const getFileKey = (_obj: IGetFileKey) => {
       throw `idField: ${idField} not found in JSON content`;
     } else if (typeof key !== "string") {
       throw `idField: ${idField} value must be string`;
-    }
-  } else if (filePath) {
-    // filename as key
-    if (filePath.endsWith(".json.gz")) {
-      key = path.basename(filePath, ".json.gz");
-    } else if (filePath.endsWith(".json")) {
-      key = path.basename(filePath, ".json");
-    } else {
-      key = path.basename(filePath);
     }
   } else if (index >= 0) {
     key = (index + 1).toString();
@@ -95,7 +85,6 @@ const processFileData = async (
   try {
     if (data?.content) {
       let key = getFileKey({
-        filePath: data.filePath,
         idField: input.idField,
         content: data.content,
         keyPrefix: input.keyPrefix,
