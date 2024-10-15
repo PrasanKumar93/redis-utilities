@@ -7,7 +7,7 @@ POST http://localhost:3001/api/testJSONFormatterFn
 {
 "jsFunctionString":"
 
-function userFunction(jsonObj){
+function customJSONFormatter(jsonObj){
 
  jsonObj.insertedAt = new Date() // add new field
  jsonObj.productDetails.brandName = jsonObj.productDetails.brandName.toUpperCase() //update field
@@ -65,7 +65,7 @@ POST http://localhost:3001/api/testJSONFormatterFn
 {
 "jsFunctionString":"
 
-function userFunction(jsonObj){
+function customJSONFormatter(jsonObj){
 
 jsonObj = {
   productId: jsonObj.productDetails.id,

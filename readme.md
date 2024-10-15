@@ -64,3 +64,7 @@ Note :
 ## Dockerhub
 
 `https://hub.docker.com/r/prasanrajpurohit/redis-utilities`
+
+## Usage
+
+- [Application screenshots/ usage](./docs/usage.md)

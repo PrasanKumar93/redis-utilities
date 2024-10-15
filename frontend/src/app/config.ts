@@ -9,7 +9,7 @@ const config = {
     ENV_VARS.FROM_DOCKER === "Y"
       ? "redis://host.docker.internal:6379"
       : "redis://localhost:6379",
-  GIT_TAG: "v0.2.0",
+  GIT_TAG: "v0.3.0",
   API_BASE_URL: `http://localhost:${ENV_VARS.PORT_BACKEND}/api`,
   SOCKET_IO_URL: `http://localhost:${ENV_VARS.PORT_BACKEND}/`,
 };
