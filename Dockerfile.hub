@@ -1,25 +1,20 @@
-FROM node:18-alpine
+# Stage 1 
+FROM node:18-alpine AS frontendBuilder
 
 WORKDIR /app
 
-# Copy the package.json for both frontend and backend
-COPY ./backend/import-tool/package*.json ./backend/import-tool/
+# Copy the package.json for  frontend 
 COPY ./frontend/package*.json ./frontend/
 
-# Install dependencies for both backend and frontend
-RUN cd ./backend/import-tool && npm install
+# Install dependencies for frontend
 RUN cd ./frontend && npm install
 
-# Copy the rest of the backend and frontend code
-COPY ./backend/import-tool ./backend/import-tool
+# Copy the rest of the frontend code
 COPY ./frontend ./frontend
 
 # Set frontend build arguments
 ARG NEXT_PUBLIC_ENCRYPTION_KEY_ARG
 ARG NEXT_PUBLIC_PORT_BACKEND_ARG
-
-# Set backend environment variables
-ENV IMPORT_TOOL_FROM_DOCKER="Y"
 
 # Set frontend environment variables as next js static build requires them
 ENV NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY_ARG}
@@ -27,8 +22,40 @@ ENV NEXT_PUBLIC_PORT_BACKEND=${NEXT_PUBLIC_PORT_BACKEND_ARG}
 ENV NEXT_PUBLIC_FROM_DOCKER="Y"
 
 # Build the frontend
-RUN cd ./frontend && npm run build
+RUN cd ./frontend && npm run build 
 
+#--------------------------------------------
+# Stage 2
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Frontend ###
+# Copy only the necessary files from the build stage
+COPY --from=frontendBuilder /app/frontend/package*.json ./frontend/
+COPY --from=frontendBuilder /app/frontend/.next ./frontend/.next
+COPY --from=frontendBuilder /app/frontend/public ./frontend/public
+COPY --from=frontendBuilder /app/frontend/.next/static ./frontend/.next/static
+COPY --from=frontendBuilder /app/frontend/.next/server ./frontend/.next/server
+
+# Install only production dependencies & Remove unnecessary files
+RUN cd ./frontend && npm ci --only=production \
+   && rm -rf ./node_modules/@next/swc-linux-arm64-musl \
+   && rm -rf ./node_modules/@next/swc-linux-arm64-gnu && rm -rf ./.next/cache 
+
+# Backend ### 
+# Copy the package.json 
+COPY ./backend/import-tool/package*.json ./backend/import-tool/
+
+# Install dependencies for backend
+RUN cd ./backend/import-tool && npm install
+
+# Copy the rest of the backend 
+COPY ./backend/import-tool ./backend/import-tool
+
+# Set backend environment variables
+ENV IMPORT_TOOL_FROM_DOCKER="Y"
+    
 # Start both backend and frontend services concurrently
 # CMD is runtime instruction, so can use ENV variable rather than ARG variable
 CMD ["sh", "-c", "cd /app/backend/import-tool && npm start & PORT_FRONTEND=${PORT_FRONTEND:-3000} && cd /app/frontend && npm start -- -p $PORT_FRONTEND"]
