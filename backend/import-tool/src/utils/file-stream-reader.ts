@@ -63,11 +63,15 @@ const getFileTotalEntriesCount = (
     if (stream) {
       stream.on("data", () => {
         count++;
-        if (recursiveCallback) {
+        if (count % 2000 == 0 && recursiveCallback) {
+          // Update progress every 2000 rows to reduce memory footprint
           recursiveCallback(count);
         }
       });
       stream.on("end", () => {
+        if (recursiveCallback) {
+          recursiveCallback(count);
+        }
         resolve(count);
       });
       stream.on("error", (error) => {
