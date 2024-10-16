@@ -60,6 +60,7 @@ const importStreamFileToRedis = async (
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.CSV_FILE ||
     input.uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE
   ) {
+    /*
     getFileTotalEntriesCount(input.uploadPath, input.uploadType, (count) => {
       if (importState.stats) {
         importState.stats.totalFiles = count;
@@ -70,6 +71,7 @@ const importStreamFileToRedis = async (
         });
       }
     }); //async
+     */
 
     const msg = await readFileAsStream(
       input.uploadPath,

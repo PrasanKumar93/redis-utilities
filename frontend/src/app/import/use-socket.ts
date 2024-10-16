@@ -48,7 +48,7 @@ const useSocket = () => {
     });
 
     socket.on("importStats", (stats) => {
-      if (stats?.totalFiles) {
+      if (stats?.totalFiles >= 0) {
         setDisplayStats(stats);
       }
     });

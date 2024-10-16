@@ -24,9 +24,11 @@ const ImportStatsCount = ({
                     <div className="import-success-count-prefix">
                         <span className="numbers-font">{displayStats.processed}</span>
                     </div>
-                    <div>
-                        out of <span className="numbers-font">{displayStats.totalFiles}</span>
-                    </div>
+                    {displayStats.totalFiles > 0 &&
+                        <div>
+                            out of <span className="numbers-font">{displayStats.totalFiles}</span>
+                        </div>
+                    }
                 </div>
             </div>
             <div className="count-container error-count-container fade-in-out-to-top">
