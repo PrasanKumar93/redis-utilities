@@ -1,5 +1,7 @@
 // Compatibility between Node.js (crypto-node-util.ts) and browser (crypto-util.ts)
 
+import { getConfigData } from "../config";
+
 interface IEncryptedElm {
   encryptedData: string;
   iv: string;
@@ -12,9 +14,7 @@ const ALGORITHMS = {
 };
 
 //"openssl rand -base64 32" command in terminal to generate a key
-const DEFAULT_ENCRYPTION_KEY =
-  process.env.NEXT_PUBLIC_ENCRYPTION_KEY ||
-  "BPM3TsjUXJ2bJq8Lfze8HcE2ya19xGD/1zBVGGD95i8=";
+const DEFAULT_ENCRYPTION_KEY = "BPM3TsjUXJ2bJq8Lfze8HcE2ya19xGD/1zBVGGD95i8=";
 
 //#region helpers
 
@@ -65,7 +65,8 @@ async function encryptData(
   data: string,
   key: string = ""
 ): Promise<IEncryptedElm> {
-  key = key || DEFAULT_ENCRYPTION_KEY || "";
+  const configData = getConfigData();
+  key = key || configData.ENCRYPTION_KEY || DEFAULT_ENCRYPTION_KEY;
 
   if (!key || !data) {
     throw "encryptData() : Mandatory parameters are missing!";
@@ -100,7 +101,9 @@ async function decryptData(
   encryptedElm: IEncryptedElm,
   key: string = ""
 ): Promise<string> {
-  key = key || DEFAULT_ENCRYPTION_KEY || "";
+  const configData = getConfigData();
+  key = key || configData.ENCRYPTION_KEY || DEFAULT_ENCRYPTION_KEY;
+
   const { encryptedData, iv, authTag } = encryptedElm || {};
 
   if (!key || !encryptedData || !iv || !authTag) {

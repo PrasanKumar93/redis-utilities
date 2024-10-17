@@ -1,11 +1,12 @@
 import axios, {
+  AxiosInstance,
   AxiosProgressEvent,
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
 
 import { errorToast } from "./toast-util";
-import { config } from "../config";
+import { getConfigData } from "../config";
 
 interface IApiResponse {
   data: any;
@@ -14,6 +15,8 @@ interface IApiResponse {
 const CSS_CLASSES = {
   CUSTOM_ERROR_TOAST: "custom-error-toast",
 };
+
+let axiosInstance: AxiosInstance | null = null;
 
 // #region helper functions
 const consoleLogError = (axiosError: any) => {
@@ -32,18 +35,30 @@ const errorAPIAlert = (apiName: string) => {
     className: CSS_CLASSES.CUSTOM_ERROR_TOAST,
   });
 };
-// #endregion
 
-const axiosInstance = axios.create({
-  baseURL: config.API_BASE_URL,
-});
+const getAxiosInstance = () => {
+  if (!axiosInstance) {
+    const configData = getConfigData();
+    if (configData.API_BASE_URL) {
+      axiosInstance = axios.create({
+        baseURL: configData.API_BASE_URL,
+      });
+    }
+  }
+  return axiosInstance;
+};
+// #endregion
 
 const getRequest = async (
   url: string,
   config?: AxiosRequestConfig
 ): Promise<AxiosResponse<IApiResponse>> => {
   try {
-    const response = await axiosInstance.get(url, config);
+    const axInst = getAxiosInstance();
+    if (!axInst) {
+      throw "getRequest() : Axios Instance is not available!";
+    }
+    const response = await axInst.get(url, config);
     return response;
   } catch (error) {
     console.error("getRequest error:", url, error);
@@ -57,7 +72,11 @@ const postRequest = async (
   config?: AxiosRequestConfig
 ): Promise<AxiosResponse<IApiResponse>> => {
   try {
-    const response = await axiosInstance.post(url, data, config);
+    const axInst = getAxiosInstance();
+    if (!axInst) {
+      throw "postRequest() : Axios Instance is not available!";
+    }
+    const response = await axInst.post(url, data, config);
     return response;
   } catch (error) {
     console.error("postRequest error:", url, error);
@@ -72,6 +91,10 @@ const fileUploadRequest = async (
   uploadProgressCallback?: (progress: number) => void
 ): Promise<AxiosResponse<IApiResponse>> => {
   try {
+    const axInst = getAxiosInstance();
+    if (!axInst) {
+      throw "fileUploadRequest() : Axios Instance is not available!";
+    }
     if (!config) {
       config = {};
     }
@@ -92,10 +115,24 @@ const fileUploadRequest = async (
         }
       };
     }
-    const response = await axiosInstance.post(url, formData, config);
+    const response = await axInst.post(url, formData, config);
     return response;
   } catch (error) {
     console.error("fileUploadRequest error:", url, error);
+    throw error;
+  }
+};
+
+const fetchServerVariables = async () => {
+  const axiosInst = axios.create({
+    baseURL: "/api",
+  });
+
+  try {
+    const response = await axiosInst.post("/getServerVariables", {});
+    return response.data;
+  } catch (error) {
+    console.error("fetchServerVariables NextJS API error:", error);
     throw error;
   }
 };
@@ -106,4 +143,5 @@ export {
   fileUploadRequest,
   consoleLogError,
   errorAPIAlert,
+  fetchServerVariables,
 };

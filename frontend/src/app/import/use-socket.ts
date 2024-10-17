@@ -3,7 +3,7 @@ import type { ImportStats, ImportFileError } from "../types";
 import React, { useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 
-import { config } from "../config";
+import { getConfigData } from "../config";
 import { IMPORT_ANIMATE_CSS, IMPORT_STATUS } from "../constants";
 
 const addToSet = (setterFn: any, value: string) => {
@@ -35,7 +35,9 @@ const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    socketRef.current = io(config.SOCKET_IO_URL);
+    const configData = getConfigData();
+
+    socketRef.current = io(configData.SOCKET_IO_URL);
     const socket = socketRef.current;
 
     socket.on("connect", () => {

@@ -13,17 +13,8 @@ RUN cd ./frontend && npm install
 COPY ./backend/import-tool ./backend/import-tool
 COPY ./frontend ./frontend
 
-# Build the backend
+# Build the code
 RUN cd ./backend/import-tool && npm run build 
-
-# Set frontend build arguments
-ARG NEXT_PUBLIC_ENCRYPTION_KEY_ARG
-ARG NEXT_PUBLIC_PORT_BACKEND_ARG
-# Set frontend environment variables as next js static build requires them
-ENV NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY_ARG}
-ENV NEXT_PUBLIC_PORT_BACKEND=${NEXT_PUBLIC_PORT_BACKEND_ARG}
-ENV NEXT_PUBLIC_FROM_DOCKER="Y"
-# Build the frontend
 RUN cd ./frontend && npm run build 
 
 #-------------------Stage 2-------------------------
@@ -50,10 +41,10 @@ RUN cd ./frontend && npm ci --only=production \
    && rm -rf ./.next/cache
 RUN cd ./backend/import-tool && npm ci --only=production
 
-# Set backend environment variables
+# Set environment variables
 ENV IMPORT_TOOL_FROM_DOCKER="Y"
     
 # Start both backend and frontend services concurrently
-# CMD is runtime instruction, so can use ENV variable rather than ARG variable
+# CMD is runtime instruction, so can use ENV variable
 CMD ["sh", "-c", "cd /app/backend/import-tool && npm run start-prod & PORT_FRONTEND=${PORT_FRONTEND:-3000} && cd /app/frontend && npm start -- -p $PORT_FRONTEND"]
 # :- operator ensures if PORT_FRONTEND env variable is not set, it will default to 3000.

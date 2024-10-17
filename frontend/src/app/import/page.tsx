@@ -31,7 +31,7 @@ import {
     UPLOAD_DROPDOWN_OPTIONS,
     UPLOAD_TYPES_FOR_IMPORT,
 } from "../constants";
-import { config } from "../config";
+import { getConfigData, setConfigData } from "../config";
 
 import { useSocket } from "./use-socket";
 
@@ -63,9 +63,30 @@ const defaultFunctionString = `function customJSONFormatter(jsonObj){
  return jsonObj; // mandatory return 
 }`;
 
-const Page = () => {
+const PageWrapper = () => {
+    const [isConfigLoaded, setIsConfigLoaded] = useState(false);
 
-    const [testRedisUrl, setTestRedisUrl] = useState(config.DEFAULT_REDIS_URL);
+    useEffect(() => {
+        const loadConfig = async () => {
+            await setConfigData();
+            setIsConfigLoaded(true);
+        }
+        loadConfig();
+    }, []);
+
+    return (
+        <>
+            {isConfigLoaded &&
+                <Page />
+            }
+        </>
+    )
+}
+
+const Page = () => {
+    const configData = getConfigData();
+
+    const [testRedisUrl, setTestRedisUrl] = useState(configData.DEFAULT_REDIS_URL || '');
 
     const [redisConUrl, setRedisConUrl] = useState('');
     const [uploadPath, setUploadPath] = useState('');
@@ -84,7 +105,7 @@ const Page = () => {
     const [uploadTypeOption, setUploadTypeOption] = useState(UPLOAD_DROPDOWN_OPTIONS[0]);
     const [isAllUploadTypes, setIsAllUploadTypes] = useState(false);
 
-    const gitTag = config.GIT_TAG;
+    const gitTag = configData.GIT_TAG;
 
     const {
         socketId,
@@ -127,7 +148,7 @@ const Page = () => {
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
 
-                if (config.FROM_DOCKER === "N") {
+                if (configData.FROM_DOCKER === "N") {
                     //Showing all upload types for application running locally (Non docker)
                     setIsAllUploadTypes(true);
                 }
@@ -386,4 +407,4 @@ const Page = () => {
     )
 };
 
-export default Page;
+export default PageWrapper;
