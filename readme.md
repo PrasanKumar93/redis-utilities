@@ -2,6 +2,11 @@
 
 Utilities to support common Redis operations.
 
+## Features
+
+- **Data Import**: Easily import data from a JSON array file, a CSV file, or a Zipped JSON folder containing multiple JSON files (where each file represents a record) into Redis.
+- **Data Formatter** : Format data using an intuitive interface before ingesting it into Redis.
+
 ## Import Tool For Redis
 
 ### Start application
