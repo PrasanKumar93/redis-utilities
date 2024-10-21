@@ -98,11 +98,11 @@ const readFileAsStream = (
     rejectCallback: RejectCallback
   ) => {
     if (stream) {
+      stream.pause(); // Pause the stream to process the current row
+
       if (!importState.isStreamStarted) {
         importState.isStreamStarted = true;
       }
-
-      stream.pause(); // Pause the stream to process the current row
 
       if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE && row.value) {
         row = row.value; // row.key is the index of the row in the JSON array
@@ -123,8 +123,11 @@ const readFileAsStream = (
       } else if (importState.currentStatus == ImportStatus.PAUSED) {
         stream.pause();
         resolveCallback("Paused on user request");
-      } else if (importState.isStreamEnded) {
-        resolveCallback("CSV processing completed");
+      } else if (
+        importState.isStreamEnded ||
+        importState.stats?.totalFiles === 1 // Single entry file
+      ) {
+        resolveCallback("File processing completed");
       } else {
         stream.resume(); // Resume the stream to read the next row
       }

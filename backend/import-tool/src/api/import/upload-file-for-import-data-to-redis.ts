@@ -116,24 +116,29 @@ const uploadFileForImportDataToRedis = async (req: Request) => {
     });
 
     busboy.on("close", async () => {
-      if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
-        const zipFilePath = serverUploadPath;
-        const destDir = zipFilePath.replace(".zip", "");
-        const { unzippedPath } = await unzipFile(zipFilePath, destDir);
+      try {
+        if (uploadType == UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER) {
+          const zipFilePath = serverUploadPath;
+          const destDir = zipFilePath.replace(".zip", "");
+          const { unzippedPath } = await unzipFile(zipFilePath, destDir);
 
-        result.data = {
-          serverUploadPath: unzippedPath,
-          message: "File uploaded & unzipped successfully !",
-        };
-      } else {
-        result.data = {
-          serverUploadPath: serverUploadPath,
-          message: "File uploaded successfully !",
-        };
+          result.data = {
+            serverUploadPath: unzippedPath,
+            message: "File uploaded & unzipped successfully !",
+          };
+        } else {
+          result.data = {
+            serverUploadPath: serverUploadPath,
+            message: "File uploaded successfully !",
+          };
+        }
+
+        req.unpipe(busboy);
+        resolve(result.data);
+      } catch (err) {
+        LoggerCls.error("Error in busboy close", err);
+        busboy.emit("error", err);
       }
-
-      req.unpipe(busboy);
-      resolve(result.data);
     });
 
     busboy.on("error", (err: any) => {

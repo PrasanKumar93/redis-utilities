@@ -70,11 +70,11 @@ httpServer.listen(PORT, () => {
 
 process.on("unhandledRejection", (reason, promise) => {
   LoggerCls.error("Unhandled promise Rejection :", {
-    promise,
-    reason,
+    promise: LoggerCls.getPureError(promise),
+    reason: LoggerCls.getPureError(reason),
   });
 });
 
 process.on("uncaughtException", (error) => {
-  LoggerCls.error("Uncaught Exception:", error);
+  LoggerCls.error("Uncaught Exception:", LoggerCls.getPureError(error));
 });

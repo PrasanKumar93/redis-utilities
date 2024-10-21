@@ -61,13 +61,27 @@ const getFilePathsFromGlobPattern = async (
   include: string[],
   exclude: string[] = []
 ) => {
+  if (!exclude) {
+    exclude = [];
+  }
+  const commonExcludes = [
+    "**/__MACOSX/**",
+    "**/._*",
+    "**/Thumbs.db",
+    "**/Desktop.ini",
+    "**/.*",
+    "**/node_modules/**",
+    "**/*.log",
+    "**/*.tmp",
+  ];
+  const allExcludes = [...commonExcludes, ...exclude];
   let filePaths: string[] = [];
   //glob patterns like ["path/**/*.ts", "**/*.?s", ...]
   if (include?.length) {
     filePaths = await fg(include, {
       caseSensitiveMatch: false,
       dot: true, // allow files that begin with a period (.)
-      ignore: exclude,
+      ignore: allExcludes,
     });
   }
 
@@ -232,6 +246,12 @@ const unzipFile = async (zipFilePath: string, destDir: string) => {
         zipFile.on("error", handleZipError);
       }
     });
+  });
+
+  promObj = promObj.catch((error) => {
+    const err = LoggerCls.getPureError(error);
+    LoggerCls.error("Error during unzipping: ", err);
+    throw err;
   });
 
   return promObj;
