@@ -47,6 +47,9 @@ const FileUpload = ({
             if (progress == 100) {
                 // Upload completed, but file processing or response is still pending
                 setIsShowApiLoader(true);
+                if (selectedFile?.type == "application/zip") {
+                    infoToast('File uploaded successfully. Unzipping the file...');
+                }
             }
         }
     }
