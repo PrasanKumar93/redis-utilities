@@ -27,6 +27,7 @@ interface IImportFolderFilesState extends IImportCommonState {
 }
 interface IImportStreamFileState extends IImportCommonState {
   stream?: any;
+  isStreamStarted?: boolean;
   isStreamEnded?: boolean;
 }
 

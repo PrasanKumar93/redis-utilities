@@ -81,6 +81,10 @@ const readRawJSONFile = async (
   let content: any = null;
   if (filePath) {
     try {
+      const stats = fs.statSync(filePath);
+      if (stats.size === 0) {
+        throw `Empty file error: The file ${filePath} is empty.`;
+      }
       if (filePath.endsWith(".json.gz")) {
         content = await decompressGZip(filePath);
       } else {

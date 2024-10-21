@@ -98,6 +98,10 @@ const readFileAsStream = (
     rejectCallback: RejectCallback
   ) => {
     if (stream) {
+      if (!importState.isStreamStarted) {
+        importState.isStreamStarted = true;
+      }
+
       stream.pause(); // Pause the stream to process the current row
 
       if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE && row.value) {
@@ -139,8 +143,16 @@ const readFileAsStream = (
     }
   };
 
-  const onEndCallback = () => {
+  const onEndCallback = (
+    resolveCallback: ResolveCallback,
+    rejectCallback: RejectCallback
+  ) => {
     importState.isStreamEnded = true;
+
+    if (!importState.isStreamStarted) {
+      //empty file
+      resolveCallback("No data was read from the file");
+    }
   };
   //#endregion
 
@@ -148,7 +160,10 @@ const readFileAsStream = (
     let stream: StreamType = null;
     if (filePath) {
       // first time file reading
-      if (fileType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
+      const stats = fs.statSync(filePath);
+      if (stats.size === 0) {
+        reject(`Empty file error: The file ${filePath} is empty.`);
+      } else if (fileType === UPLOAD_TYPES_FOR_IMPORT.CSV_FILE) {
         stream = getCsvFileStream(filePath);
       } else if (fileType === UPLOAD_TYPES_FOR_IMPORT.JSON_ARRAY_FILE) {
         //@ts-ignore
@@ -162,7 +177,9 @@ const readFileAsStream = (
         stream.on("error", (error) => {
           onErrorCallback(stream, error, resolve, reject);
         });
-        stream.on("end", onEndCallback);
+        stream.on("end", () => {
+          onEndCallback(resolve, reject);
+        });
 
         importState.stream = stream;
       }
@@ -181,7 +198,9 @@ const readFileAsStream = (
         stream.on("error", (error) => {
           onErrorCallback(stream, error, resolve, reject);
         });
-        stream.on("end", onEndCallback);
+        stream.on("end", () => {
+          onEndCallback(resolve, reject);
+        });
 
         stream.resume();
       }

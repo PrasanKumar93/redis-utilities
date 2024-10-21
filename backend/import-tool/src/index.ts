@@ -67,3 +67,14 @@ app.use(API_PREFIX, router);
 httpServer.listen(PORT, () => {
   LoggerCls.info(`Server running on port ${PORT}`);
 });
+
+process.on("unhandledRejection", (reason, promise) => {
+  LoggerCls.error("Unhandled promise Rejection :", {
+    promise,
+    reason,
+  });
+});
+
+process.on("uncaughtException", (error) => {
+  LoggerCls.error("Uncaught Exception:", error);
+});
