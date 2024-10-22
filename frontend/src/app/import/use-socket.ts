@@ -56,7 +56,7 @@ const useSocket = () => {
     });
 
     socket.on("importFileError", (info) => {
-      if (info?.filePath) {
+      if (info) {
         setDisplayErrors((prev) => [...prev, info]);
       }
     });

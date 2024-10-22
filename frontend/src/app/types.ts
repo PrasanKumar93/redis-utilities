@@ -8,6 +8,7 @@ interface ImportStats {
 interface ImportFileError {
   message?: string;
   filePath?: string;
+  fileIndex?: number;
   error?: any;
 }
 

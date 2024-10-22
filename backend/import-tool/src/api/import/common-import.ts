@@ -119,11 +119,10 @@ const formatJSONContent = async (
         true,
         null
       );
-      if (modifiedContent) {
-        data.content = modifiedContent;
-      }
+      data.content = modifiedContent || null;
     } catch (err) {
       data.error = err;
+      data.content = null;
     }
   }
 };

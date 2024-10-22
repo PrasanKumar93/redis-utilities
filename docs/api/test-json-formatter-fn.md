@@ -184,3 +184,14 @@ POST http://localhost:3001/api/testJSONFormatterFn
   }
 }
 ```
+
+## Other sample error functions
+
+```js
+function customJSONFormatter(jsonObj) {
+  if (jsonObj.productId == "P99") {
+    throw new Error("Custom runtime error occurred");
+  }
+  return jsonObj; // mandatory return
+}
+```
