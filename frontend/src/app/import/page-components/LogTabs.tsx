@@ -103,7 +103,7 @@ const LogTabs = ({
                         <div className="error-log-path">
                             {index + 1})
                             {error.filePath ? ' FilePath : ' + error.filePath : ''}
-                            {Number(error.fileIndex) >= 0 ? ' File Row Item #  ' + (Number(error.fileIndex) + 1) : ''}
+                            {!error.filePath && Number(error.fileIndex) >= 0 ? ' File Row Item #  ' + (Number(error.fileIndex) + 1) : ''}
                             {error.message ? ' Message : ' + error.message : ''}
                         </div>
                         <div className="error-log-msg">

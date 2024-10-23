@@ -3,6 +3,7 @@ import './ImportOptions.css';
 import CodeMirrorEditor from "@/app/components/CodeMirrorEditor";
 import {
     IMPORT_STATUS,
+    UPLOAD_CATEGORY,
     UPLOAD_TYPES_FOR_IMPORT,
 } from "@/app/constants";
 
@@ -15,6 +16,7 @@ interface ImportOptionsProps {
     setIsStopOnError: (value: boolean) => void;
 
     uploadType: string;
+    uploadCategory: string;
     displayStatus: string;
     infoIconFunctionString: string;
     formatterFn: string;
@@ -30,6 +32,7 @@ const ImportOptions = ({
     isStopOnError,
     setIsStopOnError,
     uploadType,
+    uploadCategory,
     displayStatus,
     infoIconFunctionString,
     formatterFn,
@@ -72,7 +75,7 @@ const ImportOptions = ({
                         </div>
 
                         <div className="options-col">
-                            {uploadType === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER &&
+                            {uploadType === UPLOAD_TYPES_FOR_IMPORT.JSON_FOLDER && uploadCategory == UPLOAD_CATEGORY.SERVER_PATH &&
                                 <>
                                     <input type="checkbox" className="pg001-checkbox"
                                         id="import-check-stop-on-error"

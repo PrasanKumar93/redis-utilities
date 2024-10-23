@@ -372,6 +372,7 @@ const Page = () => {
                                 idField={idField} setIdField={setIdField}
                                 isStopOnError={isStopOnError} setIsStopOnError={setIsStopOnError}
                                 uploadType={uploadTypeOption.uploadType}
+                                uploadCategory={uploadTypeOption.category}
                                 displayStatus={displayStatus}
                                 infoIconFunctionString={infoIconFunctionString}
                                 formatterFn={formatterFn} validateFormatterFn={validateFormatterFn}
