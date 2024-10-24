@@ -6,5 +6,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 module.exports = withBundleAnalyzer({
     swcMinify: true,  // Enable SWC minification
     reactStrictMode: true,
+    output: "standalone", // lightweight standalone app 
 });
 

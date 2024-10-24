@@ -24,21 +24,16 @@ WORKDIR /app
 
 # Copy required files from the build stage
 # Frontend ###
-COPY --from=builder /app/frontend/package*.json ./frontend/
-COPY --from=builder /app/frontend/.next ./frontend/.next
-COPY --from=builder /app/frontend/public ./frontend/public
+COPY --from=builder /app/frontend/.next/standalone ./frontend/
 COPY --from=builder /app/frontend/.next/static ./frontend/.next/static
-COPY --from=builder /app/frontend/.next/server ./frontend/.next/server
+COPY --from=builder /app/frontend/public ./frontend/public
+
 # Backend ### 
 COPY --from=builder /app/backend/import-tool/package*.json ./backend/import-tool/
 COPY --from=builder /app/backend/import-tool/dist ./backend/import-tool/dist
 
 # Install only production dependencies & Remove unnecessary files
-RUN cd ./frontend && npm ci --only=production \
-   && rm -rf ./node_modules/@next/swc-win* \
-   && rm -rf ./node_modules/@next/swc-linux-*  \
-   && rm -rf ./node_modules/@next/swc-darwin-arm64 \
-   && rm -rf ./.next/cache
+# RUN cd ./frontend && npm ci --only=production (standalone build is already production ready and has all the dependencies)
 RUN cd ./backend/import-tool && npm ci --only=production
 
 # Set environment variables
@@ -46,5 +41,5 @@ ENV IMPORT_TOOL_FROM_DOCKER="Y"
     
 # Start both backend and frontend services concurrently
 # CMD is runtime instruction, so can use ENV variable
-CMD ["sh", "-c", "cd /app/backend/import-tool && npm run start-prod & PORT_FRONTEND=${PORT_FRONTEND:-3000} && cd /app/frontend && npm start -- -p $PORT_FRONTEND"]
+CMD ["sh", "-c", "cd /app/backend/import-tool && npm run start-prod & PORT_FRONTEND=${PORT_FRONTEND:-3000} && cd /app/frontend && node server.js -p $PORT_FRONTEND"]
 # :- operator ensures if PORT_FRONTEND env variable is not set, it will default to 3000.
