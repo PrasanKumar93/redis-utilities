@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   redis-utilities:
     container_name: redis-utilities
@@ -12,3 +13,17 @@ services:
       - ./.env
     stdin_open: true # -i input flag
     tty: true # -t terminal flag
+  redis-utilities-amd64: # for heroku specific image
+    container_name: redis-utilities-amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.hub
+    image: redis-utilities-amd64:latest # built image name
+    ports:
+      - "${PORT_FRONTEND}:${PORT_FRONTEND}"
+      - "${PORT_BACKEND}:${PORT_BACKEND}"
+    env_file:
+      - ./.env
+    stdin_open: true # -i input flag
+    tty: true # -t terminal flag
+    platform: linux/amd64
