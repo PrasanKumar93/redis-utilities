@@ -9,13 +9,15 @@
     "pkg-install": "cd frontend && npm install && cd .. && cd backend/import-tool && npm install",
     "start-pm2": "pm2 start ecosystem.config.js --env production",
     "stop-pm2": "pm2 stop ecosystem.config.js --env production",
-    "pm2-frontend": "cd frontend && npm run build && npm start",
-    "pm2-backend": "cd backend/import-tool && npm start"
+    "start-frontend": "cd frontend && npm run build && npm start",
+    "start-backend": "cd backend/import-tool && npm start",
+    "start-app": "concurrently \"npm run start-frontend\" \"npm run start-backend\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "concurrently": "^9.0.1",
     "pm2": "^5.4.2"
   }
 }

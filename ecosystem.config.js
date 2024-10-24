@@ -3,7 +3,7 @@ module.exports = {
         {
             name: "redis-utilities-backend",
             script: 'npm',
-            args: 'run pm2-backend',
+            args: 'run start-backend',
             instances: 1,
             autorestart: true,
             watch: false,
@@ -18,7 +18,7 @@ module.exports = {
         {
             name: "redis-utilities-frontend",
             script: 'npm',
-            args: 'run pm2-frontend',
+            args: 'run start-frontend',
             instances: 1,
             autorestart: true,
             watch: false,
