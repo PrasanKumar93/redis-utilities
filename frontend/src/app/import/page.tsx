@@ -145,6 +145,7 @@ const Page = () => {
             });
             if (result?.data) {
                 setRedisConUrl(testRedisUrl);
+                setTestRedisUrl(testRedisUrl.split('@')[1]); // prevent showing password part in UI
 
                 addToSet(setBodyClasses, IMPORT_ANIMATE_CSS.CHOOSE_UPLOAD_PATH);
 

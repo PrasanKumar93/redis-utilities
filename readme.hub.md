@@ -35,25 +35,37 @@ docker push prasanrajpurohit/redis-utilities:0.2.0
 # first time setup
 brew tap heroku/brew && brew install heroku  # For macOS
 
-heroku login # web login
-heroku create redis-utilities # or create a new app `redis-utilities` by dashboard
+heroku login # triggers web login
+
+# or create a new app by dashboard
+heroku create redis-utilities-import-tool
+heroku create redis-utilities-frontend
 
 # informing Heroku that your app should be run using the container stack
-heroku stack:set container -a redis-utilities
+heroku stack:set container -a redis-utilities-import-tool
+heroku stack:set container -a redis-utilities-frontend
 ```
 
 ```sh
 heroku container:login
 
+# Build platform specific image
+docker-compose -f docker-compose.heroku.yml build
+
 # Tag & Push the image to Heroku (appName/web):
-docker tag redis-utilities-amd64:latest registry.heroku.com/redis-utilities/web
-docker push registry.heroku.com/redis-utilities/web
+docker tag redis-utilities-import-tool-amd64:latest registry.heroku.com/redis-utilities-import-tool/web
+docker tag redis-utilities-frontend-amd64:latest registry.heroku.com/redis-utilities-frontend/web
+
+docker push registry.heroku.com/redis-utilities-import-tool/web
+docker push registry.heroku.com/redis-utilities-frontend/web
 
 # Release the image
-heroku container:release web -a redis-utilities
+heroku container:release web -a redis-utilities-import-tool
+# Add frontend env variables in heroku dashboard like IMPORT_TOOL_END_POINT="https://redis-utilities-import-tool-a67413fa5a22.herokuapp.com"
+heroku container:release web -a redis-utilities-frontend
 
 # Just restart the app
-heroku restart -a redis-utilities
-heroku ps -a redis-utilities
+heroku restart -a redis-utilities-frontend
+heroku ps -a redis-utilities-frontend
 
 ```

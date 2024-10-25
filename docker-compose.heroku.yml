@@ -1,0 +1,28 @@
+services:
+  import-tool-service:
+    container_name: import-tool-service
+    build:
+      context: ./backend/import-tool
+      dockerfile: Dockerfile
+    image: redis-utilities-import-tool-amd64:latest # built image name
+    platform: linux/amd64
+    ports:
+      - "${PORT_BACKEND}:${PORT_BACKEND}"
+    env_file:
+      - ./.env
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    image: redis-utilities-frontend-amd64:latest # built image name
+    platform: linux/amd64
+    ports:
+      - "${PORT_FRONTEND}:${PORT_FRONTEND}"
+    env_file:
+      - ./.env
+    stdin_open: true # -i input flag
+    tty: true # -t terminal flag
+    depends_on:
+      - import-tool-service
