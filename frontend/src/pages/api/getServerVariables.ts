@@ -14,7 +14,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case "POST":
       //const data = req.body;
+      const protocol = req.headers["x-forwarded-proto"] || "http";
+      const host = req.headers["host"]?.split(":")[0];
+      const hostUrl = `${protocol}://${host}`;
+
       const retData = {
+        HOST_URL: hostUrl,
         PORT_BACKEND: process.env.PORT_BACKEND,
         PORT_FRONTEND: process.env.PORT_FRONTEND,
         IMPORT_TOOL_ENCRYPTION_KEY: process.env.IMPORT_TOOL_ENCRYPTION_KEY,

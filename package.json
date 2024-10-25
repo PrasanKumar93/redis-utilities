@@ -5,14 +5,7 @@
   "directories": {
     "doc": "docs"
   },
-  "scripts": {
-    "pkg-install": "cd frontend && npm install && cd .. && cd backend/import-tool && npm install",
-    "start-pm2": "pm2 start ecosystem.config.js --env production",
-    "stop-pm2": "pm2 stop ecosystem.config.js --env production",
-    "start-frontend": "cd frontend && npm run build && npm start",
-    "start-backend": "cd backend/import-tool && npm start",
-    "start-app": "concurrently \"npm run start-frontend\" \"npm run start-backend\""
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",

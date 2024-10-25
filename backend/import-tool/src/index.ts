@@ -15,7 +15,10 @@ import {
 } from "./api/import/upload-file-for-import-data-to-redis.js";
 
 //------ Constants
-const PORT = process.env.PORT_BACKEND || 3001;
+// process.env.PORT is dynamic port
+let PORT = process.env.PORT || process.env.PORT_BACKEND || "3001";
+process.env.PORT_BACKEND = PORT; //read in getServerVariables.ts
+
 const API_PREFIX = "/api";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -64,7 +67,7 @@ app.use(express.json());
 
 app.use(API_PREFIX, router);
 
-httpServer.listen(PORT, () => {
+httpServer.listen(parseInt(PORT), () => {
   LoggerCls.info(`Server running on port ${PORT}`);
 });
 
