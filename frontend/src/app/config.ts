@@ -19,11 +19,9 @@ const setConfigData = async () => {
   const serverVars: any = await fetchServerVariables();
   if (serverVars) {
     const ENV_VARS = {
-      HOST_URL: serverVars.HOST_URL || "http://localhost",
-      PORT_BACKEND: serverVars.PORT_BACKEND || 3001,
-      PORT_FRONTEND: serverVars.PORT_FRONTEND || 3000,
+      IMPORT_TOOL_END_POINT: serverVars.IMPORT_TOOL_END_POINT || "",
       ENCRYPTION_KEY: serverVars.IMPORT_TOOL_ENCRYPTION_KEY || "",
-      FROM_DOCKER: serverVars.IMPORT_TOOL_FROM_DOCKER || "N",
+      FROM_DOCKER: serverVars.IMPORT_TOOL_FROM_DOCKER || "",
     };
 
     config.data = {
@@ -33,8 +31,8 @@ const setConfigData = async () => {
           ? "redis://host.docker.internal:6379"
           : "redis://localhost:6379",
       GIT_TAG: "v0.3.0",
-      API_BASE_URL: `${ENV_VARS.HOST_URL}:${ENV_VARS.PORT_BACKEND}/api`,
-      SOCKET_IO_URL: `${ENV_VARS.HOST_URL}:${ENV_VARS.PORT_BACKEND}/`,
+      API_BASE_URL: `${ENV_VARS.IMPORT_TOOL_END_POINT}/api`,
+      SOCKET_IO_URL: `${ENV_VARS.IMPORT_TOOL_END_POINT}/`,
       ENCRYPTION_KEY: ENV_VARS.ENCRYPTION_KEY,
     };
   }

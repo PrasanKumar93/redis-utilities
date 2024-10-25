@@ -4,6 +4,7 @@ services:
     build:
       context: ./backend/import-tool
       dockerfile: Dockerfile
+    image: redis-utilities-import-tool:latest # built image name
     ports:
       - "${PORT_BACKEND}:${PORT_BACKEND}"
     env_file:
@@ -14,6 +15,7 @@ services:
     build:
       context: ./frontend/
       dockerfile: Dockerfile
+    image: redis-utilities-frontend:latest # built image name
     ports:
       - "${PORT_FRONTEND}:${PORT_FRONTEND}"
     env_file:
